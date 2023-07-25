@@ -1,0 +1,253 @@
+<script lang="ts" setup>
+import { emptyPatient } from '@/assets/data/data';
+import { Patient } from '@/assets/data/interfaces';
+import { Ref, ref, watch } from 'vue';
+import AppInputElement from './AppInputElement.vue';
+
+interface Props {
+	patient: Patient;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits(['file-loaded', 'form-emptied']);
+const form: Ref<Patient> = ref(props.patient);
+
+/**
+ * Empties all form's fields
+ */
+const emptyFields = () => {
+	form.value = emptyPatient;
+	emit('form-emptied');
+};
+
+const loadFile = (event: Event): void => {
+	const file = (event.target as HTMLInputElement)?.files?.[0];
+	emit('file-loaded', file);
+};
+
+/**
+ * Given a string it capitalizes every word in the string, marco di corato => Marco Di Corato
+ * @param {string} str the string to capitalize
+ */
+const capitalize = (str: string): string => {
+	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()).replace(
+		/(^|\s|')\w/g,
+		match => match.toUpperCase()
+	);
+};
+
+/**
+ * Updates username, username is fname.lname to lower case and without spaces or special chars, Gabriele D'Annunzio => gabriele.dannunzio
+ */
+const updateUsername = () => {
+	const { fname, lname } = form.value;
+	form.value.username = `${fname}.${lname}`
+		.toLowerCase()
+		.replace(/[^a-z.]/g, '');
+};
+
+/********* WATCHERS *******************/
+
+const updateField = (field: string, updatedValue: string): void => {
+	if (!field || !updatedValue || (field !== 'fname' && field !== 'lname'))
+		return;
+	form.value[field] = capitalize(updatedValue).toString();
+	updateUsername();
+};
+
+watch(
+	() => form.value.fiscalcode,
+	fiscalcode =>
+		(form.value.fiscalcode = fiscalcode
+			? (fiscalcode as string).toUpperCase()
+			: '')
+);
+
+watch(
+	() => form.value.fname,
+	(fname: string) => {
+		updateField('fname', fname);
+	}
+);
+
+watch(
+	() => form.value.lname,
+	(lname: string) => {
+		updateField('lname', lname);
+	}
+);
+</script>
+
+<template>
+	<div class="grid md:grid-cols-2 md:gap-6">
+		<div class="z-0 w-full mb-6 group">
+			<!-- FNAME -->
+
+			<AppInputElement
+				v-model.trim="form.fname"
+				label="Nome"
+				:required="true"
+			/>
+		</div>
+
+		<!-- LNAME -->
+		<div class="z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.lname"
+				label="Cognome"
+				:required="true"
+			/>
+		</div>
+	</div>
+
+	<!-- PHONE -->
+	<div class="grid md:grid-cols-2 md:gap-6">
+		<div class="z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.phone"
+				label="Telefono"
+				type="tel"
+			/>
+		</div>
+
+		<!-- EMAIL -->
+		<div class="z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.email"
+				label="Email"
+				type="email"
+			/>
+		</div>
+	</div>
+
+	<div class="grid md:grid-cols-6 md:gap-6">
+		<!-- BIRTHDAY -->
+
+		<div class="md:col-span-2 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.birthday"
+				label="Data di nascita"
+				type="date"
+				:required="true"
+			/>
+		</div>
+
+		<!-- BIRTHPLACE -->
+		<div class="md:col-span-3 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.birthplace"
+				label="Nato a"
+			/>
+		</div>
+
+		<!-- SEX -->
+		<div class="col-span-1 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.sex"
+				label="Sesso"
+				type="select"
+			>
+				<option>M</option>
+				<option>F</option>
+				<option value="O">Altro</option>
+			</AppInputElement>
+		</div>
+	</div>
+
+	<div class="grid md:grid-cols-3 gap-2 md:gap-6">
+		<!-- BEGIN -->
+
+		<div class="md:col-span-1 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.begin"
+				label="Data di inizio terapia"
+				type="date"
+			/>
+		</div>
+		<!-- ADDRESS -->
+
+		<div class="md:col-span-2 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.address"
+				label="Indirizzo"
+			/>
+		</div>
+	</div>
+
+	<div class="grid md:grid-cols-2 md:gap-6">
+		<div class="z-0 w-full mb-6 group">
+			<!-- FISCAL CODE -->
+
+			<AppInputElement
+				v-model.trim="form.fiscalcode"
+				label="Codice Fiscale"
+			/>
+		</div>
+		<!-- JOB -->
+
+		<div class="z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.job"
+				label="Lavoro"
+			/>
+		</div>
+	</div>
+
+	<div class="grid md:grid-cols-4 md:gap-6">
+		<!-- WEIGHT -->
+
+		<div class="md:col-span-1 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.weight"
+				label="Peso"
+			/>
+		</div>
+
+		<!-- HEIGHT -->
+		<div class="md:col-span-1 z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.height"
+				label="Altezza"
+			/>
+		</div>
+		<div class="md:col-span-2 z-0 w-full mb-6 group">
+			<!-- CONSENT -->
+
+			<AppInputElement
+				label="File per il consenso"
+				type="file"
+				@custom-change="loadFile"
+			/>
+		</div>
+	</div>
+
+	<div class="grid md:grid-cols-2 md:gap-6">
+		<div class="z-0 w-full mb-6 group">
+			<!-- COHABITANTS -->
+
+			<AppInputElement
+				v-model.trim="form.cohabitants"
+				label="Conviventi"
+			/>
+		</div>
+
+		<!-- USERNAME -->
+		<div class="z-0 w-full mb-6 group">
+			<AppInputElement
+				v-model.trim="form.username"
+				label="Username"
+			/>
+		</div>
+	</div>
+	<div>
+		<button
+			type="button"
+			class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto me-4"
+			@click="emptyFields"
+			ref="cancelButtonRef"
+		>
+			Svuota
+		</button>
+	</div>
+</template>

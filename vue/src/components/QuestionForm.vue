@@ -1,0 +1,157 @@
+<script lang="ts" setup>
+import { questionTypes } from '@/assets/data/data';
+import { Question, QuestionLegend } from '@/assets/data/interfaces';
+import { computed, reactive, ref } from 'vue';
+import AppInputElement from './AppInputElement.vue';
+import draggable from 'vuedraggable';
+import { useQuestionsStore } from '@/stores';
+
+interface Props {
+	question: Question;
+}
+
+const labels = useQuestionsStore().getLabels;
+
+const props = defineProps<Props>();
+
+const form = reactive(props.question);
+const types = ref(questionTypes);
+const newItem = ref('');
+
+// calculate number of answers
+const numberOfAnswers = computed(() => {
+	const low = parseInt(form.type.at(0) as string);
+	const high = parseInt(form.type.at(-1) as string);
+	const numOfAnswers = high - low + 1;
+
+	// this cycle makes the legend array the same length of the legend inputs in the form, if the array were it shorter it would cause an error when v-modeling the input with an undefined
+	while (form.legend.length < numOfAnswers) {
+		// eslint-disable-next-line vue/no-side-effects-in-computed-properties
+		(form.legend as QuestionLegend[]).push({
+			id: form.legend.length + 1,
+			legend: '',
+		});
+	}
+
+	return numOfAnswers;
+});
+
+const getLegendLabel = (i: number): string =>
+	(parseInt(form.type.at(0) as string) + i).toString();
+
+const deleteItem = (id: number): void => {
+	form.items = form.items.filter(a => a.id !== id);
+};
+
+const addAnswer = () => {
+	if (!newItem.value) return;
+	const id =
+		form.items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
+	form.items.push({ id, text: newItem.value });
+
+	emit('answer-added');
+
+	newItem.value = '';
+};
+
+const emit = defineEmits(['answer-added']);
+</script>
+
+<template>
+	<div class="grid md:grid-cols-3 md:gap-6 mb-6">
+		<!-- TITLE -->
+		<div class="md:col-span-2 mb-4">
+			<AppInputElement
+				v-model="form.question"
+				:label="labels.question"
+			/>
+		</div>
+
+		<!-- TYPE -->
+		<div class="md:col-span-1">
+			<AppInputElement
+				v-model="form.type"
+				:label="labels.type"
+				type="select"
+			>
+				<option
+					v-for="t in types"
+					:key="t"
+					:value="t"
+				>
+					{{ t }}
+				</option>
+			</AppInputElement>
+		</div>
+	</div>
+
+	<!-- DESCRIPTION TEXTAREA -->
+	<div class="relative mb-6">
+		<AppInputElement
+			v-model="form.description"
+			:label="labels.description"
+			type="textarea"
+		/>
+	</div>
+	<hr class="my-5" />
+	<p class="text-sm text-gray-500 mb-3">{{ labels.legend }}</p>
+
+	<!-- LEGEND -->
+	<div class="grid md:grid-cols-2 md:gap-x-6 relative mb-8">
+		<!-- @vue-ignore -->
+		<div
+			v-for="(n, i) in numberOfAnswers"
+			:key="i"
+			class="mb-3"
+		>
+			<AppInputElement
+				:label="getLegendLabel(i)"
+				v-model="form.legend[i].legend"
+			/>
+		</div>
+	</div>
+	<hr class="my-5" />
+	<p class="text-sm text-gray-500 mb-3">{{ labels.items }}</p>
+
+	<!-- ANSWERS -->
+	<!-- @vue-ignore -->
+	<draggable
+		item-key="id"
+		tag="ul"
+		v-model="form.items"
+		:animation="150"
+		:delay="250"
+		:delay-on-touch-only="true"
+	>
+		<template #item="{ element: item }">
+			<li class="flex items-end">
+				<AppInputElement
+					class="grow"
+					v-model="item.text"
+					:id="`answer-${item.id}`"
+				/>
+				<font-awesome-icon
+					@click="deleteItem(item.id)"
+					class="ms-3 cursor-pointer text-red-700 hover:text-red-800 mb-2 md:mb-0"
+					:icon="['fas', 'trash-can']"
+				/>
+			</li>
+		</template>
+	</draggable>
+
+	<div class="flex items-end bg-white">
+		<AppInputElement
+			@keydown.enter.prevent="addAnswer"
+			class="grow"
+			v-model.trim="newItem"
+			id="new-answer"
+		/>
+		<font-awesome-icon
+			@click="addAnswer"
+			class="ms-3 cursor-pointer text-blue-700 hover:text-blue-800"
+			:icon="['fas', 'plus']"
+		/>
+	</div>
+</template>
+
+<style scoped></style>

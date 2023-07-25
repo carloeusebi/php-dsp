@@ -1,0 +1,75 @@
+/* # HAMBURGER MENU */
+
+#hamburger-menu {
+  width: 35px;
+  height: 20px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: .5s ease-in-out;
+  cursor: pointer;
+}
+
+#hamburger-menu span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: var(--footer-color);
+  border-radius: 4px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
+}
+
+#hamburger-menu span:nth-child(1) {
+  top: 0px;
+}
+
+#hamburger-menu span:nth-child(2) {
+  top: 10px;
+}
+
+#hamburger-menu span:nth-child(3) {
+  top: 20px;
+}
+
+#hamburger-menu.open span:nth-child(1) {
+  top: 10px;
+  transform: rotate(135deg);
+}
+
+#hamburger-menu.open span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+#hamburger-menu.open span:nth-child(3) {
+  top: 10px;
+  transform: rotate(-135deg);
+}
+
+/* # SHINE ON BUTTONS */
+
+.btn:after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  bottom: -50%;
+  left: -50%;
+  background: linear-gradient(to bottom, rgba(229, 172, 142, 0), rgba(255, 255, 255, 0.5) 50%, rgba(229, 172, 142, 0));
+  transform: rotateZ(60deg) translate(-6em, 225%);
+}
+
+/*This activates the sheen once the button has been hovered*/
+.btn:hover:not(.unclickable)::after,
+.btn:focus:not(.unclickable)::after {
+  animation: sheen 1.3s forwards;
+}
+
+@keyframes sheen {
+  100% {
+    transform: rotateZ(60deg) translate(1em, -200%);
+  }
+}
