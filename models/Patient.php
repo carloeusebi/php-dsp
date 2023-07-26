@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\core\Mail;
 use app\db\DbModel;
 
 class Patient extends DbModel
@@ -82,6 +83,7 @@ class Patient extends DbModel
         if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
         if (!$this->begin) $errors['begin'] = "La data di inizio terapia è obbligatoria.";
         if (!$this->isRealDate($this->begin)) $errors['begin'] = "Data di inizio terapia non è valida";
+        if ($this->email && Mail::isUndeliverable($this->email)) $errors['email'] = Mail::UNDELIVERABLE_ERROR_MESSAGE;
 
         if ($fileToUpload) {
             if ($this->isPdf($fileToUpload)) $errors['not-pdf'] = "Si possono caricare solamente files in formato PDF";
