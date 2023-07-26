@@ -9,15 +9,40 @@ use app\core\utils\Request;
 use app\core\utils\Response;
 use app\core\middlewares\AdminMiddleware;
 
-class EmailController extends Controller
+class MailController extends Controller
 {
     protected Mail $mail;
-    protected const UNDELIVERABLE_ERROR_MESSAGE = "Email non valida, per favore riprovare con un indirizzo valido";
 
     public function __construct()
     {
         $this->mail = new Mail();
         $this->registerMiddleware(new AdminMiddleware(['sendFromAdmin']));
+    }
+
+
+    public function sendFromForm()
+    {
+        $view = Request::getPath();
+        $form_data = Request::getBody();
+
+        if (!isset($form_data['submit'])) {
+            Response::response(400);
+        }
+
+        $errors = $this->mail->prepareFromContactForm($form_data, true);
+
+        if (!$errors) {
+            $errors = $this->mail->send();
+        }
+        if (!$errors) {
+            $this->mail->sendConfirmation();
+            App::$app->session->setFlash('status', 'success');
+        } else {
+            App::$app->session->setFlash('errors', $errors);
+            App::$app->session->setFlash('form', $form_data);
+        }
+
+        Response::redirect($view);
     }
 
 

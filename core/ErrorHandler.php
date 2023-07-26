@@ -9,7 +9,7 @@ use app\core\utils\Response;
 class ErrorHandler
 {
 
-    static function handleApiException(Throwable $exception)
+    static function handleException(Throwable $exception)
     {
         Response::response(500, [
             "code" => $exception->getCode(),

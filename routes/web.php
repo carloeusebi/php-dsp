@@ -2,6 +2,7 @@
 
 use app\app\App;
 use app\controllers\SiteController;
+use app\controllers\MailController;
 
 /**
  * @var App $app
@@ -17,8 +18,8 @@ $app->router->get('/cosa-aspettarsi', [SiteController::class, 'index']);
 $app->router->get('/di-cosa-mi-occupo', [SiteController::class, 'index']);
 $app->router->get('/contatti', [SiteController::class, 'index']);
 
-$app->router->post('/', [SiteController::class, 'post']);
-$app->router->post('/chi-sono', [SiteController::class, 'post']);
-$app->router->post('/cosa-aspettarsi', [SiteController::class, 'post']);
-$app->router->post('/di-cosa-mi-occupo', [SiteController::class, 'post']);
-$app->router->post('/contatti', [SiteController::class, 'post']);
+$app->router->post('/', [MailController::class, 'sendFromForm']);
+$app->router->post('/chi-sono', [MailController::class, 'sendFromForm']);
+$app->router->post('/cosa-aspettarsi', [MailController::class, 'sendFromForm']);
+$app->router->post('/di-cosa-mi-occupo', [MailController::class, 'sendFromForm']);
+$app->router->post('/contatti', [MailController::class, 'sendFromForm']);

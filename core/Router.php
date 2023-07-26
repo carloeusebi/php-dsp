@@ -37,11 +37,6 @@ class Router
 
     public function resolve(): void
     {
-        if (Request::isApi()) {
-            set_exception_handler("app\core\ErrorHandler::handleApiException");
-            header("Content-type: application/json");
-        }
-
         $path = Request::getPath();
         $method = Request::getMethod();
 

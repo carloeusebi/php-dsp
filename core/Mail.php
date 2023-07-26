@@ -3,6 +3,7 @@
 namespace app\core;
 
 use app\app\App;
+use Error;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Verifalia\VerifaliaRestClient;
@@ -140,16 +141,24 @@ class Mail
             $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
             $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
 
+            // Verifalia returns error "Implicit conversion from float 0.5 to int loses precision" so i need to ignore the deprecated warning
+            $previous_error_reporting = error_reporting();
+            error_reporting($previous_error_reporting & ~E_DEPRECATED);
+
             $verifalia = new VerifaliaRestClient([
                 'username' => $verifalia_username,
                 'password' => $verifalia_password
             ]);
+
+            // resetting errors levels
+            error_reporting($previous_error_reporting);
 
             // check if have verifalia credits
             $balance = $verifalia->credits->getBalance();
             if ($balance->freeCredits > 0) {
                 $validation = $verifalia->emailValidations->submit($email, true);
                 $entry = $validation->entries[0];
+
 
                 if ($entry->classification === 'Undeliverable') {
                     App::$app->logIssueToDb(3);

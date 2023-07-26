@@ -29,31 +29,4 @@ class SiteController extends Controller
 
         $this->render($view, $this->params);
     }
-
-
-    public function post()
-    {
-        $view = Request::getPath();
-        $form_data = Request::getBody();
-
-        if (!isset($form_data['submit'])) {
-            Response::response(400);
-        }
-
-        $mail = new Mail();
-        $errors = $mail->prepareFromContactForm($form_data, true);
-
-        if (!$errors) {
-            $errors = $mail->send();
-        }
-        if (!$errors) {
-            $mail->sendConfirmation();
-            App::$app->session->setFlash('status', 'success');
-        } else {
-            App::$app->session->setFlash('errors', $errors);
-            App::$app->session->setFlash('form', $form_data);
-        }
-
-        Response::redirect($view);
-    }
 }

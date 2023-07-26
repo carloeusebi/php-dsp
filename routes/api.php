@@ -5,7 +5,7 @@ use app\controllers\AuthController;
 use app\controllers\PatientsController;
 use app\controllers\SurveysController;
 use app\controllers\QuestionsController;
-use app\controllers\EmailController;
+use app\controllers\MailController;
 use app\controllers\TestsController;
 
 /**
@@ -36,5 +36,5 @@ $app->router->delete('/api/questions', [QuestionsController::class, 'delete']);
 $app->router->get('/api/tests', [TestsController::class, 'get']);
 $app->router->post('/api/tests', [TestsController::class, 'save']);
 
-$app->router->post('/api/email', [EmailController::class, 'sendFromAdmin']);
-$app->router->post('/api/email/support', [EmailController::class, 'contactSupport']);
+$app->router->post('/api/email', [MailController::class, 'sendFromAdmin']);
+$app->router->post('/api/email/support', [MailController::class, 'contactSupport']);
