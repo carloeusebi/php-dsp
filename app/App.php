@@ -4,6 +4,8 @@ namespace app\app;
 
 use Error;
 use Dotenv\Dotenv;
+use Dotenv\Exception\InvalidPathException;
+
 use app\db\Database;
 use app\core\Router;
 use app\core\Session;
@@ -15,7 +17,6 @@ use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
-
 
 class App
 {
@@ -33,8 +34,12 @@ class App
 
     public function __construct()
     {
-        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        $dotenv->load();
+        try {
+            $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+            $dotenv->load();
+        } catch (InvalidPathException) {
+            // If Dotenv can't find the .env file it won't throw an exception
+        }
 
         self::$app = $this;
         self::$ROOT_DIR = dirname(__DIR__);
