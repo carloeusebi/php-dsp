@@ -5,11 +5,13 @@ namespace app\core;
 use app\app\App;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use \Verifalia\VerifaliaRestClient;
+use Verifalia\VerifaliaRestClient;
+use Verifalia\Exceptions\VerifaliaException;
 
 
 class Mail
 {
+    public const UNDELIVERABLE_ERROR_MESSAGE = "Email non valida, per favore riprovare con un indirizzo valido";
     private const SUBJECT = "Un cliente ti ha scritto";
     private const CONFIRMATION_SUBJECT = "Grazie per avermi Contattato";
     private const CONFIRMATION_BODY = " per avermi contatto, ho ricevuto la tua mail e ti contatter&ograve; al pi&ugrave; presto.";
@@ -54,9 +56,17 @@ class Mail
             Email: $this->email_from <br><br>
             Messaggio:<br> $this->message";
 
-        if ($needs_validation) {
-            return $this->validate($form_data);
+        // It means it is a bot who checked the honey box
+        if (isset($form_data['miele-cb'])) {
+            App::$app->logIssueToDb(2);
+            return "Qualcosa è andato storto, riprovare";
         }
+
+        if ($needs_validation && self::isUndeliverable(($this->email_from))) {
+            return self::UNDELIVERABLE_ERROR_MESSAGE;
+        }
+
+        return '';
     }
 
 
@@ -117,38 +127,39 @@ class Mail
         $this->send();
     }
 
-
-    public function validate(array $data = []): ?string
+    /**
+     * Checks if email address is deliverable using Verifalia api
+     * @param string $email The email address to validate
+     * @return bool False is the email address is valid and deliverable
+     */
+    static function isUndeliverable(string $email): bool
     {
-        // It means it is a bot who checked the honey box
-        if (isset($data['miele-cb'])) {
-            App::$app->logIssueToDb(2);
-            return "Qualcosa è andato storto, riprovare";
-        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return true;
 
-        $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
-        $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
+        try {
+            $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
+            $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
 
-        if (!$verifalia_username || !$verifalia_password) return false;
+            $verifalia = new VerifaliaRestClient([
+                'username' => $verifalia_username,
+                'password' => $verifalia_password
+            ]);
 
-        $verifalia = new VerifaliaRestClient([
-            'username' => $verifalia_username,
-            'password' => $verifalia_password
-        ]);
+            // check if have verifalia credits
+            $balance = $verifalia->credits->getBalance();
+            if ($balance->freeCredits > 0) {
+                $validation = $verifalia->emailValidations->submit($email, true);
+                $entry = $validation->entries[0];
 
-
-        // check if have verifalia credits
-        $balance = $verifalia->credits->getBalance();
-        if ($balance->freeCredits > 0) {
-            $validation = $verifalia->emailValidations->submit($this->email_from, true);
-            $entry = $validation->entries[0];
-
-            if ($entry->classification === 'Undeliverable') {
-                App::$app->logIssueToDb(3);
-                return "Email non valida, per favore riprovare con un indirizzo valido";
+                if ($entry->classification === 'Undeliverable') {
+                    App::$app->logIssueToDb(3);
+                    return true;
+                }
             }
+        } catch (VerifaliaException) {
+            // if there is an error with Verifalia, just pretend the email address is deliverable
+            return false;
         }
-
-        return null;
+        return false;
     }
 }

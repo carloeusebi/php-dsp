@@ -12,6 +12,7 @@ use app\core\middlewares\AdminMiddleware;
 class EmailController extends Controller
 {
     protected Mail $mail;
+    protected const UNDELIVERABLE_ERROR_MESSAGE = "Email non valida, per favore riprovare con un indirizzo valido";
 
     public function __construct()
     {
@@ -36,13 +37,6 @@ class EmailController extends Controller
         }
 
         $this->mail->email_to = $email;
-
-        // validate email
-        $error = $this->mail->validate();
-        if ($error) {
-            Response::response(400, ['error' => $error]);
-        }
-
         $this->mail->subject = $subject;
         $this->mail->body = $body;
 
@@ -74,10 +68,8 @@ class EmailController extends Controller
         $this->mail->email_from = $email;
 
         // validate email
-        $error = $this->mail->validate();
-        if ($error) {
-            Response::response(400, ['error' => $error]);
-        }
+        if (Mail::isUndeliverable($email))
+            Response::response(400, ['error' => Mail::UNDELIVERABLE_ERROR_MESSAGE]);
 
         $message = "Da: $name<br>
             Email: $email<br>
