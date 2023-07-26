@@ -1,6 +1,6 @@
 <?php
 
-namespace controllers;
+namespace app\controllers;
 
 class SurveysController extends AdminController
 {

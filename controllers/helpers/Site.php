@@ -1,8 +1,8 @@
 <?php
 
-namespace controllers\helpers;
+namespace app\controllers\helpers;
 
-use controllers\SiteController;
+use app\controllers\SiteController;
 
 class Site extends SiteController
 {

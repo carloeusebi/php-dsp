@@ -1,13 +1,13 @@
 <?php
 
-namespace controllers;
+namespace app\controllers;
 
-use app\App;
-use core\Controller;
-use core\Mail;
-use controllers\helpers\Site;
-use core\utils\Request;
-use core\utils\Response;
+use app\app\App;
+use app\core\Controller;
+use app\core\Mail;
+use app\controllers\helpers\Site;
+use app\core\utils\Request;
+use app\core\utils\Response;
 
 class SiteController extends Controller
 {

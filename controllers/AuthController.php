@@ -1,13 +1,13 @@
 <?php
 
-namespace controllers;
+namespace app\controllers;
 
-use app\App;
-use controllers\helpers\Auth;
-use core\Controller;
-use core\middlewares\AdminMiddleware;
-use core\utils\Request;
-use core\utils\Response;
+use app\app\App;
+use app\controllers\helpers\Auth;
+use app\core\Controller;
+use app\core\middlewares\AdminMiddleware;
+use app\core\utils\Request;
+use app\core\utils\Response;
 
 class AuthController extends Controller
 {

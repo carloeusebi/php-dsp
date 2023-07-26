@@ -1,6 +1,6 @@
 <?php
 
-use core\utils\Request; ?>
+use app\core\utils\Request; ?>
 
 <!DOCTYPE html>
 <html lang="it">

@@ -1,8 +1,8 @@
 <?php
 
-namespace models;
+namespace app\models;
 
-use db\DbModel;
+use app\db\DbModel;
 
 class Patient extends DbModel
 {

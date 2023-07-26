@@ -1,6 +1,6 @@
 <?php
 
-use app\App;
+use app\app\App;
 
 class m0003_create_questions_table
 {

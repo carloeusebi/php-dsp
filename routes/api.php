@@ -1,12 +1,12 @@
 <?php
 
-use app\App;
-use controllers\AuthController;
-use controllers\PatientsController;
-use controllers\SurveysController;
-use controllers\QuestionsController;
-use controllers\EmailController;
-use controllers\TestsController;
+use app\app\App;
+use app\controllers\AuthController;
+use app\controllers\PatientsController;
+use app\controllers\SurveysController;
+use app\controllers\QuestionsController;
+use app\controllers\EmailController;
+use app\controllers\TestsController;
 
 /**
  *@var App $app

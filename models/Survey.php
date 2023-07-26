@@ -1,8 +1,8 @@
 <?php
 
-namespace models;
+namespace app\models;
 
-use db\DbModel;
+use app\db\DbModel;
 use PDO;
 
 class Survey extends DbModel

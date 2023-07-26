@@ -1,7 +1,7 @@
 <?php
 
-use app\App;
-use controllers\SiteController;
+use app\app\App;
+use app\controllers\SiteController;
 
 /**
  * @var App $app

@@ -1,8 +1,8 @@
 <?php
 
-namespace core;
+namespace app\core;
 
-use app\App;
+use app\app\App;
 
 abstract class Model
 {

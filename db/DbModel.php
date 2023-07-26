@@ -1,10 +1,10 @@
 <?php
 
-namespace db;
+namespace app\db;
 
-use app\App;
-use core\Model;
-use core\utils\Request;
+use app\app\App;
+use app\core\Model;
+use app\core\utils\Request;
 use PDO;
 
 abstract class DbModel extends Model

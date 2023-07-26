@@ -1,9 +1,9 @@
 <?php
 
-namespace core;
+namespace app\core;
 
-use app\App;
-use core\middlewares\BaseMiddleware;
+use app\app\App;
+use app\core\middlewares\BaseMiddleware;
 
 abstract class Controller
 {

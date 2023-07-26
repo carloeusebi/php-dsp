@@ -1,8 +1,8 @@
 <?php
 
-namespace controllers\helpers;
+namespace app\controllers\helpers;
 
-use controllers\AuthController;
+use app\controllers\AuthController;
 
 class Auth extends AuthController
 {

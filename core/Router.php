@@ -1,10 +1,10 @@
 <?php
 
-namespace core;
+namespace app\core;
 
-use app\App;
-use core\utils\Request;
-use core\utils\Response;
+use app\app\App;
+use app\core\utils\Request;
+use app\core\utils\Response;
 
 class Router
 {
@@ -38,7 +38,7 @@ class Router
     public function resolve(): void
     {
         if (Request::isApi()) {
-            set_exception_handler("core\ErrorHandler::handleApiException");
+            set_exception_handler("app\core\ErrorHandler::handleApiException");
             header("Content-type: application/json");
         }
 

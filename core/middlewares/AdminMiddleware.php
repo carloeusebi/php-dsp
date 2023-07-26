@@ -1,9 +1,9 @@
 <?php
 
-namespace core\middlewares;
+namespace app\core\middlewares;
 
-use app\App;
-use core\utils\Response;
+use app\app\App;
+use app\core\utils\Response;
 
 class AdminMiddleware extends BaseMiddleware
 {

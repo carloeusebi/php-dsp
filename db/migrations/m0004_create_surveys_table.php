@@ -1,6 +1,6 @@
 <?php
 
-use app\App;
+use app\app\App;
 
 class m0004_create_surveys_table
 {

@@ -2,11 +2,11 @@
 
 namespace controllers;
 
-use app\App;
-use core\Controller;
-use core\middlewares\AdminMiddleware;
-use core\utils\Response;
-use core\utils\Request;
+use app\app\App;
+use app\core\Controller;
+use app\core\middlewares\AdminMiddleware;
+use app\core\utils\Response;
+use app\core\utils\Request;
 
 class TestsController extends Controller
 {

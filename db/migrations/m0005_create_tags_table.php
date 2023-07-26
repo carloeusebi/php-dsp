@@ -1,6 +1,6 @@
 <?php
 
-use app\App;
+use app\app\App;
 
 class m0005_create_tags_table
 {

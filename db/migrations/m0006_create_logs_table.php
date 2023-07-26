@@ -1,7 +1,6 @@
 <?php
 
-use app\App;
-use db\Database;
+use app\app\App;
 
 class m0006_create_logs_table
 {

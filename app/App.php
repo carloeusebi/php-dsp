@@ -1,16 +1,16 @@
 <?php
 
-namespace app;
+namespace app\app;
 
 use Error;
-use db\Database;
-use core\Router;
-use core\Session;
-use core\Controller;
-use models\Admin;
-use models\Patient;
-use models\Survey;
-use models\Question;
+use app\db\Database;
+use app\core\Router;
+use app\core\Session;
+use app\core\Controller;
+use app\models\Admin;
+use app\models\Patient;
+use app\models\Survey;
+use app\models\Question;
 
 class App
 {

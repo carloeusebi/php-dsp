@@ -1,13 +1,13 @@
 <?php
 
-namespace controllers;
+namespace app\controllers;
 
-use app\App;
-use core\Mail;
-use core\Controller;
-use core\utils\Request;
-use core\utils\Response;
-use core\middlewares\AdminMiddleware;
+use app\app\App;
+use app\core\Mail;
+use app\core\Controller;
+use app\core\utils\Request;
+use app\core\utils\Response;
+use app\core\middlewares\AdminMiddleware;
 
 class EmailController extends Controller
 {

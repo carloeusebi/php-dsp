@@ -1,13 +1,13 @@
 <?php
 
-namespace controllers;
+namespace app\controllers;
 
-use app\App;
-use core\Controller;
-use core\middlewares\AdminMiddleware;
-use core\utils\Request;
-use core\utils\Response;
-use db\DbModel;
+use app\app\App;
+use app\core\Controller;
+use app\core\middlewares\AdminMiddleware;
+use app\core\utils\Request;
+use app\core\utils\Response;
+use app\db\DbModel;
 
 abstract class AdminController extends Controller
 {

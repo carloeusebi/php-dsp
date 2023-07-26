@@ -1,10 +1,10 @@
 <?php
 
-namespace core;
+namespace app\core;
 
-use core\utils\Response;
 use ErrorException;
 use Throwable;
+use app\core\utils\Response;
 
 class ErrorHandler
 {
