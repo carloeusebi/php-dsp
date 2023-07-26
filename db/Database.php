@@ -8,16 +8,16 @@ use PDO;
 
 class Database
 {
-    protected PDO $pdo;
+    public PDO $pdo;
     public static Database $db;
 
     public function __construct()
     {
-        $db_name = $_ENV['DB_NAME'];
-        $host = $_ENV['DB_HOST'];
-        $port = $_ENV['DB_PORT'];
-        $user = $_ENV['DB_USERNAME'];
-        $password = $_ENV['DB_PASSWORD'];
+        $db_name = $_ENV['DB_NAME'] ?? '';
+        $host = $_ENV['DB_HOST'] ?? '';
+        $port = $_ENV['DB_PORT'] ?? '';
+        $user = $_ENV['DB_USERNAME'] ?? '';
+        $password = $_ENV['DB_PASSWORD'] ?? '';
 
         $dsn = "mysql:host=$host;port=$port;dbname=$db_name";
 

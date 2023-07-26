@@ -3,14 +3,19 @@
 namespace app\app;
 
 use Error;
+use Dotenv\Dotenv;
 use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
+use app\core\exceptions\RouteNotFoundException;
+use app\core\utils\Request;
+use app\core\utils\Response;
 use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
+
 
 class App
 {
@@ -26,10 +31,13 @@ class App
     public Question $question;
 
 
-    public function __construct(string $root_dir)
+    public function __construct()
     {
+        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+        $dotenv->load();
+
         self::$app = $this;
-        self::$ROOT_DIR = $root_dir;
+        self::$ROOT_DIR = dirname(__DIR__);
 
         $this->db = new Database();
         $this->router = new Router();
@@ -43,7 +51,14 @@ class App
 
     public function run(): void
     {
-        $this->router->resolve();
+        try {
+            $this->router->resolve();
+        } catch (RouteNotFoundException) {
+            Response::statusCode(404);
+            if (!Request::isApi())
+                $this->router->renderView('404');
+            exit();
+        }
     }
 
 

@@ -3,6 +3,7 @@
 namespace app\core;
 
 use app\app\App;
+use app\core\exceptions\RouteNotFoundException;
 use app\core\utils\Request;
 use app\core\utils\Response;
 
@@ -29,13 +30,19 @@ class Router
     }
 
 
+    public function routes(): array
+    {
+        return $this->routes;
+    }
+
+
     public function setLayout(string $layout): void
     {
         $this->layout = $layout;
     }
 
 
-    public function resolve(): void
+    public function resolve()
     {
         $path = Request::getPath();
         $method = Request::getMethod();
@@ -48,30 +55,23 @@ class Router
         }
 
         if (!$callback) {
-            Response::statusCode(404);
-            if (!Request::isApi())
-                $this->renderView('404');
-            exit();
+            throw new RouteNotFoundException();
         }
 
-        // initialize controller
-        if (is_array($callback)) {
+        /**
+         * @var Controller
+         */
+        $controller = new $callback[0]();
+        $controller->action = $callback[1];
+        App::$app->controller = $controller;
 
-            /**
-             * @var Controller
-             */
-            $controller = new $callback[0]();
-            $controller->action = $callback[1];
-            App::$app->controller = $controller;
-
-            // execute controller's middlewares
-            $middlewares = $controller->getMiddlewares();
-            foreach ($middlewares as $middleware) {
-                $middleware->execute();
-            }
-            // call the controller function
-            $controller->{$controller->action}();
+        // execute controller's middlewares
+        $middlewares = $controller->getMiddlewares();
+        foreach ($middlewares as $middleware) {
+            $middleware->execute();
         }
+        // call the controller function
+        return $controller->{$controller->action}();
     }
 
     public function renderView(string $page, array $params = []): void

@@ -1,0 +1,12 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubunt-latest
+
+    steps:
+      - uses: php-actions/phpunit@v3
+        with:
+          configuration: './phpunit.xml'
