@@ -19,14 +19,14 @@ class Database
         $user = $_ENV['DB_USERNAME'];
         $password = $_ENV['DB_PASSWORD'];
 
-        $dsn = "mysql:host=$host;port=$port;dbname=$db_name;charset=utf8mb4";
+        $dsn = "mysql:host=$host;port=$port;dbname=$db_name";
 
+        $this->pdo = new PDO($dsn, $user, $password);
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+
+        self::$db = $this;
         try {
-            $this->pdo = new PDO($dsn, $user, $password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-
-            self::$db = $this;
         } catch (Exception) {
             // since database is used only on api and to log errors on the front site, we don't want to raise any errors on failed db connection
         }

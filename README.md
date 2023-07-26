@@ -1,6 +1,6 @@
 # Dellasanta Psicologo
 
-![Tests](https://github.com/carloeusebi/php-vue-dsp/actions/workflows/deploy.yml/badge.svg)<br>
+![Tests](https://github.com/carloeusebi/php-vue-dsp/actions/workflows/composer.yml/badge.svg)<br>
 Website for Federico Dellasanta Psicologo with front cover site and Admin Panel to manage patients and psychological evaluation questionnaires.
 
 > Built with PHP 8.1, Vue.js and Tailwind.css.
@@ -21,7 +21,7 @@ Password: admin
 
 Make sure you have environment setup properly. You will need MySQL, PHP8.1, Node.js and composer.
 
-### Install PHP Website + API
+## Install PHP Website + API
 
 1. Download the project (or clone using GIT) and save it in your htdocs folder
 2. Copy `.env.example` into `.env` and configure database credentials
@@ -30,7 +30,19 @@ Make sure you have environment setup properly. You will need MySQL, PHP8.1, Node
 5. Run `composer install`
 6. Run migrations `php migrations.php`
 
-### Install Vue.js Admin Panel
+## Installation using docker
+
+Make sure you have docker installed. To see how you can install docker on Windows [click here](https://youtu.be/2ezNqqaSjq8). <br>
+Make sure `docker` and `docker-compose` commands are available in command line.
+
+1. Clone the project using git
+1. Copy `.env.example` into `.env` (Don't need to change anything for local development)
+1. Navigate to the project root directory and run `docker-compose up -d`
+1. Install dependencies - `docker-compose exec app composer install`
+1. Run migrations - `docker-compose exec app php migrations.php`
+1. Open in browser http://127.0.0.1:8080
+
+## Install Vue.js Admin Panel
 
 1. Navigate to `vue` folder
 2. Run `npm install`

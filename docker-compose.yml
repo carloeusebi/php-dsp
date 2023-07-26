@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  app:
+    build: ./docker
+    image: carloeusebi/php-dsp
+    ports:
+      - '8080:80'
+    volumes:
+      # Mount source-code for development
+      - ./:/var/www
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  db:
+    image: mysql:8
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql-config.cnf:/etc/mysql/conf.d/config.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: php_dsp
+      MYSQL_USER: php_dsp
+      MYSQL_PASSWORD: php_dsp
+
+volumes:
+  mysql-data:
