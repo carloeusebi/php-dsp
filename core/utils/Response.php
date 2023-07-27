@@ -14,12 +14,12 @@ class Response
         header("Location: $url");
     }
 
-    static function response(int $http_code, array|string $messages = []): never
+    static function response(int $http_code, array|string $messages = []): void
     {
         self::statusCode($http_code);
         if (!empty($messages)) {
             echo json_encode($messages, JSON_NUMERIC_CHECK);
         }
-        exit();
+        exit;
     }
 }

@@ -54,7 +54,10 @@ export const useAuthStore = defineStore('auth', {
 		 */
 		async validate() {
 			return this.axios.get('/validate').catch(e => {
-				if (isAxiosError(e)) console.warn(e.response?.data);
+				if (isAxiosError(e)) {
+					console.warn(e.response?.data);
+					throw e;
+				}
 			});
 		},
 

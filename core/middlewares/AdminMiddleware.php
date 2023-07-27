@@ -3,7 +3,7 @@
 namespace app\core\middlewares;
 
 use app\app\App;
-use app\core\utils\Response;
+use app\core\exceptions\ForbiddenException;
 
 class AdminMiddleware extends BaseMiddleware
 {
@@ -23,8 +23,7 @@ class AdminMiddleware extends BaseMiddleware
     if (empty($this->actions) || in_array(App::$app->controller->action, $this->actions)) {
 
       if (!self::validateToken()) {
-
-        Response::response(401, 'Failed to authenticate');
+        throw new ForbiddenException();
       }
     }
   }

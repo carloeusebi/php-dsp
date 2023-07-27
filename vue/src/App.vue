@@ -7,9 +7,12 @@ const user = useAuthStore();
 
 // validate admin at avery page load
 if (user.isAdmin) {
-	user.validate().then(() => {
-		user.fetchAllData();
-	});
+	user
+		.validate()
+		.then(() => {
+			user.fetchAllData();
+		})
+		.catch();
 }
 </script>
 

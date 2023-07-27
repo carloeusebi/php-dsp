@@ -1,18 +1,16 @@
 <?php
 
-namespace Test\Unit;
+namespace app\tests;
 
 use app\app\App;
 use app\core\Controller;
 use app\core\Router;
-use PHPUnit\Framework\TestCase;
 use app\core\exceptions\RouteNotFoundException;
-
-
+use PHPUnit\Framework\TestCase;
 
 class RouterTest extends TestCase
 {
-
+    protected ?App $app;
     private Router $router;
 
     protected function setUp(): void
@@ -46,9 +44,12 @@ class RouterTest extends TestCase
 
     /** @test
      * @dataProvider routeNotFoundCases
+     * @runInSeparateProcess
      */
     public function testRouteNotFound(string $request_uri, string $request_method): void
     {
+        $_SERVER['REQUEST_URI'] = $request_uri;
+        $_SERVER['REQUEST_METHOD'] = $request_method;
         $controller = new class()
         {
             public function mock(): bool
@@ -56,17 +57,18 @@ class RouterTest extends TestCase
                 return true;
             }
         };
+        // create a new router instance to empty the routes
+        $router = new Router();
         $this->router->get('/home', [$controller::class, 'index']);
         $this->router->post('/login', ['Controller', 'index']);
 
         $this->expectException(RouteNotFoundException::class);
-        $this->router->resolve();
+        $router->resolve();
     }
 
     /**@test */
     public function testResolve(): void
     {
-        new App();
         $controller = new class() extends Controller
         {
             public function index(): string
@@ -83,8 +85,8 @@ class RouterTest extends TestCase
     static function routeNotFoundCases(): array
     {
         return [
-            ['/home', 'post'], //assert route exists but wrong method
             ['/user', 'get'], //assert route does not exist
+            ['/home', 'post'], //assert route exists but wrong method
             ['/home', 'get'] // assert route exists but controller's method does not
         ];
     }

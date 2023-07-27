@@ -8,7 +8,8 @@ class Session
 
     public function __construct()
     {
-        session_start();
+        if (!isset($_SESSION)) session_start();
+
         # For CORS
         header("Access-Control-Allow-Origin: http://localhost:3000");
         header("Access-Control-Allow-Credentials: true");

@@ -10,6 +10,11 @@ class Admin extends DbModel
     public string $username;
     public string $password;
 
+    public function save(): array
+    {
+        return [];
+    }
+
     public static function tableName(): string
     {
         return 'admins';

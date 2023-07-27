@@ -10,7 +10,6 @@ use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
-use app\core\exceptions\RouteNotFoundException;
 use app\core\utils\Request;
 use app\core\utils\Response;
 use app\models\Admin;
@@ -54,15 +53,17 @@ class App
     }
 
 
-    public function run(): void
+    public function run()
     {
         try {
-            $this->router->resolve();
-        } catch (RouteNotFoundException) {
-            Response::statusCode(404);
-            if (!Request::isApi())
+            return $this->router->resolve();
+        } catch (\Exception $e) {
+            $code = $e->getCode();
+            $message = $e->getMessage();
+            if ($code === 404 && !Request::isApi())
                 $this->router->renderView('404');
-            exit();
+            else
+                Response::response($code, $message);
         }
     }
 

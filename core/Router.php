@@ -10,7 +10,7 @@ use app\core\utils\Response;
 class Router
 {
     private array $routes = [];
-    protected string $layout = 'main';
+    private string $layout = 'main';
 
     public function get(string $url, array $callback): void
     {
@@ -70,6 +70,7 @@ class Router
         foreach ($middlewares as $middleware) {
             $middleware->execute();
         }
+
         // call the controller function
         return $controller->{$controller->action}();
     }
