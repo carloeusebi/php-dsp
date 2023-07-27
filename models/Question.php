@@ -23,13 +23,13 @@ class Question extends DbModel
     }
 
 
-    public function attributes(): array
+    static function attributes(): array
     {
         return ['question', 'description', 'type', 'items', 'legend', 'id'];
     }
 
 
-    public function labels(): array
+    static function labels(): array
     {
         return
             [
@@ -39,6 +39,11 @@ class Question extends DbModel
                 'items' => 'Lista delle domande',
                 'legend' => 'Legenda'
             ];
+    }
+
+    protected static function joins(): string
+    {
+        return '';
     }
 
 

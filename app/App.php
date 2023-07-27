@@ -69,8 +69,6 @@ class App
 
     public function logIssueToDb(int $code, string $error = ''): bool
     {
-        $date = date("y-m-d H:i:s", time());
-
         $message = match ($code) {
             1 => "An email was successfully sent.",
             2 => "Form was submitted with honey box checked.",
@@ -80,14 +78,13 @@ class App
             default => "Something went unexpected.",
         };
 
-        $query = "INSERT INTO logs (code, message, date) VALUES (:code, :message, :date)";
+        $query = "INSERT INTO logs (code, message) VALUES (:code, :message)";
 
         try {
             $statement = $this->db->prepare($query);
 
             $statement->bindValue('code', $code);
             $statement->bindValue('message', $message);
-            $statement->bindValue('date', $date);
 
             $statement->execute();
             return true;

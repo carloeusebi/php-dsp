@@ -38,7 +38,9 @@ const mappedPatient = computed(() => {
 	if (mappedPatient.height) mappedPatient.height = props.patient.height + ' cm';
 
 	if (mappedPatient.consent)
-		mappedPatient.consent = `<a href="${url}/public${props.patient.consent}" class="font-medium text-blue-600 hover:underline" target="_blank">Visualizza il file per il consenso</a>`;
+		mappedPatient.consent = `<a href="${
+			url + props.patient.consent
+		}" class="font-medium text-blue-600 hover:underline" target="_blank">Visualizza il file per il consenso</a>`;
 
 	return mappedPatient;
 });

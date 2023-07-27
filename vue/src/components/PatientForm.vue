@@ -37,30 +37,19 @@ const capitalize = (str: string): string => {
 	);
 };
 
-/**
- * Updates username, username is fname.lname to lower case and without spaces or special chars, Gabriele D'Annunzio => gabriele.dannunzio
- */
-const updateUsername = () => {
-	const { fname, lname } = form.value;
-	form.value.username = `${fname}.${lname}`
-		.toLowerCase()
-		.replace(/[^a-z.]/g, '');
-};
-
 /********* WATCHERS *******************/
 
 const updateField = (field: string, updatedValue: string): void => {
 	if (!field || !updatedValue || (field !== 'fname' && field !== 'lname'))
 		return;
 	form.value[field] = capitalize(updatedValue).toString();
-	updateUsername();
 };
 
 watch(
-	() => form.value.fiscalcode,
-	fiscalcode =>
-		(form.value.fiscalcode = fiscalcode
-			? (fiscalcode as string).toUpperCase()
+	() => form.value.codice_fiscale,
+	codice_fiscale =>
+		(form.value.codice_fiscale = codice_fiscale
+			? (codice_fiscale as string).toUpperCase()
 			: '')
 );
 
@@ -177,11 +166,13 @@ watch(
 
 	<div class="grid md:grid-cols-2 md:gap-6">
 		<div class="z-0 w-full mb-6 group">
-			<!-- FISCAL CODE -->
+			<!-- CODICE FISCALE -->
 
 			<AppInputElement
-				v-model.trim="form.fiscalcode"
+				v-model.trim="form.codice_fiscale"
 				label="Codice Fiscale"
+				min="16"
+				max="16"
 			/>
 		</div>
 		<!-- JOB -->
@@ -222,21 +213,13 @@ watch(
 		</div>
 	</div>
 
-	<div class="grid md:grid-cols-2 md:gap-6">
-		<div class="z-0 w-full mb-6 group">
+	<div class="z-0 w-full mb-6 group">
+		<div class="grid">
 			<!-- COHABITANTS -->
 
 			<AppInputElement
 				v-model.trim="form.cohabitants"
 				label="Conviventi"
-			/>
-		</div>
-
-		<!-- USERNAME -->
-		<div class="z-0 w-full mb-6 group">
-			<AppInputElement
-				v-model.trim="form.username"
-				label="Username"
 			/>
 		</div>
 	</div>

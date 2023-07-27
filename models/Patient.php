@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\core\Mail;
 use app\db\DbModel;
+use app\core\utils\CodiceFiscale;
 
 class Patient extends DbModel
 {
@@ -14,7 +15,7 @@ class Patient extends DbModel
     public $birthday;
     public $birthplace;
     public $address;
-    public $fiscalcode;
+    public $codice_fiscale;
     public $begin;
     public $email;
     public $phone;
@@ -33,14 +34,14 @@ class Patient extends DbModel
         return 'patients';
     }
 
-    public function attributes(): array
+    static function attributes(): array
     {
         return [
-            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'fiscalcode', 'begin', 'email', 'phone', 'consent', 'weight', 'height', 'job', 'sex', 'cohabitants', 'username', 'id'
+            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'consent', 'weight', 'height', 'job', 'sex', 'cohabitants', 'id'
         ];
     }
 
-    public function labels(): array
+    static function labels(): array
     {
         return [
             'id' => 'id',
@@ -50,7 +51,7 @@ class Patient extends DbModel
             'birthday' => 'Data di nascita',
             'birthplace' => 'Luogo di nascita',
             'address' => 'Indirizzo',
-            'fiscalcode' => 'Codice Fiscale',
+            'codice_fiscale' => 'Codice Fiscale',
             'begin' => 'Data di inizio Terapia',
             'email' => 'Email',
             'phone' => 'Numero di Telefono',
@@ -60,9 +61,15 @@ class Patient extends DbModel
             'job' => 'Occupazione',
             'sex' => 'Sesso',
             'cohabitants' => 'Conviventi',
-            'username' => 'Username'
         ];
     }
+
+
+    protected static function joins(): string
+    {
+        return '';
+    }
+
 
     public function save(): array
     {
@@ -72,19 +79,22 @@ class Patient extends DbModel
         $fileToUpload = $_FILES['consent'] ?? null;
 
         if ($this->sex)
-            $this->sex = strtoupper($this->sex);
+            $this->sex = strtoupper(substr($this->sex, 0, 1)); // if sex should arrive with more than one characters, it takes only first char to uppercase
 
-        if ($this->checkIfExists()) $errors['exists'] = 'Un Paziente con questo nome esiste già!!';
+        // validates the codice fiscale
+        $is_invalid_cf = false;
+        if ($this->codice_fiscale) $is_invalid_cf = CodiceFiscale::validate($this->codice_fiscale);
 
         // check for errors
         if (!$this->fname) $errors['fname'] = "Il nome è obbligatorio.";
         if (!$this->lname) $errors['lname'] = "Il cognome è obbligatorio.";
         if (!$this->birthday) $errors['birthday'] = "La data di nascita è obbligatoria.";
         if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
+        if ($this->isAgeInvalid()) $errors['age'] = "{$this->age} non è un'età valida";
         if (!$this->begin) $errors['begin'] = "La data di inizio terapia è obbligatoria.";
         if (!$this->isRealDate($this->begin)) $errors['begin'] = "Data di inizio terapia non è valida";
         if ($this->email && Mail::isUndeliverable($this->email)) $errors['email'] = Mail::UNDELIVERABLE_ERROR_MESSAGE;
-
+        if ($is_invalid_cf) $errors['codice_fiscale'] = $is_invalid_cf;
         if ($fileToUpload) {
             if ($this->isPdf($fileToUpload)) $errors['not-pdf'] = "Si possono caricare solamente files in formato PDF";
             if (!isset($fileToUpload['name']) || $fileToUpload['name'] === '') $errors['invalid-name'] = "Nome del file non valido";
@@ -101,14 +111,9 @@ class Patient extends DbModel
         return $errors;
     }
 
-
-    protected function checkIfExists(): bool
+    protected function isAgeInvalid()
     {
-        $patients = self::get();
-        foreach ($patients as $patient) {
-            if ($this->fname === $patient['fname'] && $this->lname === $patient['lname'] && $this->id != $patient['id']) return true;
-        }
-        return false;
+        return $this->age < 0 || $this->age > 120;
     }
 
 

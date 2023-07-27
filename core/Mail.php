@@ -138,20 +138,19 @@ class Mail
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return true;
 
         try {
-            $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
-            $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
 
             // Verifalia returns error "Implicit conversion from float 0.5 to int loses precision" so i need to ignore the deprecated warning
             $previous_error_reporting = error_reporting();
             error_reporting($previous_error_reporting & ~E_DEPRECATED);
 
+            $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
+            $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
+
             $verifalia = new VerifaliaRestClient([
                 'username' => $verifalia_username,
                 'password' => $verifalia_password
             ]);
-
             // resetting errors levels
-            error_reporting($previous_error_reporting);
 
             // check if have verifalia credits
             $balance = $verifalia->credits->getBalance();

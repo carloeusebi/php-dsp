@@ -6,7 +6,7 @@ export interface Patient {
 	birthday: string;
 	birthplace?: string;
 	address?: string;
-	fiscalcode?: string;
+	codice_fiscale?: string;
 	begin: string;
 	email?: string;
 	phone?: string;
@@ -16,7 +16,6 @@ export interface Patient {
 	job?: string;
 	sex?: 'M' | 'F' | 'O';
 	cohabitants?: string;
-	username: string;
 }
 
 export interface QuestionItem {
@@ -42,8 +41,7 @@ export interface Question {
 	completed?: boolean;
 }
 
-export interface Survey {
-	id?: number;
+export interface Survey extends Patient {
 	patient_id: string;
 	patient_name?: string;
 	title: string;
@@ -52,11 +50,6 @@ export interface Survey {
 	last_update?: string;
 	completed: boolean;
 	token?: string;
-}
-
-export interface Test {
-	survey: Survey;
-	patient: Patient;
 }
 
 export interface LoginForm {

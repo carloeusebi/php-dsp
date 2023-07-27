@@ -32,13 +32,7 @@ class TestsController extends Controller
     if (isset($survey['completed']) && $survey['completed']) {
       Response::response(403, ['error' => 'Test is completed']);
     }
-
-    $patient = App::$app->patient->getById($survey['patient_id']);
-    $message = [
-      'survey' => $survey,
-      'patient' => $patient
-    ];
-    Response::response(200, $message);
+    Response::response(200, $survey);
   }
 
 

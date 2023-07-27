@@ -15,18 +15,18 @@ class Admin extends DbModel
         return 'admins';
     }
 
-    public function attributes(): array
+    static function attributes(): array
     {
         return ['id', 'username', 'password'];
     }
 
-    public function labels(): array
+    static function labels(): array
     {
         return [];
     }
 
-    public function save(): array
+    protected static function joins(): string
     {
-        return [];
+        return '';
     }
 }

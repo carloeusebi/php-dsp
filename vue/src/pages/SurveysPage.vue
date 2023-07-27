@@ -13,23 +13,7 @@ import AppButtonBlank from '@/components/AppButtonBlank.vue';
 import SurveyCreate from '@/components/SurveyCreate.vue';
 
 const surveysStore = useSurveysStore();
-const patientsStore = usePatientsStore();
-
 const { surveys } = storeToRefs(surveysStore);
-const patients: Patient[] = patientsStore.getPatients;
-
-// surveys come with a patient id field, this computed creates patient name field based on patient id
-const surveysWithPatientName = computed(() => {
-	if (surveys.value === null) return [];
-	return surveys.value.map((survey: Survey) => {
-		const patient: Patient | undefined = patients.find(
-			(p: Patient) => String(p.id) == survey.patient_id
-		);
-
-		if (patient) survey.patient_name = `${patient.fname} ${patient.lname}`;
-		return { ...survey };
-	});
-});
 
 // REFS
 const searchWord = ref('');
@@ -55,8 +39,8 @@ const handleSearchbarKeypress = (word: string) => {
 };
 
 const filteredBySearchSurveys = computed(() => {
-	if (surveysWithPatientName.value === null) return [];
-	return useSearchFilter(surveysWithPatientName.value, searchWord.value, [
+	if (surveys.value === null) return [];
+	return useSearchFilter(surveys.value, searchWord.value, [
 		'title',
 		'patient_name',
 	]);

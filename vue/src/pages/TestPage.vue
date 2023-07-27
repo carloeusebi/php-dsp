@@ -29,10 +29,10 @@ const fetchTest = async (token: string) => {
 	try {
 		await testsStore.fetch(params);
 
-		test.value.survey.questions.forEach(question => {
+		test.value.questions.forEach(question => {
 			pages.value.push({ question });
 			active.value = useGetFirstItemWithoutPropIndex(
-				test.value.survey.questions,
+				test.value.questions,
 				'completed'
 			);
 		});
@@ -66,30 +66,29 @@ interface Page {
 const pages: Ref<Page[]> = ref([]);
 
 const handleAnswer = (itemId: number, answer: number): void => {
-	const itemToUpdate = test.value.survey.questions[active.value].items.find(
+	const itemToUpdate = test.value.questions[active.value].items.find(
 		({ id }) => id === itemId
 	) as QuestionItem;
 
 	itemToUpdate.answer = answer;
 
-	testsStore.save(test.value.survey);
+	testsStore.save(test.value);
 };
 
 /**
- * Saves the survey and uses the store the make an ajax call
+ * Saves the and uses the store the make an ajax call
  */
 const handleQuestionComplete = () => {
-	const isLastQuestion = () =>
-		active.value === test.value.survey.questions.length - 1;
+	const isLastQuestion = () => active.value === test.value.questions.length - 1;
 
-	test.value.survey.questions[active.value].completed = true;
+	test.value.questions[active.value].completed = true;
 	if (isLastQuestion()) {
-		test.value.survey.completed = true;
+		test.value.completed = true;
 		isCompleted.value = true;
 	} else {
 		active.value++;
 	}
-	testsStore.save(test.value.survey);
+	testsStore.save(test.value);
 };
 </script>
 

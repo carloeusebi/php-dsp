@@ -1,4 +1,4 @@
-import { Patient, Survey, Test } from '@/assets/data/interfaces';
+import { Survey } from '@/assets/data/interfaces';
 import { AxiosRequestConfig, isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 
@@ -7,13 +7,12 @@ const endpoint = '/tests';
 export const useTestsStore = defineStore('tests', {
 	// state
 	state: () => ({
-		test: JSON.parse(localStorage.getItem('TEST') as string) as Test,
+		test: JSON.parse(localStorage.getItem('TEST') as string) as Survey,
 	}),
 
 	// getters
 	getters: {
-		getSurvey: (state): Survey => state.test.survey,
-		getPatient: (state): Patient => state.test.patient,
+		getSurvey: (state): Survey => state.test,
 	},
 
 	// actions
@@ -38,13 +37,13 @@ export const useTestsStore = defineStore('tests', {
 		 * Loads the test in the store and local storage
 		 * @param test The test to load
 		 */
-		load(test: Test) {
+		load(test: Survey) {
 			this.test = test;
 			localStorage.setItem('TEST', JSON.stringify(test));
 		},
 
 		async save(survey: Survey) {
-			this.test.survey = survey;
+			this.test = survey;
 			localStorage.setItem('TEST', JSON.stringify(this.test));
 
 			return this.axios.post(endpoint, survey).catch(err => {

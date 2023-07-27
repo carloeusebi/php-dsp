@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Question, QuestionItem, Survey } from '@/assets/data/interfaces';
-import { useLoaderStore, usePatientsStore, useSurveysStore } from '@/stores';
+import { useLoaderStore, useSurveysStore } from '@/stores';
 import axios from 'axios';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -11,7 +11,6 @@ const id = route.params.id as string;
 const editMode = ref(false);
 
 const survey = useSurveysStore().getById(id) as Survey;
-const patient = usePatientsStore().getById(survey?.patient_id as string);
 
 const min = (question: Question): number => {
 	return parseInt(question.type.at(0) as string);
@@ -81,27 +80,27 @@ const saveUpdates = async () => {
 			>
 				<div>
 					<h2 class="mb-3">Paziente:</h2>
-					<strong>Nome e cognome: </strong>{{ patient?.fname }}
-					{{ patient?.lname }}
+					<strong>Nome e cognome: </strong>{{ survey?.fname }}
+					{{ survey?.lname }}
 				</div>
 				<div>
-					<span><strong>Età: </strong>{{ patient?.age }}</span>
+					<span><strong>Età: </strong>{{ survey?.age }}</span>
 					<span
 						class="ms-3"
-						v-if="patient?.weight"
-						>| <strong>Peso: </strong>{{ patient?.weight }}kg</span
+						v-if="survey?.weight"
+						>| <strong>Peso: </strong>{{ survey?.weight }}kg</span
 					>
 					<span
 						class="ms-3"
-						v-if="patient?.height"
-						>| <strong>Altezza: </strong>{{ patient?.height }}cm</span
+						v-if="survey?.height"
+						>| <strong>Altezza: </strong>{{ survey?.height }}cm</span
 					>
 				</div>
-				<div v-if="patient?.job">
-					<strong>Professione: </strong>{{ patient?.job }}
+				<div v-if="survey?.job">
+					<strong>Professione: </strong>{{ survey?.job }}
 				</div>
-				<div v-if="patient?.cohabitants">
-					<strong>Vive con: </strong>{{ patient?.cohabitants }}
+				<div v-if="survey?.cohabitants">
+					<strong>Vive con: </strong>{{ survey?.cohabitants }}
 				</div>
 			</section>
 

@@ -11,30 +11,50 @@ class Survey extends DbModel
     public $patient_id;
     public $title;
     public $questions;
-    public $created_at;
-    public $last_update;
     public $completed;
     public $token;
 
     protected array $fields_to_decode = ['questions'];
 
 
-    public static function tableName(): string
+    static function tableName(): string
     {
         return 'surveys';
     }
 
-    public function attributes(): array
+    static function attributes(): array
     {
         return [
-            'patient_id', 'title', 'questions', 'created_at', 'last_update', 'completed', 'id', 'token'
+            'patient_id', 'title', 'questions', 'completed', 'id', 'token'
         ];
     }
 
-    public function labels(): array
+    static function labels(): array
     {
         return [];
     }
+
+    protected static function joins(): string
+    {
+        return ' LEFT JOIN patients ON surveys.patient_id = patients.id ';
+    }
+
+
+    public function get()
+    {
+        $order = $this->getOrder();
+        $tableName = $this->tableName();
+
+        $query = "SELECT $tableName.*, patients.id AS patient_id, patients.fname, patients.lname, patients.email, patients.age, patients.weight, patients.height, patients.job, patients.cohabitants";
+        $query .= " FROM $tableName ";
+        $query .= $this->joins();
+        $query .= " ORDER BY $tableName.$order";
+        $statement = $this->prepare($query);
+        $statement->execute();
+
+        return $this->decodeMany($statement->fetchAll(PDO::FETCH_ASSOC));
+    }
+
 
     public function getByToken(string $token)
     {
@@ -60,11 +80,8 @@ class Survey extends DbModel
         $this->questions = json_encode($this->questions);
 
         if (empty($errors)) {
-            if ($this->id) {
-                $this->last_update = date("y-m-d", time());
-                self::update();
-            } else {
-                $this->created_at = date("y-m-d", time());
+            if ($this->id) self::update();
+            else {
                 $this->token = $this->generateToken();
                 self::create();
             }

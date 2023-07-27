@@ -1,5 +1,4 @@
 import { Survey } from '@/assets/data/interfaces';
-import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 
 const endpoint = '/surveys';
@@ -26,7 +25,10 @@ export const useSurveysStore = defineStore('surveys', {
 		},
 
 		load(surveys: Survey[]) {
-			this.surveys = surveys;
+			this.surveys = surveys.map(s => {
+				s.patient_name = `${s?.fname} ${s.lname}`;
+				return s;
+			});
 			localStorage.setItem('SURVEYS', JSON.stringify(surveys));
 		},
 

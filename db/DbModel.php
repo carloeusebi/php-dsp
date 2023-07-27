@@ -10,23 +10,20 @@ use PDO;
 abstract class DbModel extends Model
 {
 
-    abstract public static function tableName(): string;
-
-    abstract public function attributes(): array;
-
-    abstract public function labels(): array;
-
-    abstract public function save(): array;
+    abstract static protected function joins(): string;
+    abstract static function attributes(): array;
+    abstract static function tableName(): string;
+    abstract static function labels(): array;
 
 
     public function get()
     {
         $order = $this->getOrder();
-
         $tableName = $this->tableName();
-        $query = "SELECT * FROM $tableName ORDER BY {$order}";
+        $joins = $this->joins();
+        $query = "SELECT * FROM $tableName $joins ORDER BY $tableName.{$order}";
         $statement = $this->prepare($query);
-        $statement->execute();;
+        $statement->execute();
 
         return $this->decodeMany($statement->fetchAll(PDO::FETCH_ASSOC));
     }
@@ -34,7 +31,8 @@ abstract class DbModel extends Model
     public function getById(int $id)
     {
         $tableName = $this->tableName();
-        $statement = $this->prepare("SELECT * FROM $tableName WHERE id = :id");
+        $joins = $this->joins();
+        $statement = $this->prepare("SELECT * FROM $tableName $joins WHERE $tableName.id = :id");
         $statement->bindValue('id', $id);
         $statement->execute();
 
