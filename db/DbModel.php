@@ -17,12 +17,15 @@ abstract class DbModel extends Model
     abstract public function save(): array;
 
 
-    public function get()
+    public function get(string $fields = '*')
     {
-        $order = $this->getOrder();
         $tableName = $this->tableName();
         $joins = $this->joins();
-        $query = "SELECT * FROM $tableName $joins ORDER BY $tableName.{$order}";
+
+        $order = $this->getOrder();
+        $params = $this->getQueryParams();
+
+        $query = "SELECT $fields FROM $tableName $joins $params ORDER BY $tableName.{$order}";
         $statement = $this->prepare($query);
         $statement->execute();
 
@@ -105,5 +108,22 @@ abstract class DbModel extends Model
         if (!in_array($direction, ['ASC', 'DESC'])) $direction = 'ASC';
 
         return "$order_by $direction";
+    }
+
+
+    protected function getQueryParams(): string
+    {
+        $data = Request::getBody();
+
+        // build the conditional SQL query
+        $params = 'WHERE ';
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->attributes())) {
+                $params .= $value ? " `$key` LIKE '%$value%' AND " : " $key IS NULL AND ";
+            }
+        }
+
+        // removes last AND        
+        return strlen($params) > 6 ? substr($params, 0, -4) : '';
     }
 }

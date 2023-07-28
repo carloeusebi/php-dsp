@@ -38,8 +38,8 @@ class Database
     {
         try {
             return $this->pdo->prepare($query);
-        } catch (Error) {
-            return false;
+        } catch (Error $error) {
+            \app\core\exceptions\ErrorHandler::handleException($error);
         }
     }
 

@@ -40,19 +40,12 @@ class Survey extends DbModel
     }
 
 
-    public function get()
+    public function get(string $fields = '*')
     {
-        $order = $this->getOrder();
         $tableName = $this->tableName();
+        $fields = " $tableName.*, patients.id AS patient_id, patients.fname,    patients.lname, patients.email, patients.age, patients.weight, patients.height, patients.job, patients.cohabitants";
 
-        $query = "SELECT $tableName.*, patients.id AS patient_id, patients.fname, patients.lname, patients.email, patients.age, patients.weight, patients.height, patients.job, patients.cohabitants";
-        $query .= " FROM $tableName ";
-        $query .= $this->joins();
-        $query .= " ORDER BY $tableName.$order";
-        $statement = $this->prepare($query);
-        $statement->execute();
-
-        return $this->decodeMany($statement->fetchAll(PDO::FETCH_ASSOC));
+        return parent::get($fields);
     }
 
 

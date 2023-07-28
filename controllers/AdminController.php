@@ -16,7 +16,7 @@ abstract class AdminController extends Controller
 
     public function __construct()
     {
-        $this->registerMiddleware(new AdminMiddleware([]));
+        // $this->registerMiddleware(new AdminMiddleware([]));
         $this->model = App::$app->{$this->model_name};
     }
 

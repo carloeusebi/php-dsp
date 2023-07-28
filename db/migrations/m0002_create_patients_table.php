@@ -28,7 +28,7 @@ class m0002_create_patients_table
       `job` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
       `cohabitants` text COLLATE utf8mb4_general_ci,
       PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
     $db->execute($SQL);
   }
