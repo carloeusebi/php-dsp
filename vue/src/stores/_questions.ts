@@ -1,5 +1,4 @@
 import { Question } from '@/assets/data/interfaces';
-import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 
 const endpoint = '/questions';

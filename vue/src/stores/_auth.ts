@@ -64,10 +64,15 @@ export const useAuthStore = defineStore('auth', {
 		/**
 		 * logout
 		 */
-		logout() {
-			this.axios.delete('/logout').then(() => {
-				this.removeUser();
-			});
+		async logout() {
+			return this.axios
+				.delete('/logout')
+				.then(() => {
+					this.removeUser();
+				})
+				.catch(err => {
+					throw err;
+				});
 		},
 
 		/**

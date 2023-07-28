@@ -93,14 +93,15 @@ class MailController extends Controller
         $this->mail->email_from = $email;
 
         // validate email
-        if (Mail::isUndeliverable($email))
+        if (Mail::isUndeliverable($email, true))
             Response::response(400, ['error' => Mail::UNDELIVERABLE_ERROR_MESSAGE]);
+
+        App::$app->logIssueToDb($issue, $name, $email);
 
         $message = "Da: $name<br>
             Email: $email<br>
             Ha contattato il supporto per il seguente motivo:<br> $issue";
 
-        App::$app->logIssueToDb(5, $message);
 
         $this->mail->name = $name;
         $this->mail->subject = 'E\' stato contattato il supporto';

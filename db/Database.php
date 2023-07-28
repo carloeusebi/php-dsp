@@ -27,8 +27,9 @@ class Database
             $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 
             self::$db = $this;
-        } catch (Exception) {
+        } catch (Exception $e) {
             // since database is used only on api and to log errors on the front site, we don't want to raise any errors on failed db connection
+            \app\core\exceptions\ErrorHandler::log($e);
         }
     }
 

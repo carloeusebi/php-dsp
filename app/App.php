@@ -16,6 +16,7 @@ use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
+use GuzzleHttp\RetryMiddleware;
 
 class App
 {
@@ -36,7 +37,7 @@ class App
         try {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__));
             $dotenv->load();
-        } catch (InvalidPathException) {
+        } catch (InvalidPathException $e) {
             // If Dotenv can't find the .env file it won't throw an exception
         }
 
@@ -58,38 +59,28 @@ class App
         try {
             return $this->router->resolve();
         } catch (\Exception $e) {
-            $code = $e->getCode();
+            $code = intval($e->getCode());
             $message = $e->getMessage();
-            if ($code === 404 && !Request::isApi())
+            if ($code === 404)
                 $this->router->renderView('404');
-            else
-                Response::response($code, $message);
+            // Response::response($code, $message);
         }
     }
 
 
-    public function logIssueToDb(int $code, string $error = ''): bool
+    public function logIssueToDb(string $message, string $name = '', string $email = '')
     {
-        $message = match ($code) {
-            1 => "An email was successfully sent.",
-            2 => "Form was submitted with honey box checked.",
-            3 => "Form was submitted with an undeliverable email.",
-            4 => $error,
-            5 => $error,
-            default => "Something went unexpected.",
-        };
-
-        $query = "INSERT INTO logs (code, message) VALUES (:code, :message)";
-
         try {
-            $statement = $this->db->prepare($query);
-
-            $statement->bindValue('code', $code);
+            $statement = $this->db->prepare('INSERT INTO `issues` (name, email, message) VALUES (:name, :email, :message)');
+            $statement->bindValue('name', $name);
+            $statement->bindValue('email', $email);
             $statement->bindValue('message', $message);
 
             $statement->execute();
+
             return true;
-        } catch (Error) {
+        } catch (\Exception $exception) {
+            \app\core\exceptions\ErrorHandler::log($exception);
             return false;
         }
     }

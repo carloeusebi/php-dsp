@@ -17,6 +17,10 @@ class Mail
     private const CONFIRMATION_SUBJECT = "Grazie per avermi Contattato";
     private const CONFIRMATION_BODY = " per avermi contatto, ho ricevuto la tua mail e ti contatter&ograve; al pi&ugrave; presto.";
 
+    private const MAIL_SENT = "An email was successfully sent";
+    private const MAIL_BOT = "A form was submitted by a bot";
+    private const MAIL_INVALID = "A form was submitted with an undeliverable email";
+
     public static string $EMAIL_FROM;
     public static string $EMAIL_NAME;
     public static string $EMAIL_MAIN;
@@ -59,11 +63,11 @@ class Mail
 
         // It means it is a bot who checked the honey box
         if (isset($form_data['miele-cb'])) {
-            App::$app->logIssueToDb(2);
+            self::log(self::MAIL_BOT);
             return "Qualcosa è andato storto, riprovare";
         }
 
-        if ($needs_validation && self::isUndeliverable(($this->email_from))) {
+        if ($needs_validation && self::isUndeliverable($this->email_from, true)) {
             return self::UNDELIVERABLE_ERROR_MESSAGE;
         }
 
@@ -110,7 +114,7 @@ class Mail
         } catch (Exception) {
 
             $error = $mail->ErrorInfo;
-            App::$app->logIssueToDb(4, $error);
+            self::log($error);
 
             return "Qualcosa è andato storto, per favore riprovare più tardi";
         }
@@ -131,9 +135,10 @@ class Mail
     /**
      * Checks if email address is deliverable using Verifalia api
      * @param string $email The email address to validate
+     * @param bool $should_log_invalid true if a log should be made in case email is invalid
      * @return bool False is the email address is valid and deliverable
      */
-    static function isUndeliverable(string $email): bool
+    static function isUndeliverable(string $email, bool $should_log_invalid = false): bool
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return true;
 
@@ -160,14 +165,30 @@ class Mail
 
 
                 if ($entry->classification === 'Undeliverable') {
-                    App::$app->logIssueToDb(3);
+                    if ($should_log_invalid) self::log(self::MAIL_INVALID);
                     return true;
                 }
             }
-        } catch (VerifaliaException) {
+        } catch (VerifaliaException $e) {
             // if there is an error with Verifalia, just pretend the email address is deliverable
+            \app\core\exceptions\ErrorHandler::log($e);
             return false;
         }
         return false;
+    }
+
+
+    public static function log(string $message): bool
+    {
+        try {
+            $statement = App::$app->db->prepare('INSERT INTO `mail_logs` (message) VALUES (:message)');
+            $statement->bindValue('message', $message);
+            $statement->execute();
+
+            return true;
+        } catch (Exception $exception) {
+            \app\core\exceptions\ErrorHandler::log($exception);
+            return false;
+        }
     }
 }

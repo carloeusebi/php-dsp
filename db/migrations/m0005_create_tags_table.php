@@ -18,8 +18,8 @@ class m0005_create_tags_table
                 `tag_id` int NOT NULL,
                 PRIMARY KEY (`question_id`,`tag_id`),
                 KEY `tag_id` (`tag_id`),
-                CONSTRAINT `question_tag_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`),
-                CONSTRAINT `question_tag_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+                CONSTRAINT `question_tag_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+                CONSTRAINT `question_tag_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
         $db->execute($SQL);
