@@ -2,7 +2,6 @@
 
 namespace app\app;
 
-use Error;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
 
@@ -10,13 +9,10 @@ use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
-use app\core\utils\Request;
-use app\core\utils\Response;
 use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
-use GuzzleHttp\RetryMiddleware;
 
 class App
 {
@@ -37,8 +33,9 @@ class App
         try {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__));
             $dotenv->load();
-        } catch (InvalidPathException $e) {
+        } catch (InvalidPathException $exception) {
             // If Dotenv can't find the .env file it won't throw an exception
+            \app\core\exceptions\ErrorHandler::log($exception);
         }
 
         self::$app = $this;

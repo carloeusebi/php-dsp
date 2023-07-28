@@ -39,7 +39,7 @@ class Database
         try {
             return $this->pdo->prepare($query);
         } catch (Error $error) {
-            \app\core\exceptions\ErrorHandler::handleException($error);
+            \app\core\exceptions\ErrorHandler::log($error);
         }
     }
 
