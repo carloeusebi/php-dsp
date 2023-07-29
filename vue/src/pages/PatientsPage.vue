@@ -2,19 +2,25 @@
 import { ref, computed, Ref } from 'vue';
 import { usePatientsStore } from '@/stores';
 import { storeToRefs } from 'pinia';
-import { useSort, useSearchFilter } from '@/composables';
 
 import PatientRow from '@/components/PatientRow.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import PatientSave from '@/components/PatientSave.vue';
 import AppSearchbar from '@/components/AppSearchbar.vue';
 import AppTable from '../components/AppTable.vue';
+import AppPagination from '@/components/AppPagination.vue';
+
 import { Cell, Order, Patient } from '@/assets/data/interfaces';
+import {
+	useSort,
+	useSearchFilter,
+	useSplitArrayIntoChunks,
+} from '@/composables';
+
+const PATIENTS_PER_PAGE = 25;
 
 const patientsStore = usePatientsStore();
 const { patients } = storeToRefs(patientsStore);
-
-// REFS
 
 const searchWord = ref('');
 
@@ -39,7 +45,8 @@ const tableCells: Ref<PatientCell[]> = ref([
 
 // FILTER BY SEARCH
 
-const handleSearchbarKeypress = (word: string) => (searchWord.value = word.toLowerCase());
+const handleSearchbarKeypress = (word: string) =>
+	(searchWord.value = word.toLowerCase());
 
 const filteredBySearchPatients = computed(() => {
 	if (patients.value === null) return [];
@@ -57,6 +64,16 @@ const order: Ref<OrderPatient> = ref({ by: 'id', type: 'down' });
 const filteredAndOrderedPatients = computed(() =>
 	useSort(filteredBySearchPatients.value, order.value.by, order.value.type)
 );
+
+// PAGINATION
+const activePage = ref(0);
+const pages = computed(() =>
+	useSplitArrayIntoChunks(filteredAndOrderedPatients.value, PATIENTS_PER_PAGE)
+);
+
+const handlePageClick = (newPage: number) => {
+	activePage.value = newPage;
+};
 </script>
 
 <template>
@@ -64,30 +81,44 @@ const filteredAndOrderedPatients = computed(() =>
 		<!-- SEARCH -->
 		<div class="relative flex justify-between w-full mb-5">
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
+			<!-- CREATE PATIENTS -->
 			<PatientSave
 				icon="plus"
 				title="Aggiungi un paziente"
-				button-label="Aggiungi" />
+				button-label="Aggiungi"
+			/>
 		</div>
+
+		<!-- PAGINATION -->
+		<AppPagination
+			:total-pages="pages.length"
+			:current-page="activePage"
+			:showing-per-page="PATIENTS_PER_PAGE"
+			:results="patients.length"
+			@page-click="handlePageClick"
+		/>
 
 		<!-- TABLE -->
 		<AppTable
 			v-if="filteredAndOrderedPatients.length > 0"
 			@sort-change="sort"
 			:cells="tableCells"
-			:has-reset="true">
+			:has-reset="true"
+		>
 			<template v-slot:tbody>
 				<PatientRow
-					v-for="patient in filteredAndOrderedPatients"
+					v-for="patient in pages[activePage]"
 					:cells="tableCells"
 					:patient="patient"
-					:key="patient.id || patient.lname + patient.fname" />
+					:key="patient.id || patient.lname + patient.fname"
+				/>
 			</template>
 		</AppTable>
 		<div v-else>
 			<AppAlert
 				:show="true"
-				title="Ops!">
+				title="Ops!"
+			>
 				Nessun paziente trovato!
 			</AppAlert>
 		</div>
@@ -97,5 +128,17 @@ const filteredAndOrderedPatients = computed(() =>
 <style scoped>
 :deep(tr td:nth-child(5)) {
 	min-width: 120px;
+}
+
+/* fname and lname */
+:deep(th:nth-of-type(1)),
+:deep(th:nth-of-type(2)) {
+	width: 200px;
+}
+
+/* age */
+:deep(th:nth-of-type(3)) {
+	width: 35px;
+	text-align: center;
 }
 </style>

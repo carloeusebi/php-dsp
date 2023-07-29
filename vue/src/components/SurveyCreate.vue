@@ -1,20 +1,17 @@
 <script lang="ts" setup>
 import { Ref, computed, ref } from 'vue';
+import draggable from 'vuedraggable';
+
+import { Errors, Patient, Survey } from '@/assets/data/interfaces';
+import { emptySurvey } from '@/assets/data/data';
+import { useSaveToStore, useSort } from '@/composables';
+import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
+
 import AppButtonBlank from './AppButtonBlank.vue';
 import AppModal from './AppModal.vue';
-import {
-	useLoaderStore,
-	usePatientsStore,
-	useQuestionsStore,
-	useSurveysStore,
-} from '@/stores';
 import AppInputElement from './AppInputElement.vue';
 import AppButton from './AppButton.vue';
 import AppAlert from './AppAlert.vue';
-import { Errors, Patient, Survey } from '@/assets/data/interfaces';
-import { emptySurvey } from '@/assets/data/data';
-import draggable from 'vuedraggable';
-import axios from 'axios';
 
 interface Props {
 	patient?: Patient;
@@ -23,8 +20,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const showModal = ref(false);
-const patients = usePatientsStore().getPatients;
+let patients = usePatientsStore().getPatients;
 const questions = ref(useQuestionsStore().getQuestions);
+
+// ordering patients to make searching for them easier
+patients = useSort(patients, 'lname', 'down');
 
 const newSurvey: Ref<Survey> = ref({ ...emptySurvey });
 if (props.patient)
@@ -69,24 +69,16 @@ const handleFormSubmit = () => {
  * Let the store handle the saving
  */
 const saveSurvey = async () => {
-	const loader = useLoaderStore();
-	loader.setLoader();
+	const surveyStore = useSurveysStore();
+	errors.value = await useSaveToStore(newSurvey.value, surveyStore);
 
-	try {
-		await useSurveysStore().save({ ...newSurvey.value });
-
+	if (!errorsStr.value) {
 		showModal.value = false;
 		newSurvey.value = { ...emptySurvey };
 		questions.value = questions.value.map(q => {
 			q.selected = false;
 			return q;
 		});
-	} catch (err) {
-		if (axios.isAxiosError(err)) {
-			errors.value = err.response?.data;
-		} else console.error(err);
-	} finally {
-		loader.unsetLoader();
 	}
 };
 </script>
@@ -180,7 +172,7 @@ const saveSurvey = async () => {
 									v-model="question.selected"
 								/>
 								<span
-									class="max-w-sm ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
+									class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
 									>{{ question.question }}</span
 								>
 							</label>

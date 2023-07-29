@@ -63,7 +63,7 @@ export const useQuestionsStore = defineStore('questions', {
 			return this.axios
 				.post(endpoint, question)
 				.then(res => {
-					const newQuestion = res.data.question;
+					const newQuestion = res.data.last_insert;
 
 					const indexToUpdate = this.questions.findIndex(
 						({ id }) => id == newQuestion.id

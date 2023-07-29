@@ -1,3 +1,5 @@
+import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
+
 export interface Patient {
 	id?: number;
 	fname: string;
@@ -23,6 +25,7 @@ export interface QuestionItem {
 	text: string;
 	answer?: number;
 	comment?: string;
+	reversed?: boolean;
 }
 
 export interface QuestionLegend {
@@ -70,3 +73,7 @@ export interface Order {
 export interface Errors {
 	[string: string]: string;
 }
+
+export type PatientsStore = ReturnType<typeof usePatientsStore>;
+export type QuestionStore = ReturnType<typeof useQuestionsStore>;
+export type SurveyStore = ReturnType<typeof useSurveysStore>;

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { questionTypes } from '@/assets/data/data';
 import { Question, QuestionLegend } from '@/assets/data/interfaces';
-import { computed, reactive, ref } from 'vue';
+import { Ref, computed, reactive, ref } from 'vue';
 import AppInputElement from './AppInputElement.vue';
 import draggable from 'vuedraggable';
 import { useQuestionsStore } from '@/stores';
@@ -16,7 +16,8 @@ const props = defineProps<Props>();
 
 const form = reactive(props.question);
 const types = ref(questionTypes);
-const newItem = ref('');
+const newItem: Ref = ref('');
+const newItemReversed = ref(false);
 
 // calculate number of answers
 const numberOfAnswers = computed(() => {
@@ -47,11 +48,12 @@ const addAnswer = () => {
 	if (!newItem.value) return;
 	const id =
 		form.items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
-	form.items.push({ id, text: newItem.value });
+	form.items.push({ id, text: newItem.value, reversed: newItemReversed.value });
 
 	emit('answer-added');
 
 	newItem.value = '';
+	newItemReversed.value = false;
 };
 
 const emit = defineEmits(['answer-added']);
@@ -111,7 +113,9 @@ const emit = defineEmits(['answer-added']);
 		</div>
 	</div>
 	<hr class="my-5" />
-	<p class="text-sm text-gray-500 mb-3">{{ labels.items }}</p>
+	<p class="text-sm text-gray-500 mb-3">
+		{{ labels.items }} - Spuntare quelle a punteggio invertito
+	</p>
 
 	<!-- ANSWERS -->
 	<!-- @vue-ignore -->
@@ -125,11 +129,22 @@ const emit = defineEmits(['answer-added']);
 	>
 		<template #item="{ element: item }">
 			<li class="flex items-end">
-				<AppInputElement
-					class="grow"
-					v-model="item.text"
-					:id="`answer-${item.id}`"
-				/>
+				<div class="grow">
+					<!-- CHECKBOX -->
+					<label class="container shrink">
+						<input
+							v-model="item.reversed"
+							type="checkbox"
+							class="me-2 cursor-pointer"
+						/>
+						<span class="checkmark"></span>
+					</label>
+					<AppInputElement
+						class="grow ms-8"
+						v-model="item.text"
+						:id="`answer-${item.id}`"
+					/>
+				</div>
 				<font-awesome-icon
 					@click="deleteItem(item.id)"
 					class="ms-3 cursor-pointer text-red-700 hover:text-red-800 mb-2 md:mb-0"
@@ -140,12 +155,22 @@ const emit = defineEmits(['answer-added']);
 	</draggable>
 
 	<div class="flex items-end bg-white">
-		<AppInputElement
-			@keydown.enter.prevent="addAnswer"
-			class="grow"
-			v-model.trim="newItem"
-			id="new-answer"
-		/>
+		<div class="grow">
+			<label class="container shrink">
+				<input
+					v-model="newItemReversed"
+					type="checkbox"
+					class="me-2 cursor-pointer"
+				/>
+				<span class="checkmark"></span>
+			</label>
+			<AppInputElement
+				@keydown.enter.prevent="addAnswer"
+				class="grow ms-8"
+				v-model.trim="newItem"
+				id="new-answer"
+			/>
+		</div>
 		<font-awesome-icon
 			@click="addAnswer"
 			class="ms-3 cursor-pointer text-blue-700 hover:text-blue-800"
@@ -154,4 +179,64 @@ const emit = defineEmits(['answer-added']);
 	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* The container */
+label.container {
+	display: block;
+	position: relative;
+	cursor: pointer;
+	font-size: 22px;
+}
+
+/* Hide the browser's default checkbox */
+label.container input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+	height: 0;
+	width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+	position: absolute;
+	top: 12px;
+	left: 0;
+	height: 20px;
+	width: 20px;
+	background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+	background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+	background-color: #2196f3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+	content: '';
+	position: absolute;
+	display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+	display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+	left: 9px;
+	top: 5px;
+	width: 5px;
+	height: 10px;
+	border: solid white;
+	border-width: 0 3px 3px 0;
+	transform: rotate(45deg);
+}
+</style>

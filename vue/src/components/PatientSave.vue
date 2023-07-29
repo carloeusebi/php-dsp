@@ -1,25 +1,21 @@
 <script lang="ts" setup>
 import { computed, ref, nextTick, Ref } from 'vue';
-import { usePatientsStore, useLoaderStore } from '@/stores';
+import { usePatientsStore } from '@/stores';
 
 import AppModal from './AppModal.vue';
 import AppAlert from './AppAlert.vue';
 import PatientForm from './PatientForm.vue';
 import AppButton from './AppButton.vue';
-import { Patient } from '@/assets/data/interfaces';
+import { Errors, Patient } from '@/assets/data/interfaces';
 import { emptyPatient } from '@/assets/data/data';
 import AppButtonBlank from './AppButtonBlank.vue';
-import axios from 'axios';
+import { useSaveToStore } from '@/composables';
 
 interface Props {
 	title: string;
 	toEditPatient?: Patient;
 	icon: string;
 	buttonLabel: string;
-}
-
-interface Errors {
-	[string: string]: string;
 }
 
 // if no toEditPatient, patient default to an empty one
@@ -89,8 +85,6 @@ const handleSavePatient = async () => {
 		return age;
 	};
 
-	const loader = useLoaderStore();
-	loader.setLoader();
 	errors.value = {};
 
 	// scrolls the modal to the top, needed to show errors when on smartphones
@@ -113,20 +107,8 @@ const handleSavePatient = async () => {
 
 	// the store handles the patient saving
 
-	try {
-		await patientStore.save(patientFormData);
-
-		showModal.value = false;
-		patientRef.value = { ...props.toEditPatient } || { ...emptyPatient };
-	} catch (err) {
-		if (axios.isAxiosError(err)) {
-			errors.value = err.response?.data;
-		} else {
-			console.error(err);
-		}
-	} finally {
-		loader.unsetLoader();
-	}
+	errors.value = await useSaveToStore(patientFormData, patientStore);
+	if (!errorsStr.value) showModal.value = false;
 };
 </script>
 

@@ -73,7 +73,7 @@ export const usePatientsStore = defineStore('patients', {
 			return this.axios
 				.post(endpoint, patient)
 				.then(res => {
-					const newPatient = res.data.patient;
+					const newPatient = res.data.last_insert;
 
 					const indexToUpdate = this.patients.findIndex(
 						({ id }) => id == newPatient.id

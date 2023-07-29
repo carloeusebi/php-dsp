@@ -11,4 +11,8 @@ import TheNavbar from '@/components/TheNavbar.vue';
 	</main>
 </template>
 
-<style scoped></style>
+<style scoped>
+::-webkit-scrollbar {
+	width: 0px;
+}
+</style>

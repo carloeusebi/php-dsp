@@ -36,7 +36,7 @@ export const useSurveysStore = defineStore('surveys', {
 			return this.axios
 				.post(endpoint, survey)
 				.then(res => {
-					const newSurvey = res.data.survey;
+					const newSurvey = res.data.last_insert;
 
 					const indexToUpdate = this.surveys.findIndex(
 						({ id }) => id == newSurvey.id

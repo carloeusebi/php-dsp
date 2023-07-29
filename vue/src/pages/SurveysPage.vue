@@ -1,16 +1,23 @@
 <script lang="ts" setup>
-import { useSurveysStore, usePatientsStore } from '@/stores';
+import { useSurveysStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { Ref, computed, ref } from 'vue';
-import { useSearchFilter, useSort } from '@/composables';
+import {
+	useSearchFilter,
+	useSort,
+	useSplitArrayIntoChunks,
+} from '@/composables';
 
 import AppSearchbar from '@/components/AppSearchbar.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import AppTable from '../components/AppTable.vue';
 import SurveyRow from '../components/SurveyRow.vue';
-import { Cell, Order, Patient, Survey } from '@/assets/data/interfaces';
+import { Cell, Order, Survey } from '@/assets/data/interfaces';
 import AppButtonBlank from '@/components/AppButtonBlank.vue';
 import SurveyCreate from '@/components/SurveyCreate.vue';
+import AppPagination from '@/components/AppPagination.vue';
+
+const SURVEYS_PER_PAGE = 25;
 
 const surveysStore = useSurveysStore();
 const { surveys } = storeToRefs(surveysStore);
@@ -60,6 +67,16 @@ const filteredAndOrderedSurveys = computed(() => {
 		order.value.type
 	);
 });
+
+// PAGINATION
+const activePage = ref(0);
+const pages = computed(() =>
+	useSplitArrayIntoChunks(filteredAndOrderedSurveys.value, SURVEYS_PER_PAGE)
+);
+
+const handlePageClick = (newPage: number) => {
+	activePage.value = newPage;
+};
 </script>
 
 <template>
@@ -82,6 +99,13 @@ const filteredAndOrderedSurveys = computed(() => {
 		</div>
 
 		<!-- TABLE -->
+		<AppPagination
+			:total-pages="pages.length"
+			:current-page="activePage"
+			:showing-per-page="SURVEYS_PER_PAGE"
+			:results="surveys.length"
+			@page-click="handlePageClick"
+		/>
 
 		<AppTable
 			v-if="filteredAndOrderedSurveys.length > 0"

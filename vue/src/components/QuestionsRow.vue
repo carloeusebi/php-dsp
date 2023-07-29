@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import { Errors, Question } from '@/assets/data/interfaces';
-import AppModal from './AppModal.vue';
 import { computed, ref, nextTick, Ref } from 'vue';
-import { useLoaderStore, useQuestionsStore } from '@/stores';
+
+import { Errors, Question } from '@/assets/data/interfaces';
+import { useQuestionsStore } from '@/stores';
+import { useSaveToStore } from '@/composables';
+
+import AppModal from './AppModal.vue';
 import AppButton from './AppButton.vue';
 import AppAlert from './AppAlert.vue';
 import QuestionForm from './QuestionForm.vue';
 import QuestionDelete from './QuestionDelete.vue';
-import axios from 'axios';
 
 interface Props {
 	question: Question;
@@ -42,25 +44,44 @@ const scrollToBottom = () => {
  * Saves the updated question to the store and db
  */
 const saveQuestion = async () => {
+	/**
+	 * Stretches or Truncate the legend based on the Questionnaire's type
+	 * @param legend The Questionnaire Legend
+	 * @param questionType The Questionnaire Type
+	 * @returns The stretched or truncated legend
+	 */
+	const getCorrectNumberOfLegendsBasedOnQuestionType = (
+		legend: Question['legend'],
+		questionType: Question['type']
+	): Question['legend'] => {
+		/**
+		 * Given the type of the question, it returns the number of total answers
+		 * @param type the type of the answer
+		 * @returns the total number of answers of the questionnaire
+		 */
+		const getNumberOfAnswers = (type: Question['type']): number => {
+			const lowestAnswer = parseInt(type.at(0) as string);
+			const highestAnswer = parseInt(type.at(-1) as string);
+			return highestAnswer - lowestAnswer + 1;
+		};
+
+		const numberOfAnswers = getNumberOfAnswers(questionType);
+		return legend.slice(0, numberOfAnswers);
+	};
+
+	errors.value = {};
+
+	questionRef.value.legend = getCorrectNumberOfLegendsBasedOnQuestionType(
+		questionRef.value.legend,
+		questionRef.value.type
+	);
+
+	/**
+	 * Attempt to save the Question
+	 */
 	const questionsStore = useQuestionsStore();
-	const loader = useLoaderStore();
-	loader.setLoader();
-
-	const maxAnswers = parseInt(questionRef.value.type.at(-1) as string);
-
-	// cuts longer legends
-	questionRef.value.legend = questionRef.value.legend.slice(0, maxAnswers);
-
-	//spread the question because on the other side we stringify its content before sending it via ajax call, if we don't spread it we modify the object on this side too
-	try {
-		await questionsStore.save({ ...questionRef.value });
-		closeModal();
-	} catch (err) {
-		if (axios.isAxiosError(err)) errors.value = err.response?.data;
-		else console.error(err);
-	} finally {
-		loader.unsetLoader();
-	}
+	errors.value = await useSaveToStore(questionRef.value, questionsStore);
+	if (!errorsStr.value) closeModal();
 };
 
 const closeModal = () => {
