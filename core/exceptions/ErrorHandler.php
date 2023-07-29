@@ -21,7 +21,7 @@ class ErrorHandler
 
     static function handleCliException(Throwable $exception): never
     {
-        echo "\033[2J\033[;H";
+        // echo "\033[2J\033[;H";
         echo "PHP Fatal error:\n";
         echo "Code: {$exception->getCode()}\n";
         echo "Message: {$exception->getMessage()}\n";
@@ -36,6 +36,12 @@ class ErrorHandler
         string $errFile,
         int $errLine
     ): bool {
+
+        if (strpos($errStr, "Implicit conversion from float 0.5 to int loses precision") !== false) {
+            // Ignore this specific warning
+            return false;
+        }
+
         throw new \ErrorException($errStr, 0, $errN, $errFile, $errLine);
     }
 

@@ -45,7 +45,10 @@ class Mail
 
 
     /**
-     * @param string[] $form_data
+     * Load the email fields from the website's contact form
+     * @param string[] $form_data An assoc array containing the data loaded from the form
+     * @param bool $needs_validation True to validate the email using Verifalia's api
+     * @return null|string Null if the email is loaded correctly, a string with the error message if the email is considered undeliverable or if an attempt from a bot was caught
      */
     public function prepareFromContactForm(array $form_data, bool $needs_validation = false): ?string
     {
@@ -74,7 +77,23 @@ class Mail
         return '';
     }
 
+    /**
+     * Load the email with the necessary field before sending the email
+     */
+    public function load(string $email_to, string $subject, string $body, string $name = '', string $email_from = '')
+    {
+        $this->email_to = $email_to;
+        $this->subject = $subject;
+        $this->body = $body;
+        $this->name = $name ?: self::$EMAIL_NAME;
+        $this->email_from = $email_from ? $email_from : self::$EMAIL_MAIN;
+    }
 
+
+    /**
+     * Send the email using PHPMailer's api
+     * @return null|string null if the email was sent, a string with the error message otherwise
+     */
     public function send(): ?string
     {
         $mail = new PHPMailer(true);
@@ -120,28 +139,23 @@ class Mail
         }
     }
 
-
-    public function sendConfirmation(): void
-    {
-        $this->email_to = $this->email_from;
-        $this->email_from = self::$EMAIL_FROM;
-        $this->subject = self::CONFIRMATION_SUBJECT;
-        $this->body = "Grazie " . $this->name . self::CONFIRMATION_BODY;
-        $this->name = self::$EMAIL_NAME;
-
-        $this->send();
-    }
-
     /**
      * Checks if email address is deliverable using Verifalia api
      * @param string $email The email address to validate
-     * @param bool $should_log_invalid true if a log should be made in case email is invalid
+     * @param bool $should_log_invalid True if a log should be made in case email is invalid
+     * @param bool $should_log_valid True if a log should be made in case email is valid; Should not log email if it doesn't belong to a registered patient
      * @return bool False is the email address is valid and deliverable
      */
-    static function isUndeliverable(string $email, bool $should_log_invalid = false): bool
+    static function isUndeliverable(string $email, bool $should_log_invalid = false, bool $should_log_valid = false): bool
     {
+
+        // if an invalid email address passed the frontend barriers immediately return the email as undeliverable
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return true;
 
+        // if the email was already validated return false
+        if (self::emailWasAlreadyValidated($email)) return false;
+
+        // try the validation through Verifalia
         try {
 
             // Verifalia returns error "Implicit conversion from float 0.5 to int loses precision" so i need to ignore the deprecated warning
@@ -155,7 +169,6 @@ class Mail
                 'username' => $verifalia_username,
                 'password' => $verifalia_password
             ]);
-            // resetting errors levels
 
             // check if have verifalia credits
             $balance = $verifalia->credits->getBalance();
@@ -164,20 +177,74 @@ class Mail
                 $entry = $validation->entries[0];
 
 
+                // if the email passed the Verifalia test is considered valid and deliverable 
                 if ($entry->classification === 'Undeliverable') {
                     if ($should_log_invalid) self::log(self::MAIL_INVALID);
                     return true;
                 }
+
+                // if the flag should_log_valid is true, probably because the email belongs to one of the registered patients, it is logged to the database
+                // EMAILS FROM NON PATIENTS ARE NOT SAVED
+                if ($should_log_valid)
+                    self::saveValidEmail($email);
             }
-        } catch (VerifaliaException $e) {
+        } catch (Exception $e) {
             // if there is an error with Verifalia, just pretend the email address is deliverable
             \app\core\exceptions\ErrorHandler::log($e);
             return false;
         }
+
+        // email is considered as valid, but since it bypassed the Verifalia validation, either because there were no more credits available or because Verifalia api failed email is not logged in the database as valid
         return false;
     }
 
+    /**
+     * Checks if the email passed as param was already validated
+     */
+    private static function emailWasAlreadyValidated(string $email_to_validate): bool
+    {
+        $valid_emails = self::getValidEmails();
+        if (!$valid_emails) return false;
 
+        return in_array($email_to_validate, $valid_emails);
+    }
+
+    /**
+     * Fetches from the db the emails and returns a list of valid emails
+     * @return string[]
+     */
+    private static function getValidEmails(): array
+    {
+        $statement = App::$app->db->prepare('SELECT * FROM `emails`');
+        $statement->execute();
+        $data = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        return array_map(fn ($d) => $d['email'], $data);
+    }
+
+
+    /**
+     * Saves in the database the newly validate email address
+     */
+    private static function saveValidEmail(string $email): bool
+    {
+        try {
+
+            $statement = App::$app->db->prepare('INSERT INTO `emails` (email) VALUES (:email)');
+            $statement->bindValue('email', $email);
+            $statement->execute();
+
+            return true;
+        } catch (Exception $exception) {
+            \app\core\exceptions\ErrorHandler::log($exception);
+            return false;
+        }
+    }
+
+
+    /**
+     * Log in the database a failed attempt to validate an email address
+     */
     public static function log(string $message): bool
     {
         try {
