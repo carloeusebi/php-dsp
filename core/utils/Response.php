@@ -18,7 +18,9 @@ class Response
     {
         self::statusCode($http_code);
         if (!empty($messages)) {
-            echo json_encode($messages, JSON_NUMERIC_CHECK);
+            $json =  json_encode($messages, JSON_INVALID_UTF8_IGNORE);
+            if ($json) echo $json;
+            else self::statusCode(500);
         }
         exit;
     }

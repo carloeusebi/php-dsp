@@ -12,13 +12,15 @@ use app\db\DbModel;
 abstract class AdminController extends Controller
 {
     protected DbModel $model;
-    protected string $model_name;
 
     public function __construct()
     {
         $this->registerMiddleware(new AdminMiddleware([]));
-        $this->model = App::$app->{$this->model_name};
+        $this->model = $this->getModel();
     }
+
+
+    abstract protected function getModel(): DbModel;
 
 
     public function get(): void
@@ -61,8 +63,8 @@ abstract class AdminController extends Controller
         if (empty($errors)) {
             // recover saved entry, and sends it back
             $id = $data['id'] ?? intval(App::$app->db->getLastInsertId());
-            $lastInsertItem = $this->model->getById($id);
-            Response::response(201, ["$this->model_name" => $lastInsertItem]);
+            $last_insert_item = $this->model->getById($id);
+            Response::response(201, ["last_insert" => $last_insert_item]);
         } else {
             Response::response(422, $errors);
         }

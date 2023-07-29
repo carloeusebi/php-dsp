@@ -113,7 +113,7 @@ abstract class DbModel extends Model
 
     protected function getQueryParams(): string
     {
-        $data = Request::getBody();
+        $data = $_GET;
 
         // build the conditional SQL query
         $params = 'WHERE ';

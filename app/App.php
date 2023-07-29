@@ -9,6 +9,10 @@ use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
+use app\core\exceptions\ForbiddenException;
+use app\core\exceptions\RouteNotFoundException;
+use app\core\utils\Request;
+use app\core\utils\Response;
 use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
@@ -55,12 +59,11 @@ class App
     {
         try {
             return $this->router->resolve();
-        } catch (\Exception $e) {
+        } catch (RouteNotFoundException | ForbiddenException $e) {
             $code = intval($e->getCode());
-            $message = $e->getMessage();
-            if ($code === 404)
+            Response::statusCode($code);
+            if ($e instanceof RouteNotFoundException && !Request::isApi())
                 $this->router->renderView('404');
-            // Response::response($code, $message);
         }
     }
 

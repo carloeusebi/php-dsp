@@ -4,7 +4,6 @@ namespace app\core\exceptions;
 
 use Throwable;
 use app\core\utils\Response;
-use PhpParser\Node\Expr\Throw_;
 
 class ErrorHandler
 {
@@ -29,6 +28,15 @@ class ErrorHandler
         echo "File: {$exception->getFile()}\n";
         echo "Line: {$exception->getLine()}\n";
         die();
+    }
+
+    static function handleError(
+        int $errN,
+        string $errStr,
+        string $errFile,
+        int $errLine
+    ): bool {
+        throw new \ErrorException($errStr, 0, $errN, $errFile, $errLine);
     }
 
     static function log(Throwable $e)
