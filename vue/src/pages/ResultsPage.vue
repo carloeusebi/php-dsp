@@ -12,9 +12,9 @@ const editMode = ref(false);
 
 const survey = useSurveysStore().getById(id) as Survey;
 
-const min = (question: Question): number => {
-	return parseInt(question.type.at(0) as string);
-};
+const min = (question: Question): number => parseInt(question.type.at(0) as string);
+const max = (question: Question): number => parseInt(question.type.at(-1) as string);
+const itemValue = (question: Question, item: QuestionItem, n: number): number => (item.reversed ? max(question) - n : min(question) + n);
 
 /**
  * Updates an answer
@@ -22,22 +22,11 @@ const min = (question: Question): number => {
  * @param itemId the item to update
  * @param answer the new answer
  */
-const changeAnswer = (
-	questionId: number,
-	itemId: number,
-	answer: number
-): void => {
+const changeAnswer = (questionId: number | undefined, itemId: number, answer: number): void => {
 	// return if we are not in question mode
 	if (!editMode.value) return;
-
-	const questionToUpdate = survey?.questions.find(
-		({ id }) => id === questionId
-	);
-
-	const itemToUpdate = questionToUpdate?.items.find(
-		({ id }) => id === itemId
-	) as QuestionItem;
-
+	const questionToUpdate = survey?.questions.find(({ id }) => id === questionId);
+	const itemToUpdate = questionToUpdate?.items.find(({ id }) => id === itemId) as QuestionItem;
 	itemToUpdate.answer = answer;
 };
 
@@ -96,12 +85,8 @@ const saveUpdates = async () => {
 						>| <strong>Altezza: </strong>{{ survey?.height }}cm</span
 					>
 				</div>
-				<div v-if="survey?.job">
-					<strong>Professione: </strong>{{ survey?.job }}
-				</div>
-				<div v-if="survey?.cohabitants">
-					<strong>Vive con: </strong>{{ survey?.cohabitants }}
-				</div>
+				<div v-if="survey?.job"><strong>Professione: </strong>{{ survey?.job }}</div>
+				<div v-if="survey?.cohabitants"><strong>Vive con: </strong>{{ survey?.cohabitants }}</div>
 			</section>
 
 			<!-- QUESTIONNAIRE -->
@@ -115,9 +100,7 @@ const saveUpdates = async () => {
 				<h2>{{ question.question }}</h2>
 				<p>{{ question.description }}</p>
 				<!-- LEGEND -->
-				<div
-					class="border border-black my-5 p-2 grid md:grid-cols-2 md:text-xl"
-				>
+				<div class="border border-black my-5 p-2 grid md:grid-cols-2">
 					<div
 						v-for="(legend, i) in question.legend"
 						:key="i"
@@ -126,35 +109,27 @@ const saveUpdates = async () => {
 						{{ i + min(question) }} = {{ legend.legend }}
 					</div>
 				</div>
-				<!-- QUESTIONS -->
+				<!-- ITEMS -->
 				<div>
 					<div
 						v-for="item in question.items"
 						:key="item.id"
 						class="grid grid-cols-6 relative"
 					>
-						<div
-							class="col-span-4 p-2 border border-black flex justify-between"
-						>
+						<div class="col-span-4 p-2 border border-black flex justify-between">
 							{{ item.text }}
 						</div>
 						<!-- ANSWERS -->
 						<div class="col-span-2 flex">
 							<!-- @vue-ignore -->
 							<div
-								v-for="(leg, n) in question.legend"
+								v-for="(legend, n) in question.legend"
 								:key="n"
 								class="answer-cell border border-black flex-grow flex justify-center items-center"
-								:class="{ 'bg-green-500': n + min(question) === item.answer }"
-								@click="
-									changeAnswer(
-										question.id as number,
-										item.id,
-										n + min(question)
-									)
-								"
+								:class="{ 'bg-green-500': itemValue(question, item, n) === item.answer }"
+								@click="changeAnswer(question.id, item.id, itemValue(question, item, n))"
 							>
-								{{ n + min(question) }}
+								{{ itemValue(question, item, n) }}
 							</div>
 						</div>
 						<!-- COMMENTS -->
@@ -186,11 +161,7 @@ const saveUpdates = async () => {
 	<!-- EDIT BUTTON -->
 	<div
 		class="edit-button"
-		:class="[
-			editMode
-				? 'bg-red-800 hover:bg-red-900'
-				: 'bg-blue-800 hover:bg-blue-900',
-		]"
+		:class="[editMode ? 'bg-red-800 hover:bg-red-900' : 'bg-blue-800 hover:bg-blue-900']"
 		@click="editMode = !editMode"
 	>
 		<font-awesome-icon

@@ -3,7 +3,7 @@ import { Question, QuestionItem } from '@/assets/data/interfaces';
 import TestHeader from '@/components/TestHeader.vue';
 import TestLanding from '@/components/TestLanding.vue';
 import TestQuestion from '@/components/TestQuestion.vue';
-import { useGetFirstItemWithoutPropIndex } from '@/composables/_useGetFirstItemWithoutPropIndex';
+import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
 import router from '@/routes';
 import { useLoaderStore, useTestsStore } from '@/stores';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -29,15 +29,21 @@ const fetchTest = async (token: string) => {
 	try {
 		await testsStore.fetch(params);
 
+		// creates the pages wit one Questionnaire per pages
 		test.value.questions.forEach(question => {
 			pages.value.push({ question });
-			active.value = useGetFirstItemWithoutPropIndex(
+			// sets the first non-completed Questionnaire as the
+			active.value = useGetIndexOfFirstItemWithoutProp(
 				test.value.questions,
 				'completed'
 			);
+			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
+
+			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
 		});
 	} catch (err) {
 		if (axios.isAxiosError(err)) {
+			// axios returns an error if the test is already complete, in that case we just redirect to page 404
 			console.warn(err.response?.data.error);
 			render404();
 		} else console.error(err);
@@ -65,6 +71,9 @@ interface Page {
 
 const pages: Ref<Page[]> = ref([]);
 
+/**
+ * Handle the patient's answer and saves it to the database
+ */
 const handleAnswer = (itemId: number, answer: number): void => {
 	const itemToUpdate = test.value.questions[active.value].items.find(
 		({ id }) => id === itemId
@@ -76,7 +85,7 @@ const handleAnswer = (itemId: number, answer: number): void => {
 };
 
 /**
- * Saves the and uses the store the make an ajax call
+ * Handles what happens when a questionnaires is completed
  */
 const handleQuestionComplete = () => {
 	const isLastQuestion = () => active.value === test.value.questions.length - 1;

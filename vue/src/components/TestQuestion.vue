@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Question } from '@/assets/data/interfaces';
 import { computed, ref } from 'vue';
-import { useGetFirstItemWithoutPropIndex } from '@/composables/_useGetFirstItemWithoutPropIndex';
+import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
 import AppButton from './AppButton.vue';
 import AppModal from './AppModal.vue';
 import AppInputElement from './AppInputElement.vue';
@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 const min = computed(() => parseInt(props.question.type.at(0) as string));
 const max = computed(() => parseInt(props.question.type.at(-1) as string));
 
-const firstNotAnsweredItemIndex = useGetFirstItemWithoutPropIndex(
+const firstNotAnsweredItemIndex = useGetIndexOfFirstItemWithoutProp(
 	props.question.items,
 	'answer'
 );

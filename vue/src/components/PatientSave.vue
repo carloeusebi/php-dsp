@@ -54,10 +54,8 @@ const scrollModalToTop = () => {
 const handleFileLoaded = (file: File) => {
 	errors.value = {};
 
-	if (file.size > 1_048_576)
-		errors.value['wrong-dimensions'] = 'Dimensioni massime del file 1MB!';
-	if (file.type !== 'application/pdf')
-		errors.value['wrong-file-type'] = 'Il file deve essere formato PDF';
+	if (file.size > 1_048_576) errors.value['wrong-dimensions'] = 'Dimensioni massime del file 1MB!';
+	if (file.type !== 'application/pdf') errors.value['wrong-file-type'] = 'Il file deve essere formato PDF';
 
 	!errorsStr.value ? (patientRef.value.consent = file) : scrollModalToTop();
 };
@@ -77,11 +75,7 @@ const handleSavePatient = async () => {
 		const age =
 			today.getFullYear() -
 			birthDate.getFullYear() -
-			(today.getMonth() < birthDate.getMonth() ||
-			(today.getMonth() === birthDate.getMonth() &&
-				today.getDate() < birthDate.getDate())
-				? 1
-				: 0);
+			(today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate()) ? 1 : 0);
 		return age;
 	};
 
@@ -92,8 +86,7 @@ const handleSavePatient = async () => {
 
 	const patientStore = usePatientsStore();
 
-	if (patientRef.value.birthday)
-		patientRef.value.age = calculateAge(patientRef.value.birthday);
+	if (patientRef.value.birthday) patientRef.value.age = calculateAge(patientRef.value.birthday);
 
 	const keys = Object.keys(patientRef.value) as Array<keyof Patient>;
 	const patientFormData = new FormData();
@@ -101,8 +94,7 @@ const handleSavePatient = async () => {
 	// maps the FormData to the patient's keys, needed for file upload
 	keys.forEach(key => {
 		if (key === 'id' && !patientRef.value.id) return;
-		if (patientRef.value[key])
-			patientFormData.append(key, patientRef.value[key] as string);
+		if (patientRef.value[key]) patientFormData.append(key, patientRef.value[key] as string);
 	});
 
 	// the store handles the patient saving

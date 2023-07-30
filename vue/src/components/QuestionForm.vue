@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { questionTypes } from '@/assets/data/data';
-import { Question, QuestionLegend } from '@/assets/data/interfaces';
+import { Question, QuestionItem, QuestionLegend } from '@/assets/data/interfaces';
 import { Ref, computed, reactive, ref } from 'vue';
 import AppInputElement from './AppInputElement.vue';
 import draggable from 'vuedraggable';
@@ -37,18 +37,29 @@ const numberOfAnswers = computed(() => {
 	return numOfAnswers;
 });
 
-const getLegendLabel = (i: number): string =>
-	(parseInt(form.type.at(0) as string) + i).toString();
+const getLegendLabel = (i: number): string => (parseInt(form.type.at(0) as string) + i).toString();
 
 const deleteItem = (id: number): void => {
 	form.items = form.items.filter(a => a.id !== id);
 };
 
-const addAnswer = () => {
+/**
+ * Adds a new item to the list of the Questionnaire's items
+ */
+const addItem = () => {
+	/**
+	 * Generates a new id for the item
+	 * @param items The list of items
+	 * @returns The id for the new item
+	 */
+	const generateId = (items: QuestionItem[]): number => items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
+	const capitalizeItem = (textToCapitalize: string): string => textToCapitalize.at(0)?.toUpperCase() + textToCapitalize.slice(1);
+
 	if (!newItem.value) return;
-	const id =
-		form.items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
-	form.items.push({ id, text: newItem.value, reversed: newItemReversed.value });
+
+	const id = generateId(form.items);
+	const text = capitalizeItem(newItem.value);
+	form.items.push({ id, text, reversed: newItemReversed.value });
 
 	emit('answer-added');
 
@@ -113,9 +124,7 @@ const emit = defineEmits(['answer-added']);
 		</div>
 	</div>
 	<hr class="my-5" />
-	<p class="text-sm text-gray-500 mb-3">
-		{{ labels.items }} - Spuntare quelle a punteggio invertito
-	</p>
+	<p class="text-sm text-gray-500 mb-3">{{ labels.items }} - Spuntare quelle a punteggio invertito</p>
 
 	<!-- ANSWERS -->
 	<!-- @vue-ignore -->
@@ -165,14 +174,14 @@ const emit = defineEmits(['answer-added']);
 				<span class="checkmark"></span>
 			</label>
 			<AppInputElement
-				@keydown.enter.prevent="addAnswer"
+				@keydown.enter.prevent="addItem"
 				class="grow ms-8"
 				v-model.trim="newItem"
 				id="new-answer"
 			/>
 		</div>
 		<font-awesome-icon
-			@click="addAnswer"
+			@click="addItem"
 			class="ms-3 cursor-pointer text-blue-700 hover:text-blue-800"
 			:icon="['fas', 'plus']"
 		/>
