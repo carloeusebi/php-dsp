@@ -36,17 +36,13 @@ class Database
 
     public function prepare(string $query)
     {
-        try {
-            return $this->pdo->prepare($query);
-        } catch (Error $error) {
-            \app\core\exceptions\ErrorHandler::log($error);
-        }
+        return $this->pdo->prepare($query);
     }
 
 
     public function execute(string $query)
     {
-        $this->pdo->exec($query);
+        return $this->pdo->exec($query);
     }
 
 

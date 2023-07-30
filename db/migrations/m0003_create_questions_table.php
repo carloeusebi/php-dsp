@@ -16,7 +16,8 @@ class m0003_create_questions_table
       `type` varchar(80) NOT NULL,
       `items` text,
       `legend` text,
-      PRIMARY KEY (`id`)
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `Title` (`question`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
     $db->execute($SQL);

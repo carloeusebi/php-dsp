@@ -1,13 +1,11 @@
 <?php
 
-namespace app\db\factories;
-
 use app\app\App;
-use DateTime;
+use app\core\utils\Utils;
 
 class PatientsFactory
 {
-    private const TABLE_NAME = 'patients';
+    public const TABLE_NAME = 'patients';
 
     private $first_names = ['Luca', 'Giulia', 'Alessandro', 'Sofia', 'Lorenzo', 'Chiara', 'Matteo', 'Giorgia', 'Davide', 'Martina', 'Marco', 'Elena', 'Federico', 'Valentina', 'Francesco', 'Aurora', 'Leonardo', 'Alessia', 'Antonio', 'Bianca'];
     private $last_names = ['Rossi', 'Bianchi', 'Ferrari', 'Esposito', 'Ricci', 'Marini', 'Conti', 'Galli', 'Barbieri', 'Romano', 'Colombo', 'Marchetti', 'Costa', 'De Luca', 'Mancini', 'Rinaldi', 'Moretti', 'Fabbri', 'Bellini', 'Rizzo', 'Leone'];
@@ -25,18 +23,6 @@ class PatientsFactory
     {
         $timestamp = mt_rand($start, $end);
         return date('Y-m-d', $timestamp);
-    }
-
-
-    /**
-     * Calculates age based on birthday;
-     */
-    private function calculateAge(string $birthday): int
-    {
-        $today = new DateTime();
-        $birth_date = new DateTime($birthday);
-        $age_interval = $today->diff($birth_date);
-        return $age_interval->y;
     }
 
     /**
@@ -62,14 +48,17 @@ class PatientsFactory
     }
 
 
-    public function generateAndInsert(int $number_of_patients): void
+    public function generateAndInsert(): void
     {
+
+        $number_of_patients = readline("How many patients do you want to generate? ");
+
         for ($i = 1; $i <= $number_of_patients; $i++) {
             $fname = $this->randomItem($this->first_names);
             $lname = $this->randomItem($this->last_names);
             $sex = $this->randomItem($this->sexes);
             $birthday = $this->randomDate(strtotime('-90 years'), strtotime('-18 years'));
-            $age = $this->calculateAge($birthday);
+            $age = Utils::calculateAge($birthday);
             $birthplace = $this->randomItem($this->birthplaces);
             $address = $this->randomItem($this->addresses);
             $begin = $this->randomDate(strtotime('-5 years'), strtotime('now'));
@@ -109,6 +98,9 @@ class PatientsFactory
             $this->printProgressBar($i, $number_of_patients);
         }
 
-        echo "\n$number_of_patients random patients generated successfully!" . PHP_EOL;
+        if ($number_of_patients)
+            echo "\n$number_of_patients random patients generated successfully!" . PHP_EOL;
+        else
+            echo "\nNo Patients generated" . PHP_EOL;
     }
 }

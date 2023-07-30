@@ -29,6 +29,7 @@ Make sure you have environment setup properly. You will need MySQL, PHP8.1, Node
 4. Navigate to the project's root directory using terminal
 5. Run `composer install`
 6. Run migrations `php migrations.php`
+7. Run factories `php db\factories\factories.php`
 
 ## Installation using docker
 
@@ -36,11 +37,12 @@ Make sure you have docker installed. To see how you can install docker on Window
 Make sure `docker` and `docker-compose` commands are available in command line.
 
 1. Clone the project using git
-1. Copy `.env.example` into `.env` (Don't need to change anything for local development)
+1. Copy `.env.example` into `.env` (no need to change database credentials for local development)
 1. Navigate to the project root directory and run `docker-compose up -d`
 1. Install dependencies - `docker-compose exec app composer install`
 1. Run migrations - `docker-compose exec app php migrations.php`
-1. Open in browser http://127.0.0.1:8080
+1. Run factories - `docker-compose exec app php db\factories\factories.php`
+1. Open in browser http://localhost:8080
 
 ## Install Vue.js Admin Panel
 
