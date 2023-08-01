@@ -5,6 +5,7 @@ import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
 import AppButton from './AppButton.vue';
 import AppModal from './AppModal.vue';
 import AppInputElement from './AppInputElement.vue';
+import AppAlert from './AppAlert.vue';
 
 interface Props {
 	question: Question;
@@ -16,10 +17,7 @@ const props = defineProps<Props>();
 const min = computed(() => parseInt(props.question.type.at(0) as string));
 const max = computed(() => parseInt(props.question.type.at(-1) as string));
 
-const firstNotAnsweredItemIndex = useGetIndexOfFirstItemWithoutProp(
-	props.question.items,
-	'answer'
-);
+const firstNotAnsweredItemIndex = useGetIndexOfFirstItemWithoutProp(props.question.items, 'answer');
 const active = ref(firstNotAnsweredItemIndex);
 const clicked = ref(-1);
 
@@ -35,19 +33,16 @@ const emit = defineEmits(['answered', 'question-complete']);
 // keyboard click of valid num key triggers handleClick
 window.addEventListener('keydown', e => {
 	const keyPress = parseInt(e.key);
-	if (!isNaN(keyPress) && keyPress >= min.value && keyPress <= max.value)
-		handleClick(keyPress);
+	if (!isNaN(keyPress) && keyPress >= min.value && keyPress <= max.value) handleClick(keyPress);
 	11;
 });
 
-const handleClick = (answer: number): void => {
-	if (scroll.value) return;
-	clicked.value = answer;
+const activeItemId = computed(() => props.question.items[active.value].id);
 
-	const itemId = props.question.items[active.value].id;
-
-	emit('answered', itemId, answer);
-
+/**
+ * Goes to the next question and handles the animation
+ */
+const goToNextQuestion = () => {
 	// scroll class triggers scroll animation
 	scroll.value = true;
 	showClickedClass.value = true;
@@ -71,9 +66,36 @@ const handleClick = (answer: number): void => {
 	}, 1500);
 };
 
+/**
+ * Handle the submission of an answer by the patient
+ * @param answer The value of the selected answer
+ */
+const handleClick = (answer: number): void => {
+	if (scroll.value) return;
+	clicked.value = answer;
+
+	emit('answered', activeItemId.value, answer);
+	goToNextQuestion();
+};
+
 const addComment = () => {
-	props.question.items[active.value].comment = comment.value.trim();
+	props.question.items[active.value].comment = comment.value;
 	showModal.value = false;
+};
+
+const showCommentAlert = ref(false);
+/**
+ * Allows the patient to skip the question, but he needs to add a comment explaining why
+ */
+const skipItem = () => {
+	showCommentAlert.value = false;
+	if (!comment.value) {
+		showCommentAlert.value = true;
+		return;
+	}
+	addComment();
+	emit('answered', activeItemId.value, -1);
+	goToNextQuestion();
 };
 </script>
 
@@ -133,9 +155,7 @@ const addComment = () => {
 						<div class="px-2 flex-grow">
 							{{ leg.legend }}
 						</div>
-						<div
-							class="absolute flex items-center bg-[#ecf5ef] top-1 bottom-1 right-1"
-						>
+						<div class="absolute flex items-center bg-[#ecf5ef] top-1 bottom-1 right-1">
 							<font-awesome-icon :icon="['fas', 'check']" />
 						</div>
 					</li>
@@ -154,26 +174,40 @@ const addComment = () => {
 		</div>
 	</section>
 
-	<!-- MODAL -->
+	<!-- ADD COMMENT MODAL -->
 
 	<AppModal
 		:open="showModal"
 		@close="showModal = false"
 	>
 		<template #content>
-			<h3 class="font-bold mb-3">Scrivi qui il tuo commento:</h3>
+			<AppAlert
+				:show="showCommentAlert"
+				title="Errore"
+				message="Se vuoi saltare la domanda devi scrivere un commento"
+				type="warning"
+			/>
+
+			<h3 class="font-bold my-3">Scrivi qui il tuo commento:</h3>
 			<form
 				id="comment-form"
 				@submit.prevent="addComment"
 			>
 				<AppInputElement
 					type="textarea"
-					v-model="comment"
+					v-model.trim="comment"
 				/>
 			</form>
 		</template>
 		<template #button>
-			<AppButton form="comment-form"> Aggiungi commento</AppButton>
+			<AppButton> Aggiungi commento</AppButton>
+			<AppButton
+				class="me-3"
+				color="green"
+				@click="skipItem"
+			>
+				Salta questa domanda</AppButton
+			>
 		</template>
 	</AppModal>
 </template>

@@ -1,21 +1,36 @@
 <script lang="ts" setup>
-import { Question, QuestionItem } from '@/assets/data/interfaces';
-import TestHeader from '@/components/TestHeader.vue';
-import TestLanding from '@/components/TestLanding.vue';
-import TestQuestion from '@/components/TestQuestion.vue';
-import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
-import router from '@/routes';
-import { useLoaderStore, useTestsStore } from '@/stores';
 import axios, { AxiosRequestConfig } from 'axios';
 import { storeToRefs } from 'pinia';
 import { Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+import TestHeader from '@/components/TestHeader.vue';
+import TestLanding from '@/components/TestLanding.vue';
+import TestQuestion from '@/components/TestQuestion.vue';
+
+import { Question, QuestionItem } from '@/assets/data/interfaces';
+import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
+import router from '@/routes';
+import { useLoaderStore, useTestsStore } from '@/stores';
+
+/**
+ * Disable back button navigation, it suggests the patient to leave a comment explaining why he wanted to go back to change the old question
+ */
+const disableBackButton = () => {
+	window.history.pushState(null, '', window.location.href);
+	window.onpopstate = () => {
+		window.history.pushState(null, '', window.location.href);
+		alert('Non puoi più modificare le risposte precedenti, se vuoi puoi lasciare un commento in cui spieghi perché volevi cambiare la risposta precedente.');
+	};
+};
+
+disableBackButton();
+
 const testsStore = useTestsStore();
 const loader = useLoaderStore();
 loader.setLoader();
 
-const render404 = () => {
+const goTo404 = () => {
 	router.push('404');
 };
 
@@ -33,19 +48,19 @@ const fetchTest = async (token: string) => {
 		test.value.questions.forEach(question => {
 			pages.value.push({ question });
 			// sets the first non-completed Questionnaire as the
-			active.value = useGetIndexOfFirstItemWithoutProp(
-				test.value.questions,
-				'completed'
-			);
+			active.value = useGetIndexOfFirstItemWithoutProp(test.value.questions, 'completed');
 			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
-
+			// const timeSinceLastAnswer = getTimeSinceLastAnswer();
+			// if (timeSinceLastAnswer > TIME_TO_COMPLETE_QUESTIONNAIRE) {
+			// 	resetQuestionnaire(test.value.questions[active.value]);
+			// }
 			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
 		});
 	} catch (err) {
 		if (axios.isAxiosError(err)) {
 			// axios returns an error if the test is already complete, in that case we just redirect to page 404
 			console.warn(err.response?.data.error);
-			render404();
+			goTo404();
 		} else console.error(err);
 	} finally {
 		loader.unsetLoader();
@@ -55,10 +70,11 @@ const fetchTest = async (token: string) => {
 const route = useRoute();
 let token: string;
 
+// reads the token
 if (route.query.token) {
 	token = route.query.token as string;
 	fetchTest(token);
-} else render404();
+} else goTo404();
 
 const { test } = storeToRefs(testsStore);
 const showLanding = ref(true);
@@ -75,9 +91,7 @@ const pages: Ref<Page[]> = ref([]);
  * Handle the patient's answer and saves it to the database
  */
 const handleAnswer = (itemId: number, answer: number): void => {
-	const itemToUpdate = test.value.questions[active.value].items.find(
-		({ id }) => id === itemId
-	) as QuestionItem;
+	const itemToUpdate = test.value.questions[active.value].items.find(({ id }) => id === itemId) as QuestionItem;
 
 	itemToUpdate.answer = answer;
 

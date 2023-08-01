@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+
 import AppButton from './AppButton.vue';
 import AppModal from './AppModal.vue';
-import { useLoaderStore, useSurveysStore } from '@/stores';
-import { Survey } from '@/assets/data/interfaces';
-import axios from 'axios';
 import AppButtonBlank from './AppButtonBlank.vue';
+
+import { useSurveysStore } from '@/stores';
+import { Survey } from '@/assets/data/interfaces';
+import { useDeleteFromStore } from '@/composables';
 
 interface Props {
 	toDeleteSurvey: Survey;
@@ -17,32 +19,25 @@ const showDeleteModal = ref(false);
 
 const handleDeleteSurvey = async () => {
 	const surveysStore = useSurveysStore();
-	const loader = useLoaderStore();
-
 	const id: number = props.toDeleteSurvey.id || -1;
 
-	try {
-		await surveysStore.delete(id);
-	} catch (err) {
-		if (axios.isAxiosError(err)) console.error(err.response?.data);
-		else console.log(err);
-	} finally {
-		loader.unsetLoader();
-	}
+	useDeleteFromStore(surveysStore, id);
 };
 </script>
 
 <template>
 	<AppButtonBlank
 		@click="showDeleteModal = true"
-		color="red">
+		color="red"
+	>
 		<font-awesome-icon :icon="['fas', 'trash-can']" />
 		<span class="hidden md:inline ms-3">Elimina Sondaggio</span>
 	</AppButtonBlank>
 
 	<AppModal
 		:open="showDeleteModal"
-		@close="showDeleteModal = false">
+		@close="showDeleteModal = false"
+	>
 		<!-- CONTENT -->
 		<template v-slot:content>
 			<h2 class="text-2xl font-medium">Elimina</h2>
@@ -55,12 +50,14 @@ const handleDeleteSurvey = async () => {
 			<form
 				@submit.prevent="handleDeleteSurvey"
 				id="delete-form"
-				class="flex items-center my-3">
+				class="flex items-center my-3"
+			>
 				<input
 					class="cursor-pointer"
 					type="checkbox"
 					id="confirm-delete"
-					required />
+					required
+				/>
 				<label
 					for="confirm-delete"
 					class="ps-3 cursor-pointer"
@@ -72,7 +69,8 @@ const handleDeleteSurvey = async () => {
 		<template v-slot:button>
 			<AppButton
 				form="delete-form"
-				color="red">
+				color="red"
+			>
 				Elimina {{ toDeleteSurvey.title }}
 			</AppButton>
 		</template>

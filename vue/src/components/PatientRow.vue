@@ -1,29 +1,42 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { Ref, computed, ref } from 'vue';
 import { PatientCell } from '@/pages/PatientsPage.vue';
 
 import AppModal from './AppModal.vue';
 import PatientSave from './PatientSave.vue';
 import PatientDelete from './PatientDelete.vue';
-import { usePatientsStore } from '@/stores';
-import { Patient } from '@/assets/data/interfaces';
+import { usePatientsStore, useSurveysStore } from '@/stores';
+import { Patient, Survey } from '@/assets/data/interfaces';
 import SurveyCreate from './SurveyCreate.vue';
+import SurveyRow from './SurveyRow.vue';
+import { SurveyCell } from '@/pages/SurveysPage.vue';
+import { useSort } from '@/composables';
+import AppTable from './AppTable.vue';
 
 interface Props {
 	patient: Patient;
 	cells: PatientCell[];
 }
 
+const patientStore = usePatientsStore();
+
+const labels = patientStore.getLabels;
+
 const props = defineProps<Props>();
 
 const showModal = ref(false);
 const successAlert = ref(false);
 
-const patientStore = usePatientsStore();
-const labels = patientStore.getLabels;
+const closeModal = () => {
+	showModal.value = false;
+	successAlert.value = false;
+};
 
 const keys = Object.keys(labels) as Array<keyof Patient>;
 
+/**
+ * Maps the patient adding formatting to some fields
+ */
 const mappedPatient = computed(() => {
 	const mappedPatient: Patient = { ...props.patient };
 	const url = import.meta.env.VITE_API_URL;
@@ -32,7 +45,7 @@ const mappedPatient = computed(() => {
 		mappedPatient.email = `<a href="mailto:${props.patient.email}" class="font-medium text-blue-600 hover:underline">${props.patient.email}</a>`;
 
 	if (mappedPatient.phone)
-		mappedPatient.phone = `<a href="tel:${props.patient.phone}" class="font-medium text-blue-600 hover:underline">${props.patient.phone}</a>`;
+		mappedPatient.phone = `<a href="https://wa.me/${props.patient.phone}" target="_blank" class="font-medium text-blue-600 hover:underline">${props.patient.phone}</a>`;
 
 	if (mappedPatient.weight) mappedPatient.weight = props.patient.weight + ' kg';
 	if (mappedPatient.height) mappedPatient.height = props.patient.height + ' cm';
@@ -45,10 +58,16 @@ const mappedPatient = computed(() => {
 	return mappedPatient;
 });
 
-const closeModal = () => {
-	showModal.value = false;
-	successAlert.value = false;
+/**
+ * Patient's Surveys
+ */
+const getPatientsSurveys = (id: number): Survey[] | null => {
+	const allSurveys = useSurveysStore().getSurveys;
+	const patientsSurveys = allSurveys.filter(({ patient_id }) => patient_id === id);
+	return useSort(patientsSurveys, 'last_update', 'down');
 };
+const patientSurveys = computed(() => getPatientsSurveys(props.patient.id as number));
+const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 </script>
 
 <template>
@@ -80,9 +99,9 @@ const closeModal = () => {
 		@close="closeModal"
 	>
 		<template v-slot:content>
+			<!-- TOP BUTTONS -->
 			<div class="">
 				<SurveyCreate :patient="patient" />
-
 				<PatientSave
 					title="Modifica il paziente"
 					icon="pen"
@@ -92,23 +111,43 @@ const closeModal = () => {
 				<PatientDelete :to-delete-patient="{ ...patient }" />
 			</div>
 			<hr />
-			<h1 class="text-4xl font-bold my-5">
-				{{ patient.fname }} {{ patient.lname }}
-			</h1>
-			<ul>
-				<!-- PATIENT DETAILS -->
-				<li
-					v-for="key in keys"
-					:key="key"
-				>
-					<!-- to not print id  -->
-					<div v-if="key !== 'id'">
-						<strong>{{ labels[key] }}: </strong>
-						<span v-html="mappedPatient[key]"></span>
-					</div>
-				</li>
-			</ul>
+			<h1 class="text-4xl font-bold my-5">{{ patient.fname }} {{ patient.lname }}</h1>
+			<div class="grid md:grid-cols-2 gap-6">
+				<div class="col-span-1">
+					<ul>
+						<!-- PATIENT DETAILS -->
+						<li
+							v-for="key in keys"
+							:key="key"
+						>
+							<!-- to not print id  -->
+							<div v-if="key !== 'id'">
+								<strong>{{ labels[key] }}: </strong>
+								<span v-html="mappedPatient[key]"></span>
+							</div>
+						</li>
+					</ul>
+				</div>
+				<!-- SURVEYS TABLE -->
+				<div class="col-span-1">
+					<AppTable
+						v-if="(patientSurveys as Survey[]).length > 0"
+						:cells="surveyCell"
+						:can-sort="false"
+					>
+						<template #tbody>
+							<SurveyRow
+								v-for="survey in patientSurveys"
+								:key="survey.id"
+								:survey="survey"
+								:cells="surveyCell"
+							/>
+						</template>
+					</AppTable>
+				</div>
+			</div>
 		</template>
+		<!-- BUTTONS -->
 		<template v-slot:button> </template>
 	</AppModal>
 </template>

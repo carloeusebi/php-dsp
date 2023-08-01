@@ -25,12 +25,4 @@ pinia.use(({ store }) => {
 	store.axios = markRaw(axiosInstance);
 });
 
-export {
-	pinia,
-	useAuthStore,
-	usePatientsStore,
-	useLoaderStore,
-	useSurveysStore,
-	useQuestionsStore,
-	useTestsStore,
-};
+export { pinia, useAuthStore, usePatientsStore, useLoaderStore, useSurveysStore, useQuestionsStore, useTestsStore };

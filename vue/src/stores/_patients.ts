@@ -1,4 +1,5 @@
 import { Patient } from '@/assets/data/interfaces';
+import { deleteMixin, saveMixin } from '@/mixins';
 import { defineStore } from 'pinia';
 
 const endpoint = '/patients';
@@ -6,12 +7,8 @@ const endpoint = '/patients';
 export const usePatientsStore = defineStore('patients', {
 	//state
 	state: () => ({
-		patients: JSON.parse(
-			localStorage.getItem('PATIENTS') as string
-		) as Patient[],
-		labels: JSON.parse(
-			localStorage.getItem('PATIENT_LABELS') as string
-		) as Patient,
+		patients: JSON.parse(localStorage.getItem('PATIENTS') as string) as Patient[],
+		labels: JSON.parse(localStorage.getItem('PATIENT_LABELS') as string) as Patient,
 	}),
 
 	// getters
@@ -38,15 +35,6 @@ export const usePatientsStore = defineStore('patients', {
 		},
 
 		/**
-		 * Given the id returns the patient with that id
-		 * @param id The id
-		 * @returns the found patient, or null
-		 */
-		getById(id: string): Patient | undefined {
-			return this.patients.find(p => String(p.id) == id);
-		},
-
-		/**
 		 * Load the patients list
 		 * @param patients the patient's list
 		 */
@@ -66,47 +54,18 @@ export const usePatientsStore = defineStore('patients', {
 
 		/**
 		 * Calls the database to update the patient, if success it updates it locally
-		 * @param the patient object
-		 * @returns the result of the ajax call
+		 * @param patient The patient to be saved
 		 */
-		async save(patient: FormData) {
-			return this.axios
-				.post(endpoint, patient)
-				.then(res => {
-					const newPatient = res.data.last_insert;
-
-					const indexToUpdate = this.patients.findIndex(
-						({ id }) => id == newPatient.id
-					);
-
-					if (indexToUpdate === -1) {
-						//is new patient => add new patient to patients array
-						this.patients.push(newPatient);
-					} else {
-						//is not new patient? => update patient
-						this.patients[indexToUpdate] = newPatient;
-					}
-					this.loadPatients(this.patients);
-				})
-				.catch(e => {
-					throw e;
-				});
+		async save(patient: FormData): Promise<void> {
+			return saveMixin(this, endpoint, patient, this.patients, this.loadPatients);
 		},
 
 		/**
 		 * Calls the db to delete the patient, if success it deletes it locally
+		 * @param id The ID of the patient to be deleted
 		 */
 		async delete(id: number) {
-			return this.axios
-				.delete(endpoint, { data: { id } })
-				.then(() => {
-					//delete patient from local store
-					const filteredPatients = [...this.patients.filter(p => p.id !== id)];
-					this.loadPatients(filteredPatients);
-				})
-				.catch(e => {
-					throw e;
-				});
+			await deleteMixin(this, endpoint, id, this.patients, this.loadPatients);
 		},
 	},
 });

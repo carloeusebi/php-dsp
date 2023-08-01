@@ -7,6 +7,7 @@ const order = ref({ by: 'id', type: 'down' });
 interface Props {
 	cells: Cell[];
 	hasReset: boolean;
+	canSort: boolean;
 }
 
 defineProps<Props>();
@@ -31,9 +32,7 @@ const sort = (prop: string, type = false) => {
 
 <template>
 	<thead>
-		<tr
-			class="cursor-pointer text-center select-none text-md font-semibold tracking-wide text-gray-900 bg-gray-100 uppercase border-b border-gray-600"
-		>
+		<tr class="cursor-pointer text-center select-none text-md font-semibold tracking-wide text-gray-900 bg-gray-100 uppercase border-b border-gray-600">
 			<th
 				v-for="cell in cells"
 				class="px-4 py-3"
@@ -46,6 +45,7 @@ const sort = (prop: string, type = false) => {
 						v-html="cell.label"
 					></div>
 					<font-awesome-icon
+						v-if="canSort"
 						:class="{ 'opacity-0': order.by !== cell.key }"
 						:icon="`fa-solid fa-angle-${order.type}`"
 					/>
@@ -55,7 +55,12 @@ const sort = (prop: string, type = false) => {
 				v-if="hasReset"
 				@click="sort('id', true)"
 			>
-				<div class="flex justify-center items-center">Resetta</div>
+				<div
+					v-if="canSort"
+					class="flex justify-center items-center"
+				>
+					Resetta
+				</div>
 			</th>
 		</tr>
 	</thead>

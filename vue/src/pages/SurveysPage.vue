@@ -2,11 +2,7 @@
 import { useSurveysStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { Ref, computed, ref } from 'vue';
-import {
-	useSearchFilter,
-	useSort,
-	useSplitArrayIntoChunks,
-} from '@/composables';
+import { useSearchFilter, useSort, useSplitArrayIntoChunks } from '@/composables';
 
 import AppSearchbar from '@/components/AppSearchbar.vue';
 import AppAlert from '@/components/AppAlert.vue';
@@ -47,10 +43,7 @@ const handleSearchbarKeypress = (word: string) => {
 
 const filteredBySearchSurveys = computed(() => {
 	if (surveys.value === null) return [];
-	return useSearchFilter(surveys.value, searchWord.value, [
-		'title',
-		'patient_name',
-	]);
+	return useSearchFilter(surveys.value, searchWord.value, ['title', 'patient_name']);
 });
 
 const sort = (newOrder: Order) => {
@@ -61,18 +54,12 @@ const order: Ref<OrderSurvey> = ref({ by: 'id', type: 'down' });
 
 const filteredAndOrderedSurveys = computed(() => {
 	if (filteredBySearchSurveys.value === null) return [];
-	return useSort(
-		filteredBySearchSurveys.value,
-		order.value.by,
-		order.value.type
-	);
+	return useSort(filteredBySearchSurveys.value, order.value.by, order.value.type);
 });
 
 // PAGINATION
 const activePage = ref(0);
-const pages = computed(() =>
-	useSplitArrayIntoChunks(filteredAndOrderedSurveys.value, SURVEYS_PER_PAGE)
-);
+const pages = computed(() => useSplitArrayIntoChunks(filteredAndOrderedSurveys.value, SURVEYS_PER_PAGE));
 
 const handlePageClick = (newPage: number) => {
 	activePage.value = newPage;
@@ -103,7 +90,7 @@ const handlePageClick = (newPage: number) => {
 			:total-pages="pages.length"
 			:current-page="activePage"
 			:showing-per-page="SURVEYS_PER_PAGE"
-			:results="surveys.length"
+			:results="filteredBySearchSurveys.length"
 			@page-click="handlePageClick"
 		/>
 
@@ -113,7 +100,7 @@ const handlePageClick = (newPage: number) => {
 			:cells="tableCells"
 			:has-reset="true"
 		>
-			<template v-slot:tbody>
+			<template #tbody>
 				<SurveyRow
 					v-for="survey in filteredAndOrderedSurveys"
 					:survey="survey"

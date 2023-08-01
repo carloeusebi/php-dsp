@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { useLoaderStore, useQuestionsStore } from '@/stores';
 
 import AppModal from '@/components/AppModal.vue';
 import AppButton from './AppButton.vue';
+
+import { useQuestionsStore } from '@/stores';
 import { Question } from '@/assets/data/interfaces';
-import axios from 'axios';
+import { useDeleteFromStore } from '@/composables';
 
 const showDeleteModal = ref(false);
 
@@ -21,32 +22,24 @@ const closeDeleteModal = () => {
 
 const handleDeleteQuestion = async () => {
 	const questionStore = useQuestionsStore();
-	const loader = useLoaderStore();
-
 	const id = props.toDeleteQuestion.id || -1;
-	loader.setLoader();
 
-	try {
-		await questionStore.delete(id);
-	} catch (err) {
-		if (axios.isAxiosError(err)) console.error(err.response?.data);
-		else console.error(err);
-	} finally {
-		loader.unsetLoader();
-	}
+	useDeleteFromStore(questionStore, id);
 };
 </script>
 
 <template>
 	<AppButton
 		@click="showDeleteModal = true"
-		color="red">
+		color="red"
+	>
 		Elimina
 	</AppButton>
 
 	<AppModal
 		:open="showDeleteModal"
-		@close="closeDeleteModal">
+		@close="closeDeleteModal"
+	>
 		<!-- CONTENT -->
 		<template v-slot:content>
 			<h2 class="text-2xl font-medium">Elimina {{ toDeleteQuestion.question }}</h2>
@@ -59,12 +52,14 @@ const handleDeleteQuestion = async () => {
 			<form
 				@submit.prevent="handleDeleteQuestion"
 				id="delete-form"
-				class="flex items-center my-3">
+				class="flex items-center my-3"
+			>
 				<input
 					class="cursor-pointer"
 					type="checkbox"
 					id="confirm-delete"
-					required />
+					required
+				/>
 				<label
 					for="confirm-delete"
 					class="ps-3 cursor-pointer"
@@ -76,7 +71,8 @@ const handleDeleteQuestion = async () => {
 		<template v-slot:button>
 			<AppButton
 				form="delete-form"
-				color="red">
+				color="red"
+			>
 				Elimina {{ toDeleteQuestion.question }}
 			</AppButton>
 		</template>

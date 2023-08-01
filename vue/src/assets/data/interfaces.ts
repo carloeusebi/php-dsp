@@ -45,7 +45,7 @@ export interface Question {
 }
 
 export interface Survey extends Patient {
-	patient_id: string;
+	patient_id: number;
 	patient_name?: string;
 	title: string;
 	questions: Question[];
@@ -74,6 +74,8 @@ export interface Errors {
 	[string: string]: string;
 }
 
-export type PatientsStore = ReturnType<typeof usePatientsStore>;
-export type QuestionStore = ReturnType<typeof useQuestionsStore>;
-export type SurveyStore = ReturnType<typeof useSurveysStore>;
+type PatientsStore = ReturnType<typeof usePatientsStore>;
+type QuestionStore = ReturnType<typeof useQuestionsStore>;
+type SurveyStore = ReturnType<typeof useSurveysStore>;
+
+export type MyStore = PatientsStore | QuestionStore | SurveyStore;

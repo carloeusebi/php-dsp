@@ -1,15 +1,19 @@
 <script lang="ts" setup>
-import { Errors, Survey } from '@/assets/data/interfaces';
-import { SurveyCell } from '@/pages/SurveysPage.vue';
 import { Ref, computed, ref } from 'vue';
+
 import AppModal from './AppModal.vue';
 import SurveyDelete from './SurveyDelete.vue';
 import AppButton from './AppButton.vue';
 import AppButtonBlank from './AppButtonBlank.vue';
 import AppAlert from './AppAlert.vue';
-import { useLoaderStore, usePatientsStore } from '@/stores';
 import axiosInstance from '@/assets/axios';
+
+import { SurveyCell } from '@/pages/SurveysPage.vue';
+import { useLoaderStore } from '@/stores';
+import { Errors, Survey } from '@/assets/data/interfaces';
 import { isAxiosError } from 'axios';
+
+// interfaces
 
 interface Props {
 	survey: Survey;
@@ -25,23 +29,21 @@ interface Alert {
 const emailAlert: Ref<Alert> = ref({ show: false });
 
 const props = defineProps<Props>();
-const token = props.survey.token;
-const patient = usePatientsStore().getById(props.survey.patient_id);
-
 const showModal = ref(false);
+const token = props.survey.token;
+const link = `${import.meta.env.VITE_BASE_URL}/admin/test?token=${token}`;
 
 const errors: Ref<Errors> = ref({});
 const errorsStr = computed(() => {
 	const keys = Object.keys(errors.value);
 	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
 });
+
 const patientEmail = computed(() =>
-	patient?.email
-		? `<a href="mailto:${patient.email}" class="font-medium text-blue-600 hover:underline">${patient.email}</a>`
+	props.survey?.email
+		? `<a href="mailto:${props.survey.email}" class="font-medium text-blue-600 hover:underline">${props.survey.email}</a>`
 		: 'Nessun indirizzo email inserito'
 );
-
-const link = `${import.meta.env.VITE_BASE_URL}/admin/test?token=${token}`;
 
 const completedIcon = computed(() => {
 	return props.survey.completed ? 'square-check' : 'square';
@@ -69,6 +71,9 @@ const showSuccessAlert = () => {
 	emailAlert.value.type = 'success';
 };
 
+/**
+ * Sends the email
+ */
 const sendEmail = async () => {
 	emailAlert.value.show = false;
 
@@ -76,7 +81,7 @@ const sendEmail = async () => {
 	loader.setLoader();
 
 	const data = {
-		email: patient?.email,
+		email: props.survey?.email,
 		subject: 'Questionario per la valutazione',
 		body: `<a href="${link}">Link al questionario per la valutazione psicologica</a>`,
 	};
@@ -182,13 +187,11 @@ const handleCloseModal = () => {
 				<AppButton>Visualizza Risposte</AppButton>
 			</router-link>
 			<AppButton
-				:disabled="survey.completed || !patient?.email"
-				:class="{ 'btn-disabled': survey.completed || !patient?.email }"
+				:disabled="survey.completed || !props.survey?.email"
+				:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
 				@click="sendEmail"
 				class="me-3"
-				>Invia un'email<span class="hidden md:block">
-					con il link</span
-				></AppButton
+				>Invia un'email<span class="hidden md:block"> con il link</span></AppButton
 			>
 		</template>
 	</AppModal>

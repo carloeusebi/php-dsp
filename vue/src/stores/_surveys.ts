@@ -1,4 +1,5 @@
 import { Survey } from '@/assets/data/interfaces';
+import { deleteMixin, saveMixin } from '@/mixins';
 import { defineStore } from 'pinia';
 
 const endpoint = '/surveys';
@@ -32,35 +33,20 @@ export const useSurveysStore = defineStore('surveys', {
 			localStorage.setItem('SURVEYS', JSON.stringify(surveys));
 		},
 
-		async save(survey: Survey) {
-			return this.axios
-				.post(endpoint, survey)
-				.then(res => {
-					const newSurvey = res.data.last_insert;
-
-					const indexToUpdate = this.surveys.findIndex(
-						({ id }) => id == newSurvey.id
-					);
-
-					if (indexToUpdate === -1) {
-						this.surveys.push(newSurvey);
-					} else {
-						this.surveys[indexToUpdate] = newSurvey;
-					}
-
-					this.load(this.surveys);
-				})
-				.catch(e => {
-					throw e;
-				});
+		/**
+		 * Saves the survey to the db and updates the local store with the new data
+		 * @param survey The survey to be saved in the server request
+		 */
+		async save(survey: Survey): Promise<void> {
+			return saveMixin(this, endpoint, survey, this.surveys, this.load);
 		},
 
+		/**
+		 * Deletes surveys from the db and updates the local store after deletion
+		 * @param id The ID of the survey to be deleted
+		 */
 		async delete(id: number) {
-			return this.axios.delete(endpoint, { data: { id } }).then(() => {
-				// delete surveys from local store
-				const filteredSurveys = [...this.surveys.filter(s => s.id !== id)];
-				this.load(filteredSurveys);
-			});
+			await deleteMixin(this, endpoint, id, this.surveys, this.load);
 		},
 	},
 });

@@ -1,15 +1,7 @@
-import {
-	Errors,
-	PatientsStore,
-	Question,
-	QuestionStore,
-	Survey,
-	SurveyStore,
-} from '@/assets/data/interfaces';
+import { MyStore, Errors, Question, Survey } from '@/assets/data/interfaces';
 import { useLoaderStore } from '@/stores';
 import { isAxiosError } from 'axios';
 
-type MyStore = PatientsStore | QuestionStore | SurveyStore;
 type DataToStore = FormData | Question | Survey;
 
 /**
@@ -18,10 +10,7 @@ type DataToStore = FormData | Question | Survey;
  * @param store The store
  * @returns An Error object, empty if there are no errors
  */
-export async function useSaveToStore(
-	data: DataToStore,
-	store: MyStore
-): Promise<Errors> {
+export async function useSaveToStore(data: DataToStore, store: MyStore): Promise<Errors> {
 	const loader = useLoaderStore();
 	loader.setLoader();
 	let errors = {};
@@ -33,9 +22,7 @@ export async function useSaveToStore(
 			errors = err.response?.data;
 		} else {
 			console.error(err);
-			alert(
-				'Qualcosa è andato storto, ma le modifiche dovrebbero essere state salvate. Prova a ricaricare la pagina!'
-			);
+			alert('Qualcosa è andato storto, ma le modifiche dovrebbero essere state salvate. Prova a ricaricare la pagina!');
 		}
 	} finally {
 		loader.unsetLoader();

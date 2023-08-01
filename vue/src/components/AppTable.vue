@@ -1,14 +1,18 @@
 <script lang="ts" setup>
-import { Cell, Patient, Survey } from '@/assets/data/interfaces';
 import AppTableHead from './AppTableHead.vue';
 
-// eslint-disable-next-line no-unused-vars
+import { Cell, Patient, Survey } from '@/assets/data/interfaces';
+
 interface Props {
 	cells: Cell[];
-	hasReset: boolean;
+	hasReset?: boolean;
+	canSort?: boolean;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+	hasReset: () => true,
+	canSort: () => true,
+});
 
 const emit = defineEmits(['sort-change']);
 
@@ -25,7 +29,9 @@ const handle = (newOrder: keyof Patient | keyof Survey) => {
 				<AppTableHead
 					@sort-change="handle"
 					:cells="cells"
-					:has-reset="hasReset" />
+					:has-reset="hasReset"
+					:can-sort="canSort"
+				/>
 
 				<!-- TBODY -->
 				<tbody class="bg-white">

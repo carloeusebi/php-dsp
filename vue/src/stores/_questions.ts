@@ -1,4 +1,5 @@
 import { Question } from '@/assets/data/interfaces';
+import { deleteMixin, saveMixin } from '@/mixins';
 import { defineStore } from 'pinia';
 
 const endpoint = '/questions';
@@ -6,12 +7,8 @@ const endpoint = '/questions';
 export const useQuestionsStore = defineStore('questions', {
 	//state
 	state: () => ({
-		questions: JSON.parse(
-			localStorage.getItem('QUESTIONS') as string
-		) as Question[],
-		labels: JSON.parse(
-			localStorage.getItem('QUESTION_LABELS') as string
-		) as Question,
+		questions: JSON.parse(localStorage.getItem('QUESTIONS') as string) as Question[],
+		labels: JSON.parse(localStorage.getItem('QUESTION_LABELS') as string) as Question,
 	}),
 
 	//getters
@@ -59,36 +56,22 @@ export const useQuestionsStore = defineStore('questions', {
 			localStorage.setItem('QUESTION_LABELS', JSON.stringify(labels));
 		},
 
-		async save(question: Question) {
-			return this.axios
-				.post(endpoint, question)
-				.then(res => {
-					const newQuestion = res.data.last_insert;
-
-					const indexToUpdate = this.questions.findIndex(
-						({ id }) => id == newQuestion.id
-					);
-
-					if (indexToUpdate === -1) {
-						// it is new question
-						this.questions.push(newQuestion);
-					} else {
-						this.questions[indexToUpdate] = newQuestion;
-					}
-
-					this.loadQuestions(this.questions);
-				})
-				.catch(e => {
-					throw e;
-				});
+		/**
+		 * Saves data to the db and updates the local store with the new data
+		 * @param question The question to be saved
+		 */
+		async save(question: Question): Promise<void> {
+			return await saveMixin(this, endpoint, question, this.questions, this.loadQuestions).catch(e => {
+				throw e;
+			});
 		},
 
+		/**
+		 * Deletes data from the db and updates the local store after deletion
+		 * @param id The ID of the item to delete
+		 */
 		async delete(id: number) {
-			return this.axios.delete(endpoint, { data: { id } }).then(() => {
-				//delete question from local store
-				const filteredQuestions = [...this.questions.filter(q => q.id !== id)];
-				this.loadQuestions(filteredQuestions);
-			});
+			await deleteMixin(this, endpoint, id, this.questions, this.loadQuestions);
 		},
 	},
 });

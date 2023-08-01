@@ -11,11 +11,7 @@ import AppTable from '../components/AppTable.vue';
 import AppPagination from '@/components/AppPagination.vue';
 
 import { Cell, Order, Patient } from '@/assets/data/interfaces';
-import {
-	useSort,
-	useSearchFilter,
-	useSplitArrayIntoChunks,
-} from '@/composables';
+import { useSort, useSearchFilter, useSplitArrayIntoChunks } from '@/composables';
 
 const PATIENTS_PER_PAGE = 25;
 
@@ -45,8 +41,7 @@ const tableCells: Ref<PatientCell[]> = ref([
 
 // FILTER BY SEARCH
 
-const handleSearchbarKeypress = (word: string) =>
-	(searchWord.value = word.toLowerCase());
+const handleSearchbarKeypress = (word: string) => (searchWord.value = word.toLowerCase());
 
 const filteredBySearchPatients = computed(() => {
 	if (patients.value === null) return [];
@@ -61,15 +56,11 @@ const sort = (newOrder: Order) => {
 
 const order: Ref<OrderPatient> = ref({ by: 'id', type: 'down' });
 
-const filteredAndOrderedPatients = computed(() =>
-	useSort(filteredBySearchPatients.value, order.value.by, order.value.type)
-);
+const filteredAndOrderedPatients = computed(() => useSort(filteredBySearchPatients.value, order.value.by, order.value.type));
 
 // PAGINATION
 const activePage = ref(0);
-const pages = computed(() =>
-	useSplitArrayIntoChunks(filteredAndOrderedPatients.value, PATIENTS_PER_PAGE)
-);
+const pages = computed(() => useSplitArrayIntoChunks(filteredAndOrderedPatients.value, PATIENTS_PER_PAGE));
 
 const handlePageClick = (newPage: number) => {
 	activePage.value = newPage;
@@ -94,7 +85,7 @@ const handlePageClick = (newPage: number) => {
 			:total-pages="pages.length"
 			:current-page="activePage"
 			:showing-per-page="PATIENTS_PER_PAGE"
-			:results="patients.length"
+			:results="filteredBySearchPatients.length"
 			@page-click="handlePageClick"
 		/>
 

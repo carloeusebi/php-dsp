@@ -19,16 +19,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
+if (props.patient) emptySurvey.patient_id = props.patient.id as number;
+
 const showModal = ref(false);
-let patients = usePatientsStore().getPatients;
+const patients = useSort(usePatientsStore().getPatients, 'lname', 'down');
 const questions = ref(useQuestionsStore().getQuestions);
 
-// ordering patients to make searching for them easier
-patients = useSort(patients, 'lname', 'down');
-
 const newSurvey: Ref<Survey> = ref({ ...emptySurvey });
-if (props.patient)
-	newSurvey.value.patient_id = props.patient.id?.toString() as string;
 
 const errors: Ref<Errors> = ref({});
 
@@ -49,14 +46,12 @@ const handleFormSubmit = () => {
 	}
 
 	if (!newSurvey.value.patient_id) {
-		errors.value['no-patient'] =
-			'Nessun Paziente selezionato, il Paziente è obbligatorio';
+		errors.value['no-patient'] = 'Nessun Paziente selezionato, il Paziente è obbligatorio';
 	}
 
 	const selectedQuestions = questions.value.filter(({ selected }) => selected);
 	if (!selectedQuestions.length) {
-		errors.value['no-questions'] =
-			'Nessun questionario selezionato, selezionarne almeno uno';
+		errors.value['no-questions'] = 'Nessun questionario selezionato, selezionarne almeno uno';
 	}
 
 	if (errorsStr.value) return;
@@ -96,6 +91,7 @@ const saveSurvey = async () => {
 	</AppButtonBlank>
 
 	<AppModal
+		:id="'Create' + (patient?.id || -1)"
 		dimensions="sm:max-w-7xl"
 		:open="showModal"
 		@close="showModal = false"
@@ -151,9 +147,7 @@ const saveSurvey = async () => {
 				</AppInputElement>
 
 				<!-- QUESTIONS -->
-				<p class="text-black my-5 text-xl">
-					Seleziona i questionari da aggiungere al sondaggio e il loro ordine
-				</p>
+				<p class="text-black my-5 text-xl">Seleziona i questionari da aggiungere al sondaggio e il loro ordine</p>
 
 				<draggable
 					item-key="id"
@@ -171,10 +165,7 @@ const saveSurvey = async () => {
 									:value="question.id"
 									v-model="question.selected"
 								/>
-								<span
-									class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
-									>{{ question.question }}</span
-								>
+								<span class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors">{{ question.question }}</span>
 							</label>
 						</li>
 					</template>

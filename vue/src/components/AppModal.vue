@@ -1,13 +1,8 @@
 <script lang="ts" setup>
-import {
-	Dialog,
-	DialogPanel,
-	TransitionChild,
-	TransitionRoot,
-} from '@headlessui/vue';
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { useRoute } from 'vue-router';
 import router from '@/routes';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 
 const route = useRoute();
 
@@ -19,26 +14,47 @@ const props = defineProps({
 	},
 });
 
-// Watcher add a route hash, when back button si pressed the back button removes the hash and closes the modal. If it were
+const emit = defineEmits(['close']);
 
-watch(
-	() => route.hash,
-	() => {
-		if (route.hash === '') {
-			emit('close');
-		}
-	}
-);
+/**
+ * The modal ID value is calculated so that it is always higher than the previously opened modal
+ */
+const modal_id = computed(() => ((route.query.modal_id as string) ? parseInt(route.query.modal_id as string) + 1 : 1));
+/**
+ * The ID the modal had when it was opened
+ */
+let assignedIdWhenOpened: number;
+
+// Watcher add a route hash, when back button si pressed the back button removes the hash and closes the modal. If it were
 watch(
 	() => props.open,
 	() => {
 		if (props.open === true) {
-			router.push({ hash: '#' });
+			router.push({ query: { modal_id: modal_id.value } });
+			assignedIdWhenOpened = modal_id.value;
 		}
 	}
 );
 
-const emit = defineEmits(['close']);
+/**
+ * Watches the modal_id param in the url query, if it changes it either means a new modal has opened, or the back button was pressed.
+ * If the new value is not null and it is higher then the modal's assigned id it means a new modal has opened, in this case we do nothing.
+ * If the new value is null it means that the current modal was the only opened modal when the back button was pressed, so we close the modal.
+ * If the new value is not null but it lower than the assigned Id it means we have more than one open modal, and the back button was pressed. We close the modal with the highest id, which is the last opened one, the top one.
+ */
+watch(
+	() => route.query.modal_id,
+	newValue => {
+		if (!route.query.modal_id || parseInt(newValue as string) < assignedIdWhenOpened) {
+			emit('close');
+		}
+	}
+);
+
+const closeModal = () => {
+	router.back();
+	emit('close');
+};
 </script>
 
 <template>
@@ -49,7 +65,7 @@ const emit = defineEmits(['close']);
 		<Dialog
 			as="div"
 			class="relative z-30"
-			@close="emit('close')"
+			@close="closeModal"
 		>
 			<TransitionChild
 				as="template"
@@ -60,18 +76,14 @@ const emit = defineEmits(['close']);
 				leave-from="opacity-100"
 				leave-to="opacity-0"
 			>
-				<div
-					class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-				/>
+				<div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 			</TransitionChild>
 
 			<div
 				class="fixed inset-0 z-10 overflow-y-auto"
 				ref="modal"
 			>
-				<div
-					class="flex min-h-full items-center justify-center text-center sm:items-center"
-				>
+				<div class="flex min-h-full items-center justify-center text-center sm:items-center">
 					<TransitionChild
 						as="template"
 						enter="ease-out duration-300"
@@ -104,7 +116,7 @@ const emit = defineEmits(['close']);
 								<button
 									type="button"
 									class="inline-flex grow md:grow-0 justify-center items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mt-0 sm:w-auto me-4"
-									@click="emit('close')"
+									@click="closeModal"
 									ref="cancelButtonRef"
 								>
 									Chiudi

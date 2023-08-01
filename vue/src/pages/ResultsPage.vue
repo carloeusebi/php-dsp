@@ -13,8 +13,7 @@ const editMode = ref(false);
 const survey = useSurveysStore().getById(id) as Survey;
 
 const min = (question: Question): number => parseInt(question.type.at(0) as string);
-const max = (question: Question): number => parseInt(question.type.at(-1) as string);
-const itemValue = (question: Question, item: QuestionItem, n: number): number => (item.reversed ? max(question) - n : min(question) + n);
+const itemValue = (question: Question, n: number): number => min(question) + n;
 
 /**
  * Updates an answer
@@ -45,6 +44,22 @@ const saveUpdates = async () => {
 		loader.unsetLoader();
 		editMode.value = false;
 	}
+};
+
+/**
+ * Handles the delete of a comment, prompts with a confirmation question and in case proceeds to delete the message
+ */
+const handleDeleteComment = (questionId: number, itemId: number) => {
+	const question = survey.questions.find(({ id }) => questionId === id);
+	const item = question?.items.find(({ id }) => itemId === id) as QuestionItem;
+
+	const proceed = confirm(`Sicuro di voler cancellare il commento\n"${item.comment}"\ndella domanda\n"${item.text}"?`);
+
+	// if answer is negative return
+	if (!proceed) return;
+
+	item.comment = '';
+	saveUpdates();
 };
 </script>
 
@@ -126,26 +141,37 @@ const saveUpdates = async () => {
 								v-for="(legend, n) in question.legend"
 								:key="n"
 								class="answer-cell border border-black flex-grow flex justify-center items-center"
-								:class="{ 'bg-green-500': itemValue(question, item, n) === item.answer }"
-								@click="changeAnswer(question.id, item.id, itemValue(question, item, n))"
+								:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
+								@click="changeAnswer(question.id, item.id, itemValue(question, n))"
 							>
-								{{ itemValue(question, item, n) }}
+								{{ itemValue(question, n) }}
 							</div>
 						</div>
 						<!-- COMMENTS -->
+						<!-- comment for the digital version -->
 						<div
 							class="comment-container"
 							v-if="item.comment"
 						>
-							<font-awesome-icon
-								:icon="['far', 'comment-dots']"
-								size="xl"
-								class="z-0"
-							/>
-							<div class="comment">
-								{{ item.comment }}
+							<div class="flex">
+								<font-awesome-icon
+									:icon="['far', 'comment-dots']"
+									size="xl"
+									class="z-0 p-2"
+								/>
+							</div>
+							<div class="comment flex">
+								<!-- comment delete button -->
+								<span class="grow">{{ item.comment }}</span>
+								<font-awesome-icon
+									@click="handleDeleteComment(question.id as number, item.id)"
+									:icon="['fas', 'trash-can']"
+									size="sm"
+									class="ms-1 text-red-500 z-0 self-start cursor-pointer p-2"
+								/>
 							</div>
 						</div>
+						<!-- comment for the print version -->
 						<div
 							v-if="item.comment"
 							class="print-comment"
@@ -207,7 +233,6 @@ img {
 	top: 50%;
 	left: 100.5%;
 	transform: translateY(-50%);
-	cursor: pointer;
 	z-index: 1;
 
 	&:hover .comment {
@@ -226,7 +251,7 @@ img {
 	z-index: 10;
 	border-radius: 20px;
 	right: 5px;
-	width: 800px;
+	min-width: fit-content;
 	max-width: 75vw;
 }
 
