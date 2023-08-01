@@ -93,6 +93,7 @@ const skipItem = () => {
 		showCommentAlert.value = true;
 		return;
 	}
+	clicked.value = -1;
 	addComment();
 	emit('answered', activeItemId.value, -1);
 	goToNextQuestion();

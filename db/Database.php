@@ -33,19 +33,28 @@ class Database
         }
     }
 
-
+    /**
+     *  Prepares a statement for execution and returns a statement object
+     * @return PDOStatement|false If the database server successfully prepares the statement, PDO::prepare returns a PDOStatement object. If the database server cannot successfully prepare the statement, PDO::prepare returns FALSE or emits PDOException (depending on error handling).
+     */
     public function prepare(string $query)
     {
         return $this->pdo->prepare($query);
     }
 
-
+    /**
+     * Execute an SQL statement and return the number of affected rows
+     * @return int|false PDO::exec returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, PDO::exec returns 0.
+     */
     public function execute(string $query)
     {
         return $this->pdo->exec($query);
     }
 
-
+    /**
+     * Returns the ID of the last inserted row or sequence value
+     * @return string|false If a sequence name was not specified for the name parameter, PDO::lastInsertId returns a string representing the row ID of the last row that was inserted into the database
+     */
     public function getLastInsertId()
     {
         return $this->pdo->lastInsertId();

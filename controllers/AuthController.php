@@ -30,22 +30,21 @@ class AuthController extends Controller
             Response::response(400, ['Error' => 'Missing username or password']);
         }
 
-        $admins = App::$app->admin->get();
+        $is_auth = App::$app->admin->attemptLogin($username, $password);
 
-        foreach ($admins as $adm) {
-            if ($username === $adm['username'] && $password === $adm['password']) {
-                $token = Auth::generateToken(self::ADMIN);
-                Auth::setCookie($token);
-                $_SESSION['TOKEN'] = $token;
-
-                $message = [
-                    'user' => self::ADMIN,
-                    'session_id' => session_id()
-                ];
-                Response::response(200, $message);
-            }
+        if (!$is_auth) {
+            Response::response(401, ['message' => 'invalid-credentials']);
         }
-        Response::response(401, ['message' => 'invalid-credentials']);
+
+        $token = Auth::generateToken(self::ADMIN);
+        Auth::setCookie($token);
+        $_SESSION['TOKEN'] = $token;
+
+        $message = [
+            'user' => self::ADMIN,
+            'session_id' => session_id()
+        ];
+        Response::response(200, $message);
     }
 
 

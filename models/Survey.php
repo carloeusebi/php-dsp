@@ -36,14 +36,14 @@ class Survey extends DbModel
 
     protected static function joins(): string
     {
-        return ' LEFT JOIN patients ON surveys.patient_id = patients.id ';
+        return ' JOIN patients AS P ON surveys.patient_id = P.id ';
     }
 
 
     public function get(string $fields = '*')
     {
         $tableName = $this->tableName();
-        $fields = " $tableName.*, patients.id AS patient_id, patients.fname,    patients.lname, patients.email, patients.age, patients.weight, patients.height, patients.job, patients.cohabitants";
+        $fields = " $tableName.*, P.id AS patient_id, P.fname, P.lname, P.email, P.age, P.weight, P.height, P.job, P.cohabitants";
 
         return parent::get($fields);
     }
