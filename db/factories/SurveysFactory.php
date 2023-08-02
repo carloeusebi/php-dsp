@@ -35,10 +35,8 @@ class SurveysFactory extends BaseFactory
      * Generates random answer for the Questionnaire's items
      * @return array The array of answered items
      */
-    private function answerItems(string $items, string $type): array
+    private function answerItems(array $items, string $type): array
     {
-        $items = json_decode($items, true);
-
         $min = intval(substr($type, 0, 1));
         $max = intval(substr($type, -1));
 
@@ -64,19 +62,20 @@ class SurveysFactory extends BaseFactory
         $last_update = $this->randomDate(strtotime($created_at), strtotime('now'));
 
         // removes empty Questionnaires, if any
-        $questions = array_filter($questions, fn ($quest) => $quest['items'] !== 'null');
+        $questions = array_values(array_filter($questions, fn ($quest) => $quest['items'] !== 'null'));
 
         // generates a 75% chance that the survey is completed
         $completed = rand(1, 100) <= 75 ? 1 : null;
 
         // if completed, fake answers 
-        if ($completed) {
-            $questions = array_map(function ($question) {
+        $questions = array_map(function ($question) use ($completed) {
+            $question['items'] = json_decode($question['items'], true);
+            if ($completed) {
                 $question['items'] = $this->answerItems($question['items'], $question['type']);
-                $question['legend'] = json_decode($question['legend'], true);
-                return $question;
-            }, $questions);
-        }
+            }
+            $question['legend'] = json_decode($question['legend'], true);
+            return $question;
+        }, $questions);
 
 
         return [

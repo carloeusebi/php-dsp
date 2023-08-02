@@ -12,6 +12,7 @@ class m0010_create_files_table
             `patient_id` int NOT NULL,
             `name` varchar(80) COLLATE utf8mb4_general_ci NOT NULL,
             `type` varchar(4) COLLATE utf8mb4_general_ci DEFAULT NULL,
+            `uploaded_on` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             KEY `patient_fk` (`patient_id`),
             CONSTRAINT `patient_fk` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT

@@ -5,6 +5,7 @@ export interface AppFile {
 	id: number;
 	name: string;
 	type: string;
+	uploaded_on: string;
 }
 
 export interface PatientFile extends AppFile {
