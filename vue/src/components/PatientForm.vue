@@ -10,7 +10,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(['file-loaded', 'form-emptied']);
+const emit = defineEmits(['form-emptied']);
 const form: Ref<Patient> = ref(props.patient);
 
 /**
@@ -21,36 +21,26 @@ const emptyFields = () => {
 	emit('form-emptied');
 };
 
-const loadFile = (event: Event): void => {
-	const file = (event.target as HTMLInputElement)?.files?.[0];
-	emit('file-loaded', file);
-};
-
 /**
  * Given a string it capitalizes every word in the string, marco di corato => Marco Di Corato
  * @param {string} str the string to capitalize
  */
 const capitalize = (str: string): string => {
-	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()).replace(
-		/(^|\s|')\w/g,
-		match => match.toUpperCase()
+	return (str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()).replace(/(^|\s|')\w/g, match =>
+		match.toUpperCase()
 	);
 };
 
 /********* WATCHERS *******************/
 
 const updateField = (field: string, updatedValue: string): void => {
-	if (!field || !updatedValue || (field !== 'fname' && field !== 'lname'))
-		return;
+	if (!field || !updatedValue || (field !== 'fname' && field !== 'lname')) return;
 	form.value[field] = capitalize(updatedValue).toString();
 };
 
 watch(
 	() => form.value.codice_fiscale,
-	codice_fiscale =>
-		(form.value.codice_fiscale = codice_fiscale
-			? (codice_fiscale as string).toUpperCase()
-			: '')
+	codice_fiscale => (form.value.codice_fiscale = codice_fiscale ? (codice_fiscale as string).toUpperCase() : '')
 );
 
 watch(
@@ -204,25 +194,13 @@ watch(
 		</div>
 		<div class="md:col-span-2 z-0 w-full mb-6 group">
 			<!-- CONSENT -->
-
-			<AppInputElement
-				label="File per il consenso"
-				type="file"
-				@custom-change="loadFile"
-			/>
-		</div>
-	</div>
-
-	<div class="z-0 w-full mb-6 group">
-		<div class="grid">
-			<!-- COHABITANTS -->
-
 			<AppInputElement
 				v-model.trim="form.cohabitants"
 				label="Conviventi"
 			/>
 		</div>
 	</div>
+
 	<div>
 		<button
 			type="button"

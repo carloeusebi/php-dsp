@@ -48,19 +48,6 @@ const scrollModalToTop = () => {
 };
 
 /**
- * Validates file type (.pdf) and size (<1MB), if valid loads it patient obj
- * @param {File} file
- */
-const handleFileLoaded = (file: File) => {
-	errors.value = {};
-
-	if (file.size > 1_048_576) errors.value['wrong-dimensions'] = 'Dimensioni massime del file 1MB!';
-	if (file.type !== 'application/pdf') errors.value['wrong-file-type'] = 'Il file deve essere formato PDF';
-
-	!errorsStr.value ? (patientRef.value.consent = file) : scrollModalToTop();
-};
-
-/**
  * Prepares patient's info and then loads store
  */
 const handleSavePatient = async () => {
@@ -75,7 +62,10 @@ const handleSavePatient = async () => {
 		const age =
 			today.getFullYear() -
 			birthDate.getFullYear() -
-			(today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate()) ? 1 : 0);
+			(today.getMonth() < birthDate.getMonth() ||
+			(today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+				? 1
+				: 0);
 		return age;
 	};
 
@@ -137,7 +127,6 @@ const handleSavePatient = async () => {
 				@submit.prevent="handleSavePatient"
 			>
 				<PatientForm
-					@file-loaded="handleFileLoaded"
 					@form-emptied="errors = {}"
 					:patient="patientRef"
 				/>

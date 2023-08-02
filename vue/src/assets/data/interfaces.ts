@@ -12,7 +12,7 @@ export interface Patient {
 	begin: string;
 	email?: string;
 	phone?: string;
-	consent?: string | File;
+	consent?: string[];
 	weight?: string;
 	height?: string;
 	job?: string;

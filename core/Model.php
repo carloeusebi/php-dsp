@@ -47,16 +47,4 @@ abstract class Model
             return $this->decodeOne($item);
         }, $data);
     }
-
-
-    protected function uploadFile($file): string
-    {
-        $filename = preg_replace("/\s+/", "_", $file['name']);
-        $filename = '/uploads/' . rand(1000, 10000) . "-" . $filename;
-        $filepath = App::$app::$ROOT_DIR . "/public" .  $filename;
-
-        move_uploaded_file($file['tmp_name'], $filepath);
-
-        return $filename;
-    }
 }

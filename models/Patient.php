@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use app\core\Mail;
 use app\db\DbModel;
 use app\core\utils\CodiceFiscale;
 use app\core\utils\Utils;
@@ -20,7 +19,6 @@ class Patient extends DbModel
     public $begin;
     public $email;
     public $phone;
-    public $consent;
     public $weight;
     public $height;
     public $job;
@@ -38,7 +36,7 @@ class Patient extends DbModel
     static function attributes(): array
     {
         return [
-            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'consent', 'weight', 'height', 'job', 'sex', 'cohabitants', 'id'
+            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'sex', 'cohabitants', 'id'
         ];
     }
 
@@ -56,7 +54,6 @@ class Patient extends DbModel
             'begin' => 'Data di inizio Terapia',
             'email' => 'Email',
             'phone' => 'Numero di Telefono',
-            'consent' => 'Consenso',
             'weight' => 'Peso',
             'height' => 'Altezza',
             'job' => 'Occupazione',
@@ -124,17 +121,7 @@ class Patient extends DbModel
             $is_invalid_cf = CodiceFiscale::validate($this->codice_fiscale);
         if ($is_invalid_cf) $errors['codice_fiscale'] = $is_invalid_cf;
 
-        // consent file upload
-        $fileToUpload = $_FILES['consent'] ?? null;
-        if ($fileToUpload) {
-            if ($this->isPdf($fileToUpload)) $errors['not-pdf'] = "Si possono caricare solamente files in formato PDF";
-            if (!isset($fileToUpload['name']) || $fileToUpload['name'] === '') $errors['invalid-name'] = "Nome del file non valido";
-        }
-
         if (empty($errors)) {
-            // file upload; only if there are no errors
-            $this->consent = $fileToUpload ? $this->uploadFile($fileToUpload) : $this->consent;
-
             if ($this->id) self::update();
             else self::create();
         }
@@ -160,14 +147,5 @@ class Patient extends DbModel
     protected function isAgeInvalid()
     {
         return $this->age < 0 || $this->age > 120;
-    }
-
-
-    /**
-     * Checks if the file is a pdf
-     */
-    protected function isPdf($file): bool
-    {
-        return isset($file['type']) && $file['type'] !== 'application/pdf' && ($file['type']) !== '';
     }
 }

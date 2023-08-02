@@ -22,7 +22,6 @@ class m0002_create_patients_table
       `begin` date DEFAULT NULL,
       `email` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
       `phone` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
-      `consent` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
       `weight` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
       `height` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
       `job` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,

@@ -10,12 +10,10 @@ import {
 	faCheck,
 	faPenToSquare,
 	faFloppyDisk,
+	faFilePdf,
+	faUpload,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-	faSquare,
-	faSquareCheck,
-	faCommentDots,
-} from '@fortawesome/free-regular-svg-icons';
+import { faSquare, faSquareCheck, faCommentDots } from '@fortawesome/free-regular-svg-icons';
 
 export const faIcons = [
 	faAngleUp,
@@ -32,4 +30,6 @@ export const faIcons = [
 	faCommentDots,
 	faPenToSquare,
 	faFloppyDisk,
+	faFilePdf,
+	faUpload,
 ];

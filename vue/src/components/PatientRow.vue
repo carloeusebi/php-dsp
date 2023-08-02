@@ -1,17 +1,19 @@
 <script lang="ts" setup>
 import { Ref, computed, ref } from 'vue';
-import { PatientCell } from '@/pages/PatientsPage.vue';
 
 import AppModal from './AppModal.vue';
 import PatientSave from './PatientSave.vue';
 import PatientDelete from './PatientDelete.vue';
-import { usePatientsStore, useSurveysStore } from '@/stores';
-import { Patient, Survey } from '@/assets/data/interfaces';
 import SurveyCreate from './SurveyCreate.vue';
 import SurveyRow from './SurveyRow.vue';
+import AppTable from './AppTable.vue';
+import PatientFiles from './PatientFiles.vue';
+
+import { PatientCell } from '@/pages/PatientsPage.vue';
+import { usePatientsStore, useSurveysStore } from '@/stores';
+import { Patient, Survey } from '@/assets/data/interfaces';
 import { SurveyCell } from '@/pages/SurveysPage.vue';
 import { useSort } from '@/composables';
-import AppTable from './AppTable.vue';
 
 interface Props {
 	patient: Patient;
@@ -39,7 +41,6 @@ const keys = Object.keys(labels) as Array<keyof Patient>;
  */
 const mappedPatient = computed(() => {
 	const mappedPatient: Patient = { ...props.patient };
-	const url = import.meta.env.VITE_API_URL;
 
 	if (mappedPatient.email)
 		mappedPatient.email = `<a href="mailto:${props.patient.email}" class="font-medium text-blue-600 hover:underline">${props.patient.email}</a>`;
@@ -49,11 +50,6 @@ const mappedPatient = computed(() => {
 
 	if (mappedPatient.weight) mappedPatient.weight = props.patient.weight + ' kg';
 	if (mappedPatient.height) mappedPatient.height = props.patient.height + ' cm';
-
-	if (mappedPatient.consent)
-		mappedPatient.consent = `<a href="${
-			url + props.patient.consent
-		}" class="font-medium text-blue-600 hover:underline" target="_blank">Visualizza il file per il consenso</a>`;
 
 	return mappedPatient;
 });
@@ -121,7 +117,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 							:key="key"
 						>
 							<!-- to not print id  -->
-							<div v-if="key !== 'id'">
+							<div v-if="key !== 'id' && key !== 'consent'">
 								<strong>{{ labels[key] }}: </strong>
 								<span v-html="mappedPatient[key]"></span>
 							</div>
@@ -148,6 +144,8 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 			</div>
 		</template>
 		<!-- BUTTONS -->
-		<template v-slot:button> </template>
+		<template v-slot:button>
+			<PatientFiles :patient="patient" />
+		</template>
 	</AppModal>
 </template>

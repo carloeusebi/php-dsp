@@ -17,6 +17,7 @@ use app\models\Admin;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
+use app\models\File;
 
 class App
 {
@@ -30,6 +31,7 @@ class App
     public Patient $patient;
     public Survey $survey;
     public Question $question;
+    public File $file;
 
 
     public function __construct()
@@ -52,6 +54,7 @@ class App
         $this->patient = new Patient();
         $this->question = new Question();
         $this->survey = new Survey();
+        $this->file = new File();
     }
 
 

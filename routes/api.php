@@ -11,30 +11,31 @@ use app\controllers\TestsController;
 /**
  *@var App $app
  */
+$router = $app->router;
 
 /*---------------------------------------------------------------*/
 /*----------------------------- API -----------------------------*/
 /*---------------------------------------------------------------*/
 
-$app->router->post('/api/login', [AuthController::class, 'login']);
-$app->router->delete('/api/logout', [AuthController::class, 'logout']);
+$router->post('/api/login', [AuthController::class, 'login']);
+$router->delete('/api/logout', [AuthController::class, 'logout']);
 
-$app->router->get('/api/validate', [AuthController::class, 'validate']);
+$router->get('/api/validate', [AuthController::class, 'validate']);
 
-$app->router->get('/api/patients', [PatientsController::class, 'get']);
-$app->router->post('/api/patients', [PatientsController::class, 'save']);
-$app->router->delete('/api/patients', [PatientsController::class, 'delete']);
+$router->get('/api/patients', [PatientsController::class, 'get']);
+$router->post('/api/patients', [PatientsController::class, 'save']);
+$router->delete('/api/patients', [PatientsController::class, 'delete']);
 
-$app->router->get('/api/surveys', [SurveysController::class, 'get']);
-$app->router->post('/api/surveys', [SurveysController::class, 'save']);
-$app->router->delete('/api/surveys', [SurveysController::class, 'delete']);
+$router->get('/api/surveys', [SurveysController::class, 'get']);
+$router->post('/api/surveys', [SurveysController::class, 'save']);
+$router->delete('/api/surveys', [SurveysController::class, 'delete']);
 
-$app->router->get('/api/questions', [QuestionsController::class, 'get']);
-$app->router->post('/api/questions', [QuestionsController::class, 'save']);
-$app->router->delete('/api/questions', [QuestionsController::class, 'delete']);
+$router->get('/api/questions', [QuestionsController::class, 'get']);
+$router->post('/api/questions', [QuestionsController::class, 'save']);
+$router->delete('/api/questions', [QuestionsController::class, 'delete']);
 
-$app->router->get('/api/tests', [TestsController::class, 'get']);
-$app->router->post('/api/tests', [TestsController::class, 'save']);
+$router->get('/api/tests', [TestsController::class, 'get']);
+$router->post('/api/tests', [TestsController::class, 'save']);
 
-$app->router->post('/api/email', [MailController::class, 'sendFromAdmin']);
-$app->router->post('/api/email/support', [MailController::class, 'contactSupport']);
+$router->post('/api/email', [MailController::class, 'sendFromAdmin']);
+$router->post('/api/email/support', [MailController::class, 'contactSupport']);

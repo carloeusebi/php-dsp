@@ -3,7 +3,7 @@
 *log.txt
 
 vendor
-uploads
+storage/*
 
 # PHPUnit
 .phpunit.result.cache
