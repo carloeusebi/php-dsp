@@ -56,7 +56,9 @@ const sort = (newOrder: Order) => {
 
 const order: Ref<OrderPatient> = ref({ by: 'id', type: 'down' });
 
-const filteredAndOrderedPatients = computed(() => useSort(filteredBySearchPatients.value, order.value.by, order.value.type));
+const filteredAndOrderedPatients = computed(() =>
+	useSort(filteredBySearchPatients.value, order.value.by, order.value.type)
+);
 
 // PAGINATION
 const activePage = ref(0);
@@ -131,5 +133,17 @@ const handlePageClick = (newPage: number) => {
 :deep(th:nth-of-type(3)) {
 	width: 35px;
 	text-align: center;
+}
+
+:deep(th:nth-of-type(4)),
+:deep(td:nth-of-type(4)) {
+	display: none;
+}
+
+@media screen and (min-width: 992px) {
+	:deep(th:nth-of-type(4)),
+	:deep(td:nth-of-type(4)) {
+		display: table-cell;
+	}
 }
 </style>

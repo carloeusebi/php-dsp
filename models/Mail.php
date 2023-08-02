@@ -1,23 +1,18 @@
 <?php
 
-namespace app\core;
+namespace app\models;
 
-use app\app\App;
-use Error;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use Verifalia\VerifaliaRestClient;
-use Verifalia\Exceptions\VerifaliaException;
 
+use app\app\App;
+use app\core\Model;
 
-class Mail
+class Mail extends Model
 {
     public const UNDELIVERABLE_ERROR_MESSAGE = "Email non valida, per favore riprovare con un indirizzo valido";
     private const SUBJECT = "Un cliente ti ha scritto";
-    private const CONFIRMATION_SUBJECT = "Grazie per avermi Contattato";
-    private const CONFIRMATION_BODY = " per avermi contatto, ho ricevuto la tua mail e ti contatter&ograve; al pi&ugrave; presto.";
-
-    private const MAIL_SENT = "An email was successfully sent";
     private const MAIL_BOT = "A form was submitted by a bot";
     private const MAIL_INVALID = "A form was submitted with an undeliverable email";
 
@@ -75,18 +70,6 @@ class Mail
         }
 
         return '';
-    }
-
-    /**
-     * Load the email with the necessary field before sending the email
-     */
-    public function load(string $email_to, string $subject, string $body, string $name = '', string $email_from = '')
-    {
-        $this->email_to = $email_to;
-        $this->subject = $subject;
-        $this->body = $body;
-        $this->name = $name ?: self::$EMAIL_NAME;
-        $this->email_from = $email_from ? $email_from : self::$EMAIL_MAIN;
     }
 
 
@@ -157,11 +140,6 @@ class Mail
 
         // try the validation through Verifalia
         try {
-
-            // Verifalia returns error "Implicit conversion from float 0.5 to int loses precision" so i need to ignore the deprecated warning
-            $previous_error_reporting = error_reporting();
-            error_reporting($previous_error_reporting & ~E_DEPRECATED);
-
             $verifalia_username = $_ENV['VERIFALIA_USERNAME'] ?? '';
             $verifalia_password = $_ENV['VERIFALIA_PASSWORD'] ?? '';
 

@@ -120,7 +120,7 @@ abstract class DbModel extends Model
 
     protected function getQueryParams(): array
     {
-        $params = Request::getBody();
+        $params = $_GET;
         $attributes = $this->attributes();
 
         $valid_params = [];

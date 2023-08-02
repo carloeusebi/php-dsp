@@ -1,8 +1,9 @@
 <?php
 
 use app\app\App;
+use app\db\factories\BaseFactory;
 
-class QuestionsFactory
+class QuestionsFactory extends BaseFactory
 {
     public const TABLE_NAME = 'questions';
 

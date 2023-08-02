@@ -37,7 +37,7 @@ class App
         try {
             $dotenv = Dotenv::createImmutable(dirname(__DIR__));
             $dotenv->load();
-        } catch (InvalidPathException $exception) {
+        } catch (\Exception $exception) {
             // If Dotenv can't find the .env file it won't throw an exception
             \app\core\exceptions\ErrorHandler::log($exception);
         }

@@ -102,7 +102,7 @@ const handlePageClick = (newPage: number) => {
 		>
 			<template #tbody>
 				<SurveyRow
-					v-for="survey in filteredAndOrderedSurveys"
+					v-for="survey in pages[activePage]"
 					:survey="survey"
 					:cells="tableCells"
 					:key="survey.id || survey.title"

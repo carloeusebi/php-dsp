@@ -10,7 +10,9 @@ class ErrorHandler
 
     static function handleException(Throwable $exception)
     {
+        // logs every exception for debugging purposes
         self::log($exception);
+
         Response::response(500, [
             "code" => $exception->getCode(),
             "message" => $exception->getMessage(),
@@ -37,8 +39,8 @@ class ErrorHandler
         int $errLine
     ): bool {
 
-        if (strpos($errStr, "Implicit conversion from float 0.5 to int loses precision") !== false) {
-            // Ignore this specific warning
+        // Verifalia's vendor package throws lots of warning or notices, this way we just ignore them
+        if (str_contains($errFile, "verifalia")) {
             return false;
         }
 

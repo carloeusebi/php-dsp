@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\app\App;
-use app\core\Mail;
+use app\models\Mail;
 use app\core\Controller;
 use app\core\utils\Request;
 use app\core\utils\Response;
@@ -56,14 +56,16 @@ class MailController extends Controller
      */
     private function sendConfirmationMailAfterContactForm(array $form_data): void
     {
-        $email_to = $form_data['mail'];
-        $subject = 'Grazie per avermi Contattato';
-        $body = "Grazie " . $form_data['name'];
-        $body .= " per avermi contatto, ho ricevuto la tua mail e ti contatter&ograve; al pi&ugrave; presto.";
+        $data['email_to'] = $form_data['mail'];
+        $data['subject'] = 'Grazie per avermi Contattato';
+        $data['body'] = "Grazie " . $form_data['name'];
+        $data['body'] .= " per avermi contatto, ho ricevuto la tua mail e ti contatter&ograve; al pi&ugrave; presto.";
 
-        $this->mail->load($email_to, $subject, $body);
+        $confirmation_mail = new Mail();
+
+        $confirmation_mail->load($data);
         // don't care about errors
-        $this->mail->send();
+        $confirmation_mail->send();
     }
 
     /**
@@ -87,7 +89,7 @@ class MailController extends Controller
         }
 
         // loads and sends the email
-        $this->mail->load($email, $subject, $body);
+        $this->mail->load($data);
         $error = $this->mail->send();
 
         // if there are errors sending the email it returns those error in the response
@@ -95,7 +97,7 @@ class MailController extends Controller
             Response::response(500, ['error' => $error]);
         }
 
-        //everything was successfull
+        //everything was successful
         Response::response(204);
     }
 
@@ -129,16 +131,18 @@ class MailController extends Controller
         App::$app->logIssueToDb($issue, $name, $email_from);
 
         // build the email body
-        $subject = 'E\' stato contattato il supporto';
-        $body = "Da: $name<br>
+        $data['subject'] = 'E\' stato contattato il supporto';
+        $data['body'] = "Da: $name<br>
             Email: $email_from<br>
             Ha contattato il supporto per il seguente motivo:<br> $issue";
 
         // send email both to admin's panel user and the support team
-        $this->mail->load(Mail::$EMAIL_MAIN, $subject, $body, $name, $email_from);
+        $data['email_to'] = Mail::$EMAIL_FROM;
+        $this->mail->load($data);
         $this->mail->send();
 
-        $this->mail->load(Mail::$EMAIL_SUPPORT, $subject, $body, $name, $email_from);
+        $data['email_to'] = Mail::$EMAIL_SUPPORT;
+        $this->mail->load($data);
         $this->mail->send();
 
         Response::response(204);

@@ -9,7 +9,7 @@ abstract class Model
     protected array $fields_to_decode;
 
 
-    public function load($data)
+    public function load(array $data): void
     {
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
@@ -21,6 +21,9 @@ abstract class Model
     }
 
 
+    /**
+     * Decodes fields stored as json
+     */
     protected function decodeOne(array $item): array
     {
         foreach ($this->fields_to_decode as $key) {
@@ -31,6 +34,11 @@ abstract class Model
     }
 
 
+    /**
+     * Decodes fields stored as json for each retrieved item, based on the attribute ```$fields_to_decode``` of the Model
+     * @param array $data The array with the items to decode
+     * @return array The array with the decoded items
+     */
     protected function decodeMany(array $data): array
     {
         // if model has no field to decode, just return the original data

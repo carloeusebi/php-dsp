@@ -83,7 +83,7 @@ class Survey extends DbModel
     }
 
 
-    protected function generateToken(): string
+    public function generateToken(): string
     {
         return bin2hex(random_bytes(16));
     }
