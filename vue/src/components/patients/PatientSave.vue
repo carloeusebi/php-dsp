@@ -1,15 +1,16 @@
 <script lang="ts" setup>
 import { computed, ref, nextTick, Ref } from 'vue';
-import { usePatientsStore } from '@/stores';
 
-import AppModal from './AppModal.vue';
-import AppAlert from './AppAlert.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppAlert from '@/components/AppAlert.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
+import AppButton from '@/components/AppButton.vue';
 import PatientForm from './PatientForm.vue';
-import AppButton from './AppButton.vue';
+
 import { Errors, Patient } from '@/assets/data/interfaces';
 import { emptyPatient } from '@/assets/data/data';
-import AppButtonBlank from './AppButtonBlank.vue';
 import { useSaveToStore } from '@/composables';
+import { usePatientsStore } from '@/stores';
 
 interface Props {
 	title: string;

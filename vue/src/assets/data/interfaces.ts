@@ -1,5 +1,16 @@
 import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
 
+export interface AppFile {
+	[foreignId: string]: any;
+	id: number;
+	name: string;
+	type: string;
+}
+
+export interface PatientFile extends AppFile {
+	patient_id: number;
+}
+
 export interface Patient {
 	id?: number;
 	fname: string;
@@ -12,7 +23,7 @@ export interface Patient {
 	begin: string;
 	email?: string;
 	phone?: string;
-	consent?: string[];
+	files?: PatientFile[];
 	weight?: string;
 	height?: string;
 	job?: string;

@@ -1,17 +1,18 @@
 <script lang="ts" setup>
-import { useSurveysStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { Ref, computed, ref } from 'vue';
-import { useSearchFilter, useSort, useSplitArrayIntoChunks } from '@/composables';
 
 import AppSearchbar from '@/components/AppSearchbar.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import AppTable from '../components/AppTable.vue';
-import SurveyRow from '../components/SurveyRow.vue';
-import { Cell, Order, Survey } from '@/assets/data/interfaces';
+import SurveyRow from '../components/surveys/SurveyRow.vue';
 import AppButtonBlank from '@/components/AppButtonBlank.vue';
-import SurveyCreate from '@/components/SurveyCreate.vue';
+import SurveyCreate from '@/components/surveys/SurveyCreate.vue';
 import AppPagination from '@/components/AppPagination.vue';
+
+import { useSurveysStore } from '@/stores';
+import { useSearchFilter, useSort, useSplitArrayIntoChunks } from '@/composables';
+import { Cell, Order, Survey } from '@/assets/data/interfaces';
 
 const SURVEYS_PER_PAGE = 25;
 

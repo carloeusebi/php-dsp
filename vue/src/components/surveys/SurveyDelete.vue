@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-import AppButton from './AppButton.vue';
-import AppModal from './AppModal.vue';
-import AppButtonBlank from './AppButtonBlank.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
 
 import { useSurveysStore } from '@/stores';
 import { Survey } from '@/assets/data/interfaces';

@@ -2,8 +2,8 @@
 import { ref } from 'vue';
 
 import AppModal from '@/components/AppModal.vue';
-import AppButton from './AppButton.vue';
-import AppButtonBlank from './AppButtonBlank.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
 
 import { Patient } from '@/assets/data/interfaces';
 import { usePatientsStore } from '@/stores';
@@ -61,7 +61,8 @@ const handleDeletePatient = async () => {
 				<label
 					for="confirm-delete"
 					class="ps-3 cursor-pointer"
-					>Sono sicuro di voler eliminare <strong>{{ toDeletePatient.fname }} {{ toDeletePatient.lname }}</strong></label
+					>Sono sicuro di voler eliminare
+					<strong>{{ toDeletePatient.fname }} {{ toDeletePatient.lname }}</strong></label
 				>
 			</form>
 		</template>

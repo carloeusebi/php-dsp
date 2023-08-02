@@ -16,6 +16,9 @@ class Response
 
     static function response(int $http_code, array|string $messages = []): void
     {
+        if (Request::isApi()) {
+            header('Content-Type: application/json');
+        }
         self::statusCode($http_code);
         if (!empty($messages)) {
             $json =  json_encode($messages, JSON_INVALID_UTF8_IGNORE);

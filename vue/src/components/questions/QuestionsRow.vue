@@ -5,9 +5,9 @@ import { Errors, Question } from '@/assets/data/interfaces';
 import { useQuestionsStore } from '@/stores';
 import { useSaveToStore } from '@/composables';
 
-import AppModal from './AppModal.vue';
-import AppButton from './AppButton.vue';
-import AppAlert from './AppAlert.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppAlert from '@/components/AppAlert.vue';
 import QuestionForm from './QuestionForm.vue';
 import QuestionDelete from './QuestionDelete.vue';
 

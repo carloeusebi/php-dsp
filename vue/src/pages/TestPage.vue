@@ -4,9 +4,9 @@ import { storeToRefs } from 'pinia';
 import { Ref, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import TestHeader from '@/components/TestHeader.vue';
-import TestLanding from '@/components/TestLanding.vue';
-import TestQuestion from '@/components/TestQuestion.vue';
+import TestHeader from '@/components/tests/TestHeader.vue';
+import TestLanding from '@/components/tests/TestLanding.vue';
+import TestQuestion from '@/components/tests/TestQuestion.vue';
 
 import { Question, QuestionItem } from '@/assets/data/interfaces';
 import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
@@ -20,7 +20,9 @@ const disableBackButton = () => {
 	window.history.pushState(null, '', window.location.href);
 	window.onpopstate = () => {
 		window.history.pushState(null, '', window.location.href);
-		alert('Non puoi più modificare le risposte precedenti, se vuoi puoi lasciare un commento in cui spieghi perché volevi cambiare la risposta precedente.');
+		alert(
+			'Non puoi più modificare le risposte precedenti, se vuoi puoi lasciare un commento in cui spieghi perché volevi cambiare la risposta precedente.'
+		);
 	};
 };
 

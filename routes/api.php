@@ -2,6 +2,7 @@
 
 use app\app\App;
 use app\controllers\AuthController;
+use app\controllers\FilesController;
 use app\controllers\PatientsController;
 use app\controllers\SurveysController;
 use app\controllers\QuestionsController;
@@ -39,3 +40,7 @@ $router->post('/api/tests', [TestsController::class, 'save']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);
+
+$router->get('/api/file', [FilesController::class, 'viewFile']);
+$router->post('/api/file', [FilesController::class, 'save']);
+$router->delete('/api/file', [FilesController::class, 'delete']);

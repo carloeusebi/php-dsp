@@ -10,7 +10,7 @@ class m0010_create_files_table
         $sql = "CREATE TABLE `files` (
             `id` int NOT NULL AUTO_INCREMENT,
             `patient_id` int NOT NULL,
-            `path` varchar(80) COLLATE utf8mb4_general_ci NOT NULL,
+            `name` varchar(80) COLLATE utf8mb4_general_ci NOT NULL,
             `type` varchar(4) COLLATE utf8mb4_general_ci DEFAULT NULL,
             PRIMARY KEY (`id`),
             KEY `patient_fk` (`patient_id`),

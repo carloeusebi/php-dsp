@@ -60,14 +60,14 @@ abstract class AdminController extends Controller
         $this->model->load($data);
         $errors = $this->model->save();
 
-        if (empty($errors)) {
-            // recover saved entry, and sends it back
-            $id = $data['id'] ?? intval(App::$app->db->getLastInsertId());
-            $last_insert_item = $this->model->getById($id);
-            Response::response(201, ["last_insert" => $last_insert_item]);
-        } else {
+        if ($errors) {
             Response::response(422, $errors);
         }
+
+        // recover saved entry, and sends it back
+        $id = $data['id'] ?? intval(App::$app->db->getLastInsertId());
+        $last_insert_item = $this->model->getById($id);
+        Response::response(201, ["last_insert" => $last_insert_item]);
     }
 
 

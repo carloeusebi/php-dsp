@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { Question } from '@/assets/data/interfaces';
 import { computed, ref } from 'vue';
+
+import AppButton from '@/components/AppButton.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppInputElement from '@/components/AppInputElement.vue';
+import AppAlert from '@/components/AppAlert.vue';
+
+import { Question } from '@/assets/data/interfaces';
 import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
-import AppButton from './AppButton.vue';
-import AppModal from './AppModal.vue';
-import AppInputElement from './AppInputElement.vue';
-import AppAlert from './AppAlert.vue';
 
 interface Props {
 	question: Question;

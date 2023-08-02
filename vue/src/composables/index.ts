@@ -5,4 +5,11 @@ import { useSearchFilter } from './_useSearchFilter';
 import { useSaveToStore } from './_useSaveToStore';
 import { useSort } from './_useSort';
 
-export { useGetIndexOfFirstItemWithoutProp, useSplitArrayIntoChunks, useDeleteFromStore, useSearchFilter, useSaveToStore, useSort };
+export {
+	useGetIndexOfFirstItemWithoutProp,
+	useSplitArrayIntoChunks,
+	useDeleteFromStore,
+	useSearchFilter,
+	useSaveToStore,
+	useSort,
+};

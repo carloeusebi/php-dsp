@@ -67,6 +67,20 @@ export const usePatientsStore = defineStore('patients', {
 		async delete(id: number) {
 			await deleteMixin(this, endpoint, id, this.patients, this.loadPatients);
 		},
+
+		/**
+		 * It updates the store deleting the file locally.
+		 * @param patientId The ID of the Patient to whom the file is being deleted
+		 * @param fileId The ID of the file to delete
+		 */
+		deletePatientFile(patientId: number, fileId: number) {
+			const patIndex = this.patients.findIndex(({ id }) => id === patientId);
+			const files = this.patients[patIndex].files;
+
+			if (!files) return;
+
+			this.patients[patIndex].files = this.patients[patIndex].files?.filter(({ id }) => id !== fileId);
+		},
 	},
 });
 

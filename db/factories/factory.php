@@ -2,6 +2,8 @@
 
 namespace app\db\factories;
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 use app\app\App;
 use app\db\factories\BaseFactory;
 

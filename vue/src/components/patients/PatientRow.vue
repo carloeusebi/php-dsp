@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { Ref, computed, ref } from 'vue';
 
-import AppModal from './AppModal.vue';
-import PatientSave from './PatientSave.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppTable from '@/components/AppTable.vue';
+import SurveyRow from '@/components/surveys/SurveyRow.vue';
+import SurveyCreate from '@/components/surveys/SurveyCreate.vue';
 import PatientDelete from './PatientDelete.vue';
-import SurveyCreate from './SurveyCreate.vue';
-import SurveyRow from './SurveyRow.vue';
-import AppTable from './AppTable.vue';
+import PatientSave from './PatientSave.vue';
 import PatientFiles from './PatientFiles.vue';
 
 import { PatientCell } from '@/pages/PatientsPage.vue';
@@ -97,6 +97,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 		<template v-slot:content>
 			<!-- TOP BUTTONS -->
 			<div class="">
+				<PatientFiles :patient="patient" />
 				<SurveyCreate :patient="patient" />
 				<PatientSave
 					title="Modifica il paziente"
@@ -117,7 +118,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 							:key="key"
 						>
 							<!-- to not print id  -->
-							<div v-if="key !== 'id' && key !== 'consent'">
+							<div v-if="key !== 'id'">
 								<strong>{{ labels[key] }}: </strong>
 								<span v-html="mappedPatient[key]"></span>
 							</div>
@@ -144,8 +145,6 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 			</div>
 		</template>
 		<!-- BUTTONS -->
-		<template v-slot:button>
-			<PatientFiles :patient="patient" />
-		</template>
+		<template v-slot:button> </template>
 	</AppModal>
 </template>

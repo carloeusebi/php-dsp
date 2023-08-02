@@ -7,11 +7,11 @@ import { emptySurvey } from '@/assets/data/data';
 import { useSaveToStore, useSort } from '@/composables';
 import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
 
-import AppButtonBlank from './AppButtonBlank.vue';
-import AppModal from './AppModal.vue';
-import AppInputElement from './AppInputElement.vue';
-import AppButton from './AppButton.vue';
-import AppAlert from './AppAlert.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppInputElement from '@/components/AppInputElement.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppAlert from '@/components/AppAlert.vue';
 
 interface Props {
 	patient?: Patient;
@@ -165,7 +165,10 @@ const saveSurvey = async () => {
 									:value="question.id"
 									v-model="question.selected"
 								/>
-								<span class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors">{{ question.question }}</span>
+								<span
+									class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
+									>{{ question.question }}</span
+								>
 							</label>
 						</li>
 					</template>

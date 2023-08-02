@@ -1,14 +1,16 @@
 <script lang="ts" setup>
 import { Ref, computed, ref } from 'vue';
-import AppButtonBlank from './AppButtonBlank.vue';
-import AppButton from './AppButton.vue';
-import AppModal from './AppModal.vue';
-import { emptyQuestion, questionTypes } from '@/assets/data/data';
-import AppInputElement from './AppInputElement.vue';
-import { useLoaderStore, useQuestionsStore } from '@/stores';
-import AppAlert from './AppAlert.vue';
-import { Errors } from '@/assets/data/interfaces';
 import axios from 'axios';
+
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppInputElement from '@/components/AppInputElement.vue';
+import AppAlert from '@/components/AppAlert.vue';
+
+import { useLoaderStore, useQuestionsStore } from '@/stores';
+import { emptyQuestion, questionTypes } from '@/assets/data/data';
+import { Errors } from '@/assets/data/interfaces';
 
 const questionStore = useQuestionsStore();
 const labels = questionStore.getLabels;

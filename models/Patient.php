@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\app\App;
 use app\db\DbModel;
 use app\core\utils\CodiceFiscale;
 use app\core\utils\Utils;
@@ -81,6 +82,7 @@ class Patient extends DbModel
                 parent::load($patient);
                 parent::update();
             }
+            $patient['files'] = App::$app->file->getByPatientId($patient['id']);
             return $patient;
         }, parent::get());
     }

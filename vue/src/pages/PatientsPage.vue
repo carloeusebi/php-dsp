@@ -3,9 +3,9 @@ import { ref, computed, Ref } from 'vue';
 import { usePatientsStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 
-import PatientRow from '@/components/PatientRow.vue';
+import PatientRow from '@/components/patients/PatientRow.vue';
 import AppAlert from '@/components/AppAlert.vue';
-import PatientSave from '@/components/PatientSave.vue';
+import PatientSave from '@/components/patients/PatientSave.vue';
 import AppSearchbar from '@/components/AppSearchbar.vue';
 import AppTable from '../components/AppTable.vue';
 import AppPagination from '@/components/AppPagination.vue';

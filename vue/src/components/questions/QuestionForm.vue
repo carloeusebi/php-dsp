@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+import draggable from 'vuedraggable';
+import { Ref, computed, reactive, ref } from 'vue';
+
+import AppInputElement from '@/components/AppInputElement.vue';
+
 import { questionTypes } from '@/assets/data/data';
 import { Question, QuestionItem, QuestionLegend } from '@/assets/data/interfaces';
-import { Ref, computed, reactive, ref } from 'vue';
-import AppInputElement from './AppInputElement.vue';
-import draggable from 'vuedraggable';
 import { useQuestionsStore } from '@/stores';
 
 interface Props {
@@ -52,8 +54,10 @@ const addItem = () => {
 	 * @param items The list of items
 	 * @returns The id for the new item
 	 */
-	const generateId = (items: QuestionItem[]): number => items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
-	const capitalizeItem = (textToCapitalize: string): string => textToCapitalize.at(0)?.toUpperCase() + textToCapitalize.slice(1);
+	const generateId = (items: QuestionItem[]): number =>
+		items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
+	const capitalizeItem = (textToCapitalize: string): string =>
+		textToCapitalize.at(0)?.toUpperCase() + textToCapitalize.slice(1);
 
 	if (!newItem.value) return;
 

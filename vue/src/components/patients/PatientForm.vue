@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { emptyPatient } from '@/assets/data/data';
-import { Patient } from '@/assets/data/interfaces';
 import { Ref, ref, watch } from 'vue';
-import AppInputElement from './AppInputElement.vue';
+import AppInputElement from '@/components/AppInputElement.vue';
+import { Patient } from '@/assets/data/interfaces';
+import { emptyPatient } from '@/assets/data/data';
 
 interface Props {
 	patient: Patient;

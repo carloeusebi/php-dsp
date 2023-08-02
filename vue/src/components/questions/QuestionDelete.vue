@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 
 import AppModal from '@/components/AppModal.vue';
-import AppButton from './AppButton.vue';
+import AppButton from '@/components/AppButton.vue';
 
 import { useQuestionsStore } from '@/stores';
 import { Question } from '@/assets/data/interfaces';

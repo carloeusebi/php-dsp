@@ -2,7 +2,6 @@
 
 namespace app\db;
 
-use Error;
 use Exception;
 use PDO;
 

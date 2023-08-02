@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { Ref, computed, ref } from 'vue';
 
-import AppModal from './AppModal.vue';
+import AppModal from '@/components/AppModal.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
+import AppAlert from '@/components/AppAlert.vue';
 import SurveyDelete from './SurveyDelete.vue';
-import AppButton from './AppButton.vue';
-import AppButtonBlank from './AppButtonBlank.vue';
-import AppAlert from './AppAlert.vue';
-import axiosInstance from '@/assets/axios';
 
+import axiosInstance from '@/assets/axios';
 import { SurveyCell } from '@/pages/SurveysPage.vue';
 import { useLoaderStore } from '@/stores';
 import { Errors, Survey } from '@/assets/data/interfaces';
@@ -43,6 +43,12 @@ const patientEmail = computed(() =>
 	props.survey?.email
 		? `<a href="mailto:${props.survey.email}" class="font-medium text-blue-600 hover:underline">${props.survey.email}</a>`
 		: 'Nessun indirizzo email inserito'
+);
+
+const patientPhone = computed(() =>
+	props.survey.phone
+		? `<a href="https://wa.me/${props.survey.phone}" target="_blank" class="font-medium text-blue-600 hover:underline">${props.survey.phone}</a>`
+		: 'Nessun numero di telefono inserito'
 );
 
 const completedIcon = computed(() => {
@@ -162,6 +168,7 @@ const handleCloseModal = () => {
 			<!-- patient name -->
 			<p><strong>Paziente: </strong>{{ survey.patient_name }}</p>
 			<p><strong>Email: </strong><span v-html="patientEmail"></span></p>
+			<p><strong>Numero di telefono: </strong><span v-html="patientPhone"></span></p>
 			<p><strong>Creato il: </strong>{{ survey.created_at }}</p>
 			<p><strong>Ultima modifica: </strong>{{ survey.last_update || '-' }}</p>
 			<!-- link -->
@@ -180,12 +187,15 @@ const handleCloseModal = () => {
 			</p>
 		</template>
 		<template #button>
+			<!-- RESULTS BUTTON -->
 			<router-link
 				target="_blank"
 				:to="{ name: 'results', params: { id: survey.id } }"
 			>
 				<AppButton>Visualizza Risposte</AppButton>
 			</router-link>
+
+			<!-- EMAIL BUTTON -->
 			<AppButton
 				:disabled="survey.completed || !props.survey?.email"
 				:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
