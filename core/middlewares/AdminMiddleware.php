@@ -18,7 +18,6 @@ class AdminMiddleware extends BaseMiddleware
 
   public function execute(): void
   {
-
     // if the controller's method is inside the actions array it executes the validation. An empty actions array means that all controller's methods are protected by the middleware
     if (empty($this->actions) || in_array(App::$app->controller->action, $this->actions)) {
 

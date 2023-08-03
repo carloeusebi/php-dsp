@@ -83,10 +83,10 @@ class Router
 
         ob_start();
 
-        include_once(App::$ROOT_DIR . "/views/$page.view.php");
+        include_once(App::$ROOT_DIR . "/resources/views/$page.view.php");
 
         $content = ob_get_clean();
 
-        include_once(App::$ROOT_DIR . "/resources/layouts/$this->layout.php");
+        include_once(App::$ROOT_DIR . "/resources/views/layouts/$this->layout.php");
     }
 }

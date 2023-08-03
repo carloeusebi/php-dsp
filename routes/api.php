@@ -9,10 +9,7 @@ use app\controllers\QuestionsController;
 use app\controllers\MailController;
 use app\controllers\TestsController;
 
-/**
- *@var App $app
- */
-$router = $app->router;
+$router = App::$app->router;
 
 /*---------------------------------------------------------------*/
 /*----------------------------- API -----------------------------*/
@@ -41,6 +38,6 @@ $router->post('/api/tests', [TestsController::class, 'save']);
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);
 
-$router->get('/api/file', [FilesController::class, 'viewFile']);
-$router->post('/api/file', [FilesController::class, 'save']);
+$router->get('/api/file', [FilesController::class, 'download']);
+$router->post('/api/file', [FilesController::class, 'upload']);
 $router->delete('/api/file', [FilesController::class, 'delete']);

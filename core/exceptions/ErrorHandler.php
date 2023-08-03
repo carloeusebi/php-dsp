@@ -2,6 +2,7 @@
 
 namespace app\core\exceptions;
 
+use app\app\App;
 use Throwable;
 use app\core\utils\Response;
 
@@ -47,18 +48,38 @@ class ErrorHandler
         throw new \ErrorException($errStr, 0, $errN, $errFile, $errLine);
     }
 
+    /**
+     * Logs the details of a Throwable object to a file.
+     * @param Throwable $e The Throwable object to log.
+     */
     static function log(Throwable $e)
     {
-        $file_path = __DIR__ . '/../../errors_log.txt';
+        try {
+            // Create the storage folder if it doesn't exist.
+            $storage_path = App::$ROOT_DIR . '/storage';
+            if (!file_exists($storage_path)) {
+                mkdir($storage_path);
+            }
 
-        // creates file if doesn't exists
-        $file_handler = fopen($file_path, 'a+');
-        fclose($file_handler);
+            // Create the log folder if it doesn't exist.
+            $log_folder_path = $storage_path . '/logs';
+            if (!file_exists($log_folder_path)) {
+                mkdir($log_folder_path);
+            }
 
-        $date = date('d-m-Y H:i:s', time());
+            // Create the log file if it doesn't exist.
+            $file_path = $log_folder_path . '/errors.log';
+            if (!file_exists($file_path)) {
+                touch($file_path);
+            }
 
-        $content = file_get_contents($file_path);
-        $prepend = "$date - Code: {$e->getCode()} - Message: {$e->getMessage()} - File: {$e->getFile()} - Line: {$e->getLine()}" . PHP_EOL;
-        file_put_contents($file_path, $prepend . $content);
+            $date = date('d-m-Y H:i:s', time());
+
+            $content = file_get_contents($file_path);
+            $prepend = "$date - Code: {$e->getCode()} - Message: {$e->getMessage()} - File: {$e->getFile()} - Line: {$e->getLine()}" . PHP_EOL;
+            file_put_contents($file_path, $prepend . $content);
+        } catch (\Exception) {
+            return false;
+        }
     }
 }

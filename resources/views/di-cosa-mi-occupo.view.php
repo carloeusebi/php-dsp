@@ -8,4 +8,4 @@
     </div>
 </section>
 
-<?php include app\App::$ROOT_DIR . "/resources/partials/table.html" ?>
+<?php include app\app\App::$ROOT_DIR . "/resources/views/partials/table.html" ?>

@@ -57,10 +57,14 @@ class App
         $this->file = new File();
     }
 
-
+    /**
+     * Runs the application by resolving the route and handling exceptions.
+     * @return mixed The result of the resolved route.
+     */
     public function run()
     {
         try {
+            // Resolve the requested route using the router.
             return $this->router->resolve();
         } catch (RouteNotFoundException | ForbiddenException $e) {
             $code = intval($e->getCode());
