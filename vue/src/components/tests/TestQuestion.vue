@@ -21,10 +21,13 @@ const max = computed(() => parseInt(props.question.type.at(-1) as string));
 
 const firstNotAnsweredItemIndex = useGetIndexOfFirstItemWithoutProp(props.question.items, 'answer');
 const active = ref(firstNotAnsweredItemIndex);
+
+/**
+ * Determines the css class that displays the the clicked answer
+ */
 const clicked = ref(-1);
 
 const scroll = ref(false);
-const showClickedClass = ref(false);
 const showQuestionDescription = ref(true);
 const showModal = ref(false);
 const comment = ref('');
@@ -47,7 +50,6 @@ const activeItemId = computed(() => props.question.items[active.value].id);
 const goToNextQuestion = () => {
 	// scroll class triggers scroll animation
 	scroll.value = true;
-	showClickedClass.value = true;
 
 	// when animation end removes the scroll
 	setTimeout(() => {
@@ -60,10 +62,11 @@ const goToNextQuestion = () => {
 			emit('question-complete');
 			active.value = 0;
 			showQuestionDescription.value = true;
+			clicked.value = -1;
 		} else {
 			active.value++;
-			showClickedClass.value = false;
 			comment.value = '';
+			clicked.value = -1;
 		}
 	}, 1500);
 };
@@ -152,7 +155,7 @@ const skipItem = () => {
 						@click="handleClick(n + min)"
 						v-for="(leg, n) in question.legend"
 						:key="leg.id"
-						:class="{ active: clicked === n + min && showClickedClass }"
+						:class="{ active: clicked === n + min }"
 					>
 						<div class="score flex-shrink-0">{{ n + min }}</div>
 						<div class="px-2 flex-grow">

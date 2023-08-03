@@ -4,17 +4,7 @@
  * @param prop the prop to find
  * @returns the index of the first item without the prop in the array
  */
-export function useGetIndexOfFirstItemWithoutProp<T>(
-	arr: T[],
-	prop: keyof T
-): number {
-	let i = 0;
-	let isFound = false;
-
-	for (i; i <= arr.length && !isFound; i++) {
-		if (arr[i][prop] == undefined) {
-			isFound = true;
-		}
-	}
-	return i - 1;
+export function useGetIndexOfFirstItemWithoutProp<T>(arr: T[], prop: keyof T): number {
+	const index = arr.findIndex(item => item[prop] === undefined);
+	return index !== -1 ? index : arr.length;
 }

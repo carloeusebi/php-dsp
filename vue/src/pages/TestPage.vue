@@ -7,11 +7,17 @@ import { useRoute } from 'vue-router';
 import TestHeader from '@/components/tests/TestHeader.vue';
 import TestLanding from '@/components/tests/TestLanding.vue';
 import TestQuestion from '@/components/tests/TestQuestion.vue';
+import TestForm from '@/components/tests/TestForm.vue';
 
-import { Question, QuestionItem } from '@/assets/data/interfaces';
-import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
 import router from '@/routes';
+import { Question, QuestionItem } from '@/assets/data/interfaces';
+import { useGetIndexOfFirstItemWithoutProp, useGetTimeDifferenceFromNow } from '@/composables';
 import { useLoaderStore, useTestsStore } from '@/stores';
+
+/**
+ * The maximum time the patient has to complete the questionnaire
+ */
+const MINUTES_TO_COMPLETE_QUESTIONNAIRE = 120;
 
 /**
  * Disable back button navigation, it suggests the patient to leave a comment explaining why he wanted to go back to change the old question
@@ -21,17 +27,29 @@ const disableBackButton = () => {
 	window.onpopstate = () => {
 		window.history.pushState(null, '', window.location.href);
 		alert(
-			'Non puoi più modificare le risposte precedenti, se vuoi puoi lasciare un commento in cui spieghi perché volevi cambiare la risposta precedente.'
+			'Non puoi più modificare le risposte precedenti, se vuoi puoi lasciare un commento in cui spieghi perché volevi cambiare la risposta precedente.\nSe invece volevi uscire ti basta chiudere la scheda.'
 		);
 	};
 };
 
-disableBackButton();
+/**
+ * Resets the answers for a specific question.
+ * @param index The index of the question in the 'questions' array of the 'test' object.
+ */
+const resetAnswers = (index: number) => {
+	const items = test.value.questions[index].items;
+	if (items[0].answer === undefined) return; // if the questionnaire doesn't contain any answer the rest of the code doesn't need to be executed
+	const resettedItems = items.map(({ id, text, reversed }) => ({ id, text, reversed }));
+	test.value.questions[index].items = [...resettedItems];
+	testsStore.save(test.value);
+	alert(
+		`Sono passate più di due ore dalla tua ultima risposta. Le risposte del questionario "${test.value.questions[index].question}" sono state azzerate.`
+	);
+};
 
-const testsStore = useTestsStore();
-const loader = useLoaderStore();
-loader.setLoader();
-
+/**
+ * Redirects to page not found
+ */
 const goTo404 = () => {
 	router.push('404');
 };
@@ -42,6 +60,7 @@ const goTo404 = () => {
  */
 const fetchTest = async (token: string) => {
 	const params: AxiosRequestConfig = { params: { token } };
+	loader.setLoader();
 
 	try {
 		await testsStore.fetch(params);
@@ -49,15 +68,16 @@ const fetchTest = async (token: string) => {
 		// creates the pages wit one Questionnaire per pages
 		test.value.questions.forEach(question => {
 			pages.value.push({ question });
-			// sets the first non-completed Questionnaire as the
-			active.value = useGetIndexOfFirstItemWithoutProp(test.value.questions, 'completed');
-			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
-			// const timeSinceLastAnswer = getTimeSinceLastAnswer();
-			// if (timeSinceLastAnswer > TIME_TO_COMPLETE_QUESTIONNAIRE) {
-			// 	resetQuestionnaire(test.value.questions[active.value]);
-			// }
-			// TODO RESET ANSWERS IF MORE THAN X HOURS HAVE PASSED
 		});
+
+		// sets the first non-completed Questionnaire as the active one
+		active.value = useGetIndexOfFirstItemWithoutProp(test.value.questions, 'completed');
+
+		// if more than 120 minutes have passed between answer, it resets the questionnaire
+		const minutesSinceLastAnswer = useGetTimeDifferenceFromNow(test.value.last_update as string, 'minutes');
+		if (minutesSinceLastAnswer > MINUTES_TO_COMPLETE_QUESTIONNAIRE) {
+			resetAnswers(active.value);
+		}
 	} catch (err) {
 		if (axios.isAxiosError(err)) {
 			// axios returns an error if the test is already complete, in that case we just redirect to page 404
@@ -69,6 +89,10 @@ const fetchTest = async (token: string) => {
 	}
 };
 
+const testsStore = useTestsStore();
+const loader = useLoaderStore();
+disableBackButton();
+
 const route = useRoute();
 let token: string;
 
@@ -78,14 +102,24 @@ if (route.query.token) {
 	fetchTest(token);
 } else goTo404();
 
-const { test } = storeToRefs(testsStore);
-const showLanding = ref(true);
-const active = ref(0);
-const isCompleted = ref(false);
-
 interface Page {
 	question: Question;
 }
+
+const { test } = storeToRefs(testsStore);
+const showLanding = ref(true);
+console.log(test.value.last_update);
+const showForm = test.value.last_update === null;
+
+/**
+ * The index of the active Questionnaire, the same of the active Page
+ */
+const active = ref(0);
+
+/**
+ * When true displays last page
+ */
+const isCompleted = ref(false);
 
 const pages: Ref<Page[]> = ref([]);
 
@@ -126,12 +160,13 @@ const handleQuestionComplete = () => {
 				v-if="showLanding"
 				@start="showLanding = false"
 			/>
+			<TestForm v-else-if="showForm" />
 			<!-- AT TEST COMPLETION -->
 			<div
 				v-else-if="isCompleted"
 				class="text-center pt-5"
 			>
-				<h2>Grazie per aver completato il test</h2>
+				<h2>Grazie {{ test.fname }} per aver completato il test</h2>
 				<p>Questo link non sarà più valido.</p>
 			</div>
 			<!-- TEST QUESTION -->
