@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { Question, QuestionItem, Survey } from '@/assets/data/interfaces';
-import { useLoaderStore, useSurveysStore } from '@/stores';
 import axios from 'axios';
 import { ref } from 'vue';
+
+import { Question, QuestionItem, Survey } from '@/assets/data/interfaces';
+import { useLoaderStore, useSurveysStore } from '@/stores';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -14,6 +15,22 @@ const survey = useSurveysStore().getById(id) as Survey;
 
 const min = (question: Question): number => parseInt(question.type.at(0) as string);
 const itemValue = (question: Question, n: number): number => min(question) + n;
+
+const checkboxes = ref<Array<boolean[]>>([]);
+
+const fillCheckboxes = () => {
+	const checkboxes: Array<boolean[]> = [];
+	survey.questions.forEach(question => {
+		const legends = [];
+		for (let i = 0; i < question.legend.length; i++) {
+			legends.push(false);
+		}
+		checkboxes.push(legends);
+	});
+	return checkboxes;
+};
+
+checkboxes.value = fillCheckboxes();
 
 /**
  * Updates an answer
@@ -106,7 +123,7 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 
 			<!-- QUESTIONNAIRE -->
 			<section
-				v-for="question in survey?.questions"
+				v-for="(question, i) in survey?.questions"
 				:key="question.id"
 				:id="(question.id as number).toString()"
 				class="my-10 border-b pb-5"
@@ -117,11 +134,26 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 				<!-- LEGEND -->
 				<div class="border border-black my-5 p-2 grid md:grid-cols-2">
 					<div
-						v-for="(legend, i) in question.legend"
-						:key="i"
+						v-for="(legend, j) in question.legend"
+						:key="j"
 						class="uppercase font-bold"
 					>
-						{{ i + min(question) }} = {{ legend.legend }}
+						<!-- checkbox -->
+						<label class="container shrink">
+							<input
+								v-model="checkboxes[i][j]"
+								type="checkbox"
+								class="cursor-pointer"
+								:id="`cb-${i}-${j}`"
+							/>
+							<span class="checkmark"></span>
+						</label>
+						<!-- text -->
+						<label
+							:for="`cb-${i}-${j}`"
+							class="ms-7 cursor-pointer"
+							>{{ j + min(question) }} = {{ legend.legend }}</label
+						>
 					</div>
 				</div>
 				<!-- ITEMS -->
@@ -140,11 +172,16 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 							<div
 								v-for="(legend, n) in question.legend"
 								:key="n"
-								class="answer-cell border border-black flex-grow flex justify-center items-center"
-								:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
-								@click="changeAnswer(question.id, item.id, itemValue(question, n))"
+								class="flex-grow h-full"
+								:class="{ hidden: !checkboxes[i][n] && !checkboxes[i].every(cb => !cb) }"
 							>
-								{{ itemValue(question, n) }}
+								<div
+									class="answer-cell border border-black flex-grow flex justify-center items-center h-full"
+									:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
+									@click="changeAnswer(question.id, item.id, itemValue(question, n))"
+								>
+									{{ itemValue(question, n) }}
+								</div>
 							</div>
 						</div>
 						<!-- COMMENTS -->
@@ -218,6 +255,11 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 </template>
 
 <style lang="scss" scoped>
+@use '@/assets/scss/checkbox';
+.checkmark {
+	top: 3px;
+}
+
 * {
 	-webkit-print-color-adjust: exact;
 	print-color-adjust: exact;
@@ -312,6 +354,10 @@ img {
 	}
 
 	.edit-button {
+		display: none;
+	}
+
+	label.container {
 		display: none;
 	}
 }
