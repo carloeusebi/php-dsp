@@ -74,7 +74,7 @@ class Database
             if ($migration === '.' || $migration === '..')
                 continue;
 
-            require_once __DIR__ . '/migrations/' . $migration;
+            require_once __DIR__ . "/migrations/$migration";
             $className = pathinfo($migration, PATHINFO_FILENAME);
             $instance = new $className();
             $instance->up();
@@ -90,7 +90,47 @@ class Database
     }
 
 
-    public function createMigrationsTable()
+    public function applyFactories()
+    {
+        $files = scandir(__DIR__ . '/factories');
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..' || $file === 'sql' || $file === 'BaseFactory.php')
+                continue;
+
+            require_once __DIR__ . "/factories/$file";
+            $className = pathinfo($file, PATHINFO_FILENAME);
+
+            $instance = new $className;
+            try {
+                $instance->generateAndInsert();
+            } catch (Exception $exception) {
+                $code = $exception->getCode();
+                if ($code === '42S02') {
+                    $this->log("No `" . $instance::TABLE_NAME . "` table found, make sure to run php database migrate first");
+                    exit;
+                }
+            }
+        }
+    }
+
+
+    public function dropTables()
+    {
+        $tables = $this->getTables();
+
+        // prepare sql
+        $sql = 'DROP TABLES ';
+        foreach ($tables as $table) {
+            $sql .= $table[0] . ", ";
+        }
+        $sql = substr($sql, 0, -2);  // removes last ', '
+        $this->pdo->exec($sql);
+
+        $this->log(count($tables) . " tables dropped.");
+    }
+
+
+    protected function createMigrationsTable()
     {
         $SQL = "CREATE TABLE IF NOT EXISTS migrations (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -102,7 +142,7 @@ class Database
     }
 
 
-    public function getAppliedMigrations()
+    protected function getAppliedMigrations()
     {
         $statement = $this->pdo->prepare("SELECT migration FROM migrations");
         $statement->execute();
@@ -111,7 +151,7 @@ class Database
     }
 
 
-    public function saveMigrations(array $newMigrations)
+    protected function saveMigrations(array $newMigrations)
     {
         $str = implode(',', array_map(fn ($m) => "('$m')", $newMigrations));
         $statement = $this->pdo->prepare("INSERT INTO migrations (migration) VALUES $str");
@@ -119,7 +159,22 @@ class Database
     }
 
 
-    public function log(string $message)
+    protected function getTables(): array
+    {
+        // fetch tables
+        $statement = $this->pdo->prepare('SHOW TABLES');
+        $statement->execute();
+
+        $tables = $statement->fetchAll(PDO::FETCH_NUM);
+        if (count($tables) === 0) {
+            $this->log('No tables to drop');
+            exit;
+        }
+        return $tables;
+    }
+
+
+    protected function log(string $message)
     {
         echo "[" . date("d-m-y H:i:s") . "] - " . $message . PHP_EOL;
     }

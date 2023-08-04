@@ -43,8 +43,11 @@ class App
             \app\core\exceptions\ErrorHandler::log($exception);
         }
 
+
         self::$app = $this;
         self::$ROOT_DIR = dirname(__DIR__);
+
+        require self::$ROOT_DIR . '/core/utils/functions.php';
 
         $this->db = new Database();
         $this->router = new Router();

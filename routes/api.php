@@ -34,6 +34,7 @@ $router->delete('/api/questions', [QuestionsController::class, 'delete']);
 
 $router->get('/api/tests', [TestsController::class, 'get']);
 $router->post('/api/tests', [TestsController::class, 'save']);
+$router->get('/api/tests/patient', [TestsController::class, 'getPatient']);
 $router->post('/api/tests/patient', [TestsController::class, 'updatePatientInfo']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);

@@ -28,8 +28,8 @@ Make sure you have environment setup properly. You will need MySQL, PHP8.1, Node
 3. In `.env` configure your email credentials if you want to be able to send emails
 4. Navigate to the project's root directory using terminal
 5. Run `composer install`
-6. Run migrations `php migrations.php`
-7. Run factories `php db\factories\factories.php`
+6. Run migrations `php database migrate`
+7. Run factories `php database seed`
 
 ## Installation using docker
 
@@ -40,8 +40,8 @@ Make sure `docker` and `docker-compose` commands are available in command line.
 1. Copy `.env.example` into `.env` (no need to change database credentials for local development)
 1. Navigate to the project root directory and run `docker-compose up -d`
 1. Install dependencies - `docker-compose exec app composer install`
-1. Run migrations - `docker-compose exec app php migrations.php`
-1. Run factories - `docker-compose exec app php db\factories\factories.php`
+1. Run migrations - `docker-compose exec app php database migrate`
+1. Run factories - `docker-compose exec app php database seed`
 1. Open in browser http://localhost:8080
 
 ## Install Vue.js Admin Panel

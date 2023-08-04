@@ -5,7 +5,6 @@ namespace app\models;
 use app\app\App;
 use app\db\DbModel;
 use app\core\utils\CodiceFiscale;
-use app\core\utils\Utils;
 
 class Patient extends DbModel
 {
@@ -77,7 +76,7 @@ class Patient extends DbModel
     {
         // calculates and updates the age of the patients
         return array_map(function ($patient) {
-            $age = Utils::calculateAge($patient['birthday']);
+            $age = calculateAge($patient['birthday']);
             if ($age !== $patient['age']) {
                 $patient['age'] = $age;
                 parent::load($patient);
@@ -107,7 +106,7 @@ class Patient extends DbModel
 
         //birthday
         if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
-        if ($this->isAgeInvalid()) $errors['age'] = "{$this->age} non è un'età valida";
+        $this->age = calculateAge($this->birthday);
 
         // date of therapy start
         $this->begin = $this->begin  ? $this->begin : date("Y-m-d", time()); // if no previous date was submitted start of therapy is considered now
@@ -148,6 +147,6 @@ class Patient extends DbModel
      */
     protected function isAgeInvalid()
     {
-        return $this->age < 0 || $this->age > 120;
+        return $this->age <= 0 || $this->age > 120;
     }
 }

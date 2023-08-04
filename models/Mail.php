@@ -132,6 +132,8 @@ class Mail extends Model
     static function isUndeliverable(string $email, bool $should_log_invalid = false, bool $should_log_valid = false): bool
     {
 
+        error_reporting(E_ALL & ~E_DEPRECATED);
+
         // if an invalid email address passed the frontend barriers immediately return the email as undeliverable
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return true;
 

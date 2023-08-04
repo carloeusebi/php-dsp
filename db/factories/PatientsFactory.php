@@ -20,14 +20,14 @@ class PatientsFactory extends BaseFactory
 
     public function generateAndInsert(): void
     {
-        $number_of_patients = readline("How many patients do you want to generate? ");
+        $number_of_patients = (int) readline("How many patients do you want to generate? ");
 
         for ($i = 1; $i <= $number_of_patients; $i++) {
             $fname = $this->randomItem($this->first_names);
             $lname = $this->randomItem($this->last_names);
             $sex = $this->randomItem($this->sexes);
             $birthday = $this->randomDate(strtotime('-90 years'), strtotime('-18 years'));
-            $age = Utils::calculateAge($birthday);
+            $age = calculateAge($birthday);
             $birthplace = $this->randomItem($this->birthplaces);
             $address = $this->randomItem($this->addresses);
             $begin = $this->randomDate(strtotime('-5 years'), strtotime('now'));

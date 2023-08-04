@@ -7,8 +7,6 @@ class SurveysFactory extends BaseFactory
 {
     public const TABLE_NAME = 'surveys';
 
-    private float $avg_surveys_per_patient;
-
     private array $titles = ['Test di inizio terapia', 'Test di metà terapia', 'Test di fine terapia'];
 
     /**
@@ -121,9 +119,9 @@ class SurveysFactory extends BaseFactory
 
         $number_of_patients = count($patients);
 
-        $this->avg_surveys_per_patient = readline("Average surveys per patients (float): ");
+        $avg_surveys_per_patient = (float) readline("Average surveys per patients (float): ");
 
-        $total_num_of_surveys = $number_of_patients * $this->avg_surveys_per_patient;
+        $total_num_of_surveys =  $number_of_patients * (int) $avg_surveys_per_patient;
 
         for ($i = 1; $i <= $total_num_of_surveys; $i++) {
             $patient = $this->randomItem($patients);
