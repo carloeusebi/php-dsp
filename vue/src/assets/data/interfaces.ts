@@ -13,7 +13,7 @@ export interface PatientFile extends AppFile {
 }
 
 export interface Patient {
-	id?: number;
+	id: number;
 	fname: string;
 	lname: string;
 	age?: number;
@@ -28,6 +28,7 @@ export interface Patient {
 	weight?: string;
 	height?: string;
 	job?: string;
+	qualification?: string;
 	sex?: 'M' | 'F' | 'O';
 	cohabitants?: string;
 }
@@ -46,7 +47,7 @@ export interface QuestionLegend {
 }
 
 export interface Question {
-	id?: number;
+	id: number;
 	question: string;
 	description: string;
 	type: '' | '1-4' | '1-6' | '0-5' | '0-3' | '1-7' | '0-4' | '1-4' | '1-5';
@@ -64,8 +65,12 @@ export interface Survey extends Patient {
 	created_at?: string;
 	last_update?: string;
 	completed: boolean;
-	token?: string;
+	token: string;
 }
+
+export type NewPatient = Omit<Patient, 'id'>;
+export type NewQuestion = Omit<Question, 'id'>;
+export type NewSurvey = Omit<Survey, 'id' | 'token'>;
 
 export interface LoginForm {
 	username: string;

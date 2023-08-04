@@ -13,7 +13,7 @@ class Auth extends AuthController
   {
     $prefix = ($type === self::ADMIN) ? self::ADMIN_TOKEN : self::USER_TOKEN;
     $randomBytes = random_bytes(32);
-    $token = $prefix . $id . '.' . bin2hex($randomBytes) . '.' . hash_hmac('sha256', $prefix . bin2hex($randomBytes), 'your-secret-key');
+    $token = $prefix . $id . hash_hmac('sha256', $prefix, bin2hex($randomBytes));
 
     return $token;
   }

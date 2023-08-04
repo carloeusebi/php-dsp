@@ -12,7 +12,7 @@ import PatientFiles from './PatientFiles.vue';
 import { PatientCell } from '@/pages/PatientsPage.vue';
 import { usePatientsStore, useSurveysStore } from '@/stores';
 import { Patient, Survey } from '@/assets/data/interfaces';
-import { SurveyCell } from '@/pages/SurveysPage.vue';
+import { OrderSurvey, SurveyCell } from '@/pages/SurveysPage.vue';
 import { useSort } from '@/composables';
 
 interface Props {
@@ -54,16 +54,30 @@ const mappedPatient = computed(() => {
 	return mappedPatient;
 });
 
-/**
- * Patient's Surveys
- */
+/**************************************************************************** */
+/***************************       SURVEYS       **************************** */
+/**************************************************************************** */
+
 const getPatientsSurveys = (id: number): Survey[] | null => {
 	const allSurveys = useSurveysStore().getSurveys;
-	const patientsSurveys = allSurveys.filter(({ patient_id }) => patient_id === id);
-	return useSort(patientsSurveys, 'last_update', 'down');
+	return allSurveys.filter(({ patient_id }) => patient_id === id);
 };
+
+const sortSurveys = (newOrder: OrderSurvey) => {
+	orderSurvey.value = { ...newOrder };
+};
+
 const patientSurveys = computed(() => getPatientsSurveys(props.patient.id as number));
-const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
+const orderSurvey = ref<OrderSurvey>({ by: 'last_update', type: 'up' });
+const orderedSurveys = computed(() =>
+	useSort(patientSurveys.value as Survey[], orderSurvey.value.by, orderSurvey.value.type)
+);
+
+const surveyCell: Ref<SurveyCell[]> = ref([
+	{ label: 'Titolo', key: 'title' },
+	{ label: 'Ultima modifica', key: 'last_update' },
+	{ label: '', key: 'completed' },
+]);
 </script>
 
 <template>
@@ -96,7 +110,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 	>
 		<template v-slot:content>
 			<!-- TOP BUTTONS -->
-			<div class="">
+			<div>
 				<PatientFiles :patient="patient" />
 				<SurveyCreate :patient="patient" />
 				<PatientSave
@@ -109,7 +123,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 			</div>
 			<hr />
 			<h1 class="text-4xl font-bold my-5">{{ patient.fname }} {{ patient.lname }}</h1>
-			<div class="grid md:grid-cols-2 gap-6">
+			<div class="grid lg:grid-cols-2 gap-6">
 				<div class="col-span-1">
 					<ul>
 						<!-- PATIENT DETAILS -->
@@ -125,16 +139,17 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 						</li>
 					</ul>
 				</div>
+				<hr class="lg:hidden my-1" />
 				<!-- SURVEYS TABLE -->
-				<div class="col-span-1">
+				<div class="survey-table col-span-1">
 					<AppTable
 						v-if="(patientSurveys as Survey[]).length > 0"
 						:cells="surveyCell"
-						:can-sort="false"
+						@sort-change="sortSurveys"
 					>
 						<template #tbody>
 							<SurveyRow
-								v-for="survey in patientSurveys"
+								v-for="survey in orderedSurveys"
 								:key="survey.id"
 								:survey="survey"
 								:cells="surveyCell"
@@ -148,3 +163,19 @@ const surveyCell: Ref<SurveyCell[]> = ref([{ label: 'Titolo', key: 'title' }]);
 		<template v-slot:button> </template>
 	</AppModal>
 </template>
+
+<style scoped lang="scss">
+.survey-table {
+	// completed row
+	:deep(th:nth-of-type(3)),
+	:deep(td:nth-of-type(3)) {
+		width: 30px;
+	}
+
+	// details row
+	:deep(th:last-of-type),
+	:deep(td:last-of-type) {
+		width: 75px;
+	}
+}
+</style>

@@ -7,10 +7,10 @@ const emit = defineEmits(['start']);
 <template>
 	<section
 		id="landing-page"
-		class="py-5"
+		class="py-5 md:max-w-5xl mx-auto"
 	>
 		<h1 class="text-center text-4xl font-bold uppercase mb-5">QUESTIONARI PER LA VALUTAZIONE PSICOLOGICA</h1>
-		<p>
+		<p class="text-justify">
 			Questo fascicolo contiene una serie di questionari appositamente selezionati per esplorare alcuni aspetti del
 			funzionamento psicologico che potrebbero influire sul Suo benessere. La preghiamo di compilare ogni questionario
 			in tutte le sue parti, anche nel caso in cui qualche domanda possa risultarle poco chiara o non pertinente. La
@@ -24,6 +24,7 @@ const emit = defineEmits(['start']);
 		<div class="flex justify-center my-6">
 			<AppButton
 				color="green"
+				class="px-10"
 				@click="emit('start')"
 			>
 				Inizia

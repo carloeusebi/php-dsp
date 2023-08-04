@@ -74,9 +74,11 @@ const fetchTest = async (token: string) => {
 		active.value = useGetIndexOfFirstItemWithoutProp(test.value.questions, 'completed');
 
 		// if more than 120 minutes have passed between answer, it resets the questionnaire
-		const minutesSinceLastAnswer = useGetTimeDifferenceFromNow(test.value.last_update as string, 'minutes');
-		if (minutesSinceLastAnswer > MINUTES_TO_COMPLETE_QUESTIONNAIRE) {
-			resetAnswers(active.value);
+		if (test.value.last_update) {
+			const minutesSinceLastAnswer = useGetTimeDifferenceFromNow(test.value.last_update as string, 'minutes');
+			if (minutesSinceLastAnswer > MINUTES_TO_COMPLETE_QUESTIONNAIRE) {
+				resetAnswers(active.value);
+			}
 		}
 	} catch (err) {
 		if (axios.isAxiosError(err)) {
@@ -108,8 +110,7 @@ interface Page {
 
 const { test } = storeToRefs(testsStore);
 const showLanding = ref(true);
-console.log(test.value.last_update);
-const showForm = test.value.last_update === null;
+const showForm = ref(test.value.last_update === null);
 
 /**
  * The index of the active Questionnaire, the same of the active Page
@@ -160,7 +161,12 @@ const handleQuestionComplete = () => {
 				v-if="showLanding"
 				@start="showLanding = false"
 			/>
-			<TestForm v-else-if="showForm" />
+			<TestForm
+				v-else-if="showForm"
+				:patient-id="test.patient_id"
+				:token="test.token"
+				@form-submit="showForm = false"
+			/>
 			<!-- AT TEST COMPLETION -->
 			<div
 				v-else-if="isCompleted"

@@ -28,6 +28,13 @@ export const useSurveysStore = defineStore('surveys', {
 		load(surveys: Survey[]) {
 			this.surveys = surveys.map(s => {
 				s.patient_name = `${s?.fname} ${s.lname}`;
+				if (s.created_at) {
+					s.created_at = new Date(s.created_at).toLocaleDateString();
+				}
+				if (s.last_update) {
+					s.last_update = new Date(s.last_update).toLocaleDateString();
+				}
+
 				return s;
 			});
 			localStorage.setItem('SURVEYS', JSON.stringify(surveys));

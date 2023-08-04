@@ -193,12 +193,19 @@ watch(
 			/>
 		</div>
 		<div class="md:col-span-2 z-0 w-full mb-6 group">
-			<!-- CONSENT -->
+			<!-- QUALIFICATION -->
 			<AppInputElement
-				v-model.trim="form.cohabitants"
-				label="Conviventi"
+				v-model.trim="form.qualification"
+				label="Titolo di Studio"
 			/>
 		</div>
+	</div>
+	<div class="md:col-span-2 z-0 w-full mb-6 group">
+		<!-- COHABITANTS -->
+		<AppInputElement
+			v-model.trim="form.cohabitants"
+			label="Conviventi"
+		/>
 	</div>
 
 	<div>

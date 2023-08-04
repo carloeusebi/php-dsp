@@ -25,7 +25,7 @@ class FilesController extends AdminController
             Response::response(400, ['Error' => 'No file name']);
         }
 
-        $file_path = App::$ROOT_DIR . '/storage/uploads' . $data['file_name'];
+        $file_path = App::$ROOT_DIR . '/storage/uploads/' . $data['file_name'];
 
         if (file_exists($file_path)) {
             header('Content-Type: application/pdf');

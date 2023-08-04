@@ -5,11 +5,7 @@
  * @param type up = asc | down = desc
  * @returns the sorted array of objects
  */
-export function useSort<T>(
-	arr: T[],
-	by: keyof T,
-	direction: 'up' | 'down'
-): T[] {
+export function useSort<T>(arr: T[], by: keyof T, direction: 'up' | 'down'): T[] {
 	return direction === 'up'
 		? arr.sort((a, b) => (a[by] < b[by] ? 1 : -1))
 		: arr.sort((a, b) => (a[by] > b[by] ? 1 : -1));

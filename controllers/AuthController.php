@@ -12,7 +12,6 @@ use app\core\utils\Response;
 class AuthController extends Controller
 {
     protected const ADMIN = 'ADMIN';
-    protected const USER = 'USER';
 
     public function __construct()
     {

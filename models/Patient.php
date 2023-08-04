@@ -23,9 +23,9 @@ class Patient extends DbModel
     public $weight;
     public $height;
     public $job;
+    public $qualification;
     public $sex;
     public $cohabitants;
-    public $username;
 
     protected array $fields_to_decode = [];
 
@@ -37,7 +37,7 @@ class Patient extends DbModel
     static function attributes(): array
     {
         return [
-            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'sex', 'cohabitants', 'id'
+            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'qualification', 'sex', 'cohabitants', 'id'
         ];
     }
 
@@ -57,6 +57,7 @@ class Patient extends DbModel
             'phone' => 'Numero di Telefono',
             'weight' => 'Peso',
             'height' => 'Altezza',
+            'qualification' => 'Titolo di Studio',
             'job' => 'Occupazione',
             'sex' => 'Sesso',
             'cohabitants' => 'Conviventi',
@@ -105,7 +106,6 @@ class Patient extends DbModel
             $this->sex = strtoupper(substr($this->sex, 0, 1));
 
         //birthday
-        if (!$this->birthday) $errors['birthday'] = "La data di nascita è obbligatoria.";
         if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
         if ($this->isAgeInvalid()) $errors['age'] = "{$this->age} non è un'età valida";
 

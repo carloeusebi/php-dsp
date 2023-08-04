@@ -26,7 +26,7 @@ export interface SurveyCell extends Cell {
 	key: keyof Survey;
 }
 
-interface OrderSurvey extends Order {
+export interface OrderSurvey extends Order {
 	by: keyof Survey;
 }
 
@@ -47,8 +47,8 @@ const filteredBySearchSurveys = computed(() => {
 	return useSearchFilter(surveys.value, searchWord.value, ['title', 'patient_name']);
 });
 
-const sort = (newOrder: Order) => {
-	order.value = { ...newOrder } as OrderSurvey;
+const sort = (newOrder: OrderSurvey) => {
+	order.value = { ...newOrder };
 };
 
 const order: Ref<OrderSurvey> = ref({ by: 'id', type: 'down' });

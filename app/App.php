@@ -3,7 +3,6 @@
 namespace app\app;
 
 use Dotenv\Dotenv;
-use Dotenv\Exception\InvalidPathException;
 
 use app\db\Database;
 use app\core\Router;
