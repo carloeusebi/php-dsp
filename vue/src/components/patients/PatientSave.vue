@@ -26,10 +26,10 @@ const props = withDefaults(defineProps<Props>(), {
 
 const showModal = ref(false);
 const patientRef: Ref<Patient> = ref({ ...props.toEditPatient });
-const errors: Ref<Errors> = ref({});
 // modal component ref
 const modalComponent = ref<InstanceType<typeof AppModal> | null>(null);
 
+const errors: Ref<Errors> = ref({});
 const errorsStr = computed(() => {
 	const keys = Object.keys(errors.value);
 	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
@@ -52,32 +52,12 @@ const scrollModalToTop = () => {
  * Prepares patient's info and then loads store
  */
 const handleSavePatient = async () => {
-	/**
-	 * Calculates age based on birthday
-	 * @param birthday
-	 * @return the age based on the birthday
-	 */
-	const calculateAge = (birthday: string) => {
-		const birthDate = new Date(birthday);
-		const today = new Date();
-		const age =
-			today.getFullYear() -
-			birthDate.getFullYear() -
-			(today.getMonth() < birthDate.getMonth() ||
-			(today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
-				? 1
-				: 0);
-		return age;
-	};
-
 	errors.value = {};
 
 	// scrolls the modal to the top, needed to show errors when on smartphones
 	scrollModalToTop();
 
 	const patientStore = usePatientsStore();
-
-	if (patientRef.value.birthday) patientRef.value.age = calculateAge(patientRef.value.birthday);
 
 	const keys = Object.keys(patientRef.value) as Array<keyof Patient>;
 	const patientFormData = new FormData();

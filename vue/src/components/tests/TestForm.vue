@@ -1,23 +1,59 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { Ref, computed, ref } from 'vue';
 
 import AppButton from '../AppButton.vue';
-import AppInputElement from '../AppInputElement.vue';
+import AppAlert from '../AppAlert.vue';
+import PatientForm from '../patients/PatientForm.vue';
 
-import { Patient } from '@/assets/data/interfaces';
+import { Errors, Patient } from '@/assets/data/interfaces';
 import axiosInstance from '@/assets/axios';
+import { useLoaderStore } from '@/stores';
+import { isAxiosError } from 'axios';
 
-const handelFormSubmit = async () => {
+const endpoint = 'tests/patient';
+
+const fetchPatient = async (token: string) => {
+	loader.setLoader();
+	errors.value = {};
 	const params = {
-		token: props.token,
-		...patientInfos.value,
+		token,
+		id: props.patientId,
 	};
 	try {
-		await axiosInstance.post('tests/patient', params);
+		const response = await axiosInstance.get(endpoint, { params });
+		patient.value = response.data.patient;
 	} catch (err) {
 		console.log(err);
-	} finally {
+		// ignore the error and go on
 		emit('form-submit');
+	} finally {
+		loader.unsetLoader();
+	}
+};
+
+const handleFormSubmit = async () => {
+	loader.setLoader();
+	errors.value = {};
+	if (patient.value === null) return;
+	const params = {
+		token: props.token,
+		...patient.value,
+	};
+	try {
+		await axiosInstance.post(endpoint, params);
+		emit('form-submit');
+	} catch (err) {
+		if (isAxiosError(err)) {
+			// Axios error means the patient information are not correct
+			errors.value = err.response?.data;
+			console.warn(err);
+		} else {
+			// If not axios error ignore the error and go on
+			console.error(err);
+			emit('form-submit');
+		}
+	} finally {
+		loader.unsetLoader();
 	}
 };
 
@@ -32,16 +68,17 @@ const props = defineProps({
 	},
 });
 
+const loader = useLoaderStore();
 const emit = defineEmits(['form-submit']);
+const patient = ref<Patient | null>(null);
 
-const patientInfos = ref<Partial<Patient>>({
-	id: props.patientId,
-	weight: '',
-	height: '',
-	qualification: '',
-	job: '',
-	cohabitants: '',
+const errors: Ref<Errors> = ref({});
+const errorsStr = computed(() => {
+	const keys = Object.keys(errors.value);
+	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
 });
+
+fetchPatient(props.token);
 
 // fetches the patient
 </script>
@@ -49,52 +86,37 @@ const patientInfos = ref<Partial<Patient>>({
 <template>
 	<div class="container md:max-w-4xl mx-auto my-8">
 		<h2 class="text-center text-3xl">Inserisci prima delle informazioni su di te</h2>
+		<AppAlert
+			:show="errorsStr.length > 0"
+			:message="errorsStr"
+			type="warning"
+			title="Attenzione"
+			class="my-4"
+		/>
 		<hr class="my-8" />
+
 		<!-- FORM -->
 		<form
-			@submit.prevent="handelFormSubmit"
+			@submit.prevent="handleFormSubmit"
 			class="mb-8"
 		>
-			<div class="grid md:grid-cols-2 gap-10">
-				<div>
-					<AppInputElement
-						v-model="patientInfos.weight"
-						label="Peso in kg"
-						:required="true"
-					/>
-				</div>
-				<div>
-					<AppInputElement
-						v-model="patientInfos.height"
-						label="Altezza in cm"
-						:required="true"
-					/>
-				</div>
-				<div>
-					<AppInputElement
-						v-model="patientInfos.qualification"
-						label="Titolo di studio"
-						:required="true"
-					/>
-				</div>
-				<div>
-					<AppInputElement
-						v-model="patientInfos.job"
-						label="Professione attuale"
-						:required="true"
-					/>
-				</div>
-				<div class="col-span-2">
-					<AppInputElement
-						v-model="patientInfos.cohabitants"
-						label="Vivo con"
-						:required="true"
-					/>
-				</div>
-			</div>
+			<PatientForm
+				v-if="patient"
+				@form-emptied="errors = {}"
+				:patient="patient"
+				:is-test="true"
+			/>
 			<!-- FORM BUTTON -->
 			<hr class="my-5" />
 			<div class="flex justify-end">
+				<button
+					v-if="errorsStr.length > 0"
+					type="button"
+					class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto me-4"
+					@click="$emit('form-submit')"
+				>
+					Salta
+				</button>
 				<AppButton color="green"> Conferma </AppButton>
 			</div>
 		</form>

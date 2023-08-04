@@ -54,6 +54,19 @@ class TestsController extends Controller
   }
 
 
+  public function getPatient(): void
+  {
+    $patient_id = Request::getBody()['id'] ?? '';
+    if (!$patient_id) {
+      Response::response(400, ['Error' => 'No Patient ID']);
+    }
+
+    $patient = $this->fetchPatient($patient_id);
+
+    Response::response(200, ['patient' => $patient]);
+  }
+
+
   public function updatePatientInfo(): void
   {
     $model = App::$app->patient;
@@ -63,15 +76,12 @@ class TestsController extends Controller
       Response::response(400, ['Error' => 'No patient ID']);
     }
 
-    $patient_to_update = $model->getById($updated_patient_info['id']);
-    if (!$patient_to_update) {
-      // There should always be a match in the database, if there is not a match this is a Bad Request code and not a Not Found
-      Response::response(400, ['Error' => 'Invalid patient ID']);
-    }
+    $patient_to_update = $this->fetchPatient($updated_patient_info['id']);
+
 
     // updates patient infos with the ones sent from the form
     foreach ($patient_to_update as $key => $value) {
-      if (isset($updated_patient_info[$key]))
+      if ($updated_patient_info[$key])
         $patient_to_update[$key] = $updated_patient_info[$key];
     }
 
@@ -79,5 +89,16 @@ class TestsController extends Controller
     $errors = $model->save();
 
     $errors ? Response::response(422, $errors) : Response::response(204);
+  }
+
+
+  protected function fetchPatient(int $id): array
+  {
+    $patient = App::$app->patient->getById($id);
+    if (!$patient) {
+      // There should always be a match in the database, if there is not a match this is a Bad Request code and not a Not Found
+      Response::response(400, ['Error' => 'Invalid patient ID']);
+    }
+    return $patient;
   }
 }

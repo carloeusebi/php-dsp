@@ -1,5 +1,5 @@
 import { Survey } from '@/assets/data/interfaces';
-import { deleteMixin, saveMixin } from '@/mixins';
+import { deleteMixin, formatDateToIta, saveMixin } from '@/mixins';
 import { defineStore } from 'pinia';
 
 const endpoint = '/surveys';
@@ -29,10 +29,10 @@ export const useSurveysStore = defineStore('surveys', {
 			this.surveys = surveys.map(s => {
 				s.patient_name = `${s?.fname} ${s.lname}`;
 				if (s.created_at) {
-					s.created_at = new Date(s.created_at).toLocaleDateString();
+					s.created_at = formatDateToIta(s.created_at);
 				}
 				if (s.last_update) {
-					s.last_update = new Date(s.last_update).toLocaleDateString();
+					s.last_update = formatDateToIta(s.last_update);
 				}
 
 				return s;

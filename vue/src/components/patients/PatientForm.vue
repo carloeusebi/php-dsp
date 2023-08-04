@@ -6,9 +6,14 @@ import { emptyPatient } from '@/assets/data/data';
 
 interface Props {
 	patient: Patient;
+	isTest: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+	isTest: false,
+});
+
+// const props = defineProps<Props>();
 
 const emit = defineEmits(['form-emptied']);
 const form: Ref<Patient> = ref(props.patient);
@@ -137,7 +142,10 @@ watch(
 	<div class="grid md:grid-cols-3 gap-2 md:gap-6">
 		<!-- BEGIN -->
 
-		<div class="md:col-span-1 z-0 w-full mb-6 group">
+		<div
+			class="md:col-span-1 z-0 w-full mb-6 group"
+			v-if="!isTest"
+		>
 			<AppInputElement
 				v-model.trim="form.begin"
 				label="Data di inizio terapia"
@@ -146,7 +154,10 @@ watch(
 		</div>
 		<!-- ADDRESS -->
 
-		<div class="md:col-span-2 z-0 w-full mb-6 group">
+		<div
+			class="z-0 w-full mb-6 group"
+			:class="isTest ? 'md:col-span-3' : 'md:col-span-2'"
+		>
 			<AppInputElement
 				v-model.trim="form.address"
 				label="Indirizzo"
@@ -210,6 +221,7 @@ watch(
 
 	<div>
 		<button
+			v-if="!isTest"
 			type="button"
 			class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto me-4"
 			@click="emptyFields"
