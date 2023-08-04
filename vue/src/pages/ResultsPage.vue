@@ -1,17 +1,60 @@
 <script lang="ts" setup>
-import axios from 'axios';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
-import { Question, QuestionItem, Survey } from '@/assets/data/interfaces';
-import { useLoaderStore, useSurveysStore } from '@/stores';
+import { Patient, Question, QuestionItem, Survey } from '@/assets/data/interfaces';
+import { useLoaderStore, usePatientsStore, useSurveysStore } from '@/stores';
 import { useRoute } from 'vue-router';
+import axiosInstance from '@/assets/axios';
+import { isAxiosError } from 'axios';
+
+interface PrintableQuestion extends Question {
+	printable: boolean;
+}
 
 const route = useRoute();
-const id = route.params.id as string;
+const surveyId = parseInt(route.params.id as string);
+const loader = useLoaderStore();
+const survey = ref<Survey | null>(null);
+const patient = ref<Patient | null>(null);
+
+/**
+ * On mount fetches the Survey details, which are not stored locally
+ */
+onMounted(async () => {
+	/**
+	 * Fetches the Survey details, which are not stored locally.
+	 * @param id The Survey ID to fetch
+	 * @async
+	 */
+	const fetchSurveyQuestion = async (id: number): Promise<Survey | undefined> => {
+		/**
+		 * Adds the printable propriety to each questionnaire
+		 * @param questions The questions to modify
+		 */
+		const makeQuestionsPrintable = (questions: Question[]): PrintableQuestion[] =>
+			questions.map(q => ({ ...q, printable: true })) as PrintableQuestion[];
+
+		loader.setLoader();
+		const params = { id };
+		try {
+			const res = await axiosInstance.get('surveys', { params });
+			const survey = res.data.list as Survey;
+			survey.questions = makeQuestionsPrintable(survey.questions);
+			return survey;
+		} catch (err) {
+			alert(err);
+		} finally {
+			loader.unsetLoader();
+		}
+		return undefined;
+	};
+
+	survey.value = (await fetchSurveyQuestion(surveyId)) as Survey;
+	patient.value = usePatientsStore().getById(survey.value?.patient_id) as Patient;
+	checkboxes.value = fillCheckboxes();
+});
 
 const editMode = ref(false);
-
-const survey = useSurveysStore().getById(id) as Survey;
 
 const min = (question: Question): number => parseInt(question.type.at(0) as string);
 const itemValue = (question: Question, n: number): number => min(question) + n;
@@ -20,7 +63,8 @@ const checkboxes = ref<Array<boolean[]>>([]);
 
 const fillCheckboxes = () => {
 	const checkboxes: Array<boolean[]> = [];
-	survey.questions.forEach(question => {
+	if (!survey.value) return checkboxes;
+	survey.value.questions.forEach(question => {
 		const legends = [];
 		for (let i = 0; i < question.legend.length; i++) {
 			legends.push(false);
@@ -30,8 +74,6 @@ const fillCheckboxes = () => {
 	return checkboxes;
 };
 
-checkboxes.value = fillCheckboxes();
-
 /**
  * Updates an answer
  * @param questionId the question where the answer to update is
@@ -40,8 +82,8 @@ checkboxes.value = fillCheckboxes();
  */
 const changeAnswer = (questionId: number | undefined, itemId: number, answer: number): void => {
 	// return if we are not in question mode
-	if (!editMode.value) return;
-	const questionToUpdate = survey?.questions.find(({ id }) => id === questionId);
+	if (!editMode.value || !survey.value) return;
+	const questionToUpdate = survey.value.questions.find(({ id }) => id === questionId);
 	const itemToUpdate = questionToUpdate?.items.find(({ id }) => id === itemId) as QuestionItem;
 	itemToUpdate.answer = answer;
 };
@@ -50,12 +92,12 @@ const changeAnswer = (questionId: number | undefined, itemId: number, answer: nu
  * Saves the survey and uses the store to make an ajax call
  */
 const saveUpdates = async () => {
-	const loader = useLoaderStore();
+	if (!survey.value) return;
 	loader.setLoader();
 	try {
-		await useSurveysStore().save({ ...survey });
+		await useSurveysStore().save({ ...survey.value });
 	} catch (err) {
-		if (axios.isAxiosError(err)) console.warn(err.response?.data);
+		if (isAxiosError(err)) console.warn(err.response?.data);
 		else console.error(err);
 	} finally {
 		loader.unsetLoader();
@@ -67,7 +109,8 @@ const saveUpdates = async () => {
  * Handles the delete of a comment, prompts with a confirmation question and in case proceeds to delete the message
  */
 const handleDeleteComment = (questionId: number, itemId: number) => {
-	const question = survey.questions.find(({ id }) => questionId === id);
+	if (!survey.value) return;
+	const question = survey.value.questions.find(({ id }) => questionId === id);
 	const item = question?.items.find(({ id }) => itemId === id) as QuestionItem;
 
 	const proceed = confirm(`Sicuro di voler cancellare il commento\n"${item.comment}"\ndella domanda\n"${item.text}"?`);
@@ -123,13 +166,25 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 
 			<!-- QUESTIONNAIRE -->
 			<section
-				v-for="(question, i) in survey?.questions"
+				v-for="(question, i) in (survey?.questions as PrintableQuestion[])"
 				:key="question.id"
-				:id="(question.id as number).toString()"
+				:id="question.id.toString()"
 				class="my-10 border-b pb-5"
-				:class="{ 'edit-mode': editMode }"
+				:class="{ 'edit-mode': editMode, 'non-printable': !question.printable }"
 			>
-				<h2>{{ question.question }}</h2>
+				<div
+					class="inline-flex items-center gap-3 cursor-pointer mb-5"
+					@click="question.printable = !question.printable"
+				>
+					<h2 class="mb-0">
+						{{ question.question }}
+					</h2>
+					<font-awesome-icon
+						:icon="['fas', question.printable ? 'eye' : 'eye-slash']"
+						size="lg"
+						class="text-gray-400"
+					/>
+				</div>
 				<p>{{ question.description }}</p>
 				<!-- LEGEND -->
 				<div class="border border-black my-5 p-2 grid md:grid-cols-2">
@@ -201,7 +256,7 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 								<!-- comment delete button -->
 								<span class="grow">{{ item.comment }}</span>
 								<font-awesome-icon
-									@click="handleDeleteComment(question.id as number, item.id)"
+									@click="handleDeleteComment(question.id, item.id)"
 									:icon="['fas', 'trash-can']"
 									size="sm"
 									class="ms-1 text-red-500 z-0 self-start cursor-pointer p-2"
@@ -345,11 +400,19 @@ img {
 // PRINT MEDIA
 
 @media print {
+	section.non-printable {
+		display: none;
+	}
 	.print-comment {
 		display: block;
 	}
 
 	.fa-comment-dots {
+		display: none;
+	}
+
+	.fa-eye,
+	.fa-eye-slash {
 		display: none;
 	}
 

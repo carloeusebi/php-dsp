@@ -27,6 +27,17 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 	} else page = action - 1;
 	emit('page-click', page);
 };
+
+/**
+ * Calculates the offset value based on the current page and total pages.
+ * The offset is used to determine the starting point of a pagination range.
+ */
+const offset = computed(() => {
+	const { currentPage, totalPages } = props;
+	// Calculate the offset using a mathematical formula
+	const offset = Math.min(Math.max(currentPage - 4, 1), totalPages - 10);
+	return offset;
+});
 </script>
 
 <template>
@@ -37,13 +48,13 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 		>
 			<div
 				@click="handleClick('prev')"
-				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 			>
 				Precedente
 			</div>
 			<div
 				@click="handleClick('next')"
-				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 			>
 				Successiva
 			</div>
@@ -72,15 +83,19 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 					>
 						<ChevronLeftIcon class="h-5 w-5" />
 					</div>
-					<!-- PAGINATION IF LENGTH < 7 -->
-					<div v-if="totalPages < 7">
+					<!-- PAGINATION IF LENGTH < 10 -->
+					<div v-if="totalPages <= 8">
 						<div
 							v-for="n in totalPages"
 							:key="n"
 							role="button"
 							@click="handleClick(n)"
-							:class="[n === currentPage + 1 ? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700'] : ['bg-white', 'hover:bg-gray-50', 'text-gray-900']]"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
+							:class="[
+								n === currentPage + 1
+									? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700']
+									: ['bg-white', 'hover:bg-gray-50', 'text-gray-900'],
+							]"
+							class="relative inline-flex items-center justify-center py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
 						>
 							{{ n }}
 						</div>
@@ -89,55 +104,41 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 					<div v-else>
 						<!-- link to first page -->
 						<div
-							v-if="currentPage !== 0"
 							role="button"
 							@click="handleClick(1)"
-							:class="[1 === currentPage + 1 ? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700'] : ['bg-white', 'hover:bg-gray-50', 'text-gray-900']]"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
+							:class="[
+								1 === currentPage + 1
+									? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700']
+									: ['bg-white', 'hover:bg-gray-50', 'text-gray-900'],
+							]"
+							class="relative inline-flex items-center justify-center py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
 						>
 							1
 						</div>
-						<span
-							v-if="currentPage > 2"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0"
-							>...</span
-						>
+
 						<div
-							v-if="currentPage > 1"
+							v-for="n in 9"
 							role="button"
-							@click="handleClick(currentPage)"
-							:class="[1 === currentPage + 1 ? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700'] : ['bg-white', 'hover:bg-gray-50', 'text-gray-900']]"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
+							@click="handleClick(n + offset)"
+							:class="[
+								n + offset === currentPage + 1
+									? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700']
+									: ['bg-white', 'hover:bg-gray-50', 'text-gray-900'],
+							]"
+							class="relative inline-flex items-center justify-center py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
 						>
-							{{ currentPage }}
+							{{ n + offset }}
 						</div>
-						<div
-							role="button"
-							class="relative bg-sky-100 hover:bg-sky-200 text-sky-700 inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
-						>
-							{{ currentPage + 1 }}
-						</div>
-						<div
-							v-if="currentPage + 1 < totalPages"
-							role="button"
-							@click="handleClick(currentPage + 2)"
-							:class="[1 === currentPage + 2 ? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700'] : ['bg-white', 'hover:bg-gray-50', 'text-gray-900']]"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
-						>
-							{{ currentPage + 2 }}
-						</div>
-						<span
-							v-if="currentPage < totalPages - 3"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0"
-							>...</span
-						>
 						<!-- link to last page -->
 						<div
-							v-if="currentPage + 2 < totalPages"
 							role="button"
 							@click="handleClick(totalPages)"
-							:class="[totalPages === currentPage + 1 ? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700'] : ['bg-white', 'hover:bg-gray-50', 'text-gray-900']]"
-							class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
+							:class="[
+								totalPages === currentPage + 1
+									? ['bg-sky-100', 'hover:bg-sky-200', 'text-sky-700']
+									: ['bg-white', 'hover:bg-gray-50', 'text-gray-900'],
+							]"
+							class="relative inline-flex items-center justify-center py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0 select-none"
 						>
 							{{ totalPages }}
 						</div>
@@ -155,3 +156,9 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 		</div>
 	</div>
 </template>
+
+<style scoped>
+div[role='button'] {
+	width: 44px;
+}
+</style>

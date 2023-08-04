@@ -27,7 +27,7 @@ abstract class Model
     protected function decodeOne(array $item): array
     {
         foreach ($this->fields_to_decode as $key) {
-            if ($item[$key])
+            if (isset($item[$key]) && $item[$key])
                 $item[$key] = json_decode($item[$key]);
         }
         return $item;

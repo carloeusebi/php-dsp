@@ -43,7 +43,7 @@ class Survey extends DbModel
     public function get(string $fields = '*')
     {
         $tableName = $this->tableName();
-        $fields = " $tableName.*, P.id AS patient_id, P.fname, P.lname, P.phone, P.email, P.age, P.weight, P.height, P.qualification, P.job, P.cohabitants";
+        $fields = " $tableName.id, $tableName.patient_id, $tableName.title, $tableName.created_at, $tableName.last_update, $tableName.completed, $tableName.token, P.id AS patient_id, P.fname, P.lname, P.phone, P.email";
 
         return parent::get($fields);
     }

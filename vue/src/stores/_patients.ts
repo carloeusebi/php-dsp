@@ -26,6 +26,15 @@ export const usePatientsStore = defineStore('patients', {
 		},
 
 		/**
+		 * Get a Patient by its ID
+		 * @param id The Patient ID
+		 * @returns The Patient object
+		 */
+		getById(id: number): Patient | undefined {
+			return this.patients.find(patient => patient.id === id);
+		},
+
+		/**
 		 * Loads both labels and patients list received from ta ajax call to the
 		 * @param patients An object with labels and patients list
 		 */

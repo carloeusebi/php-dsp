@@ -17,11 +17,14 @@ export const useSurveysStore = defineStore('surveys', {
 
 	//actions
 	actions: {
-		async fetch() {
-			return this.axios.get(endpoint).then(res => this.load(res.data.list));
+		async fetch(id?: number) {
+			const params = {
+				id,
+			};
+			return this.axios.get(endpoint, { params }).then(res => this.load(res.data.list));
 		},
 
-		getById(id: string): Survey | undefined {
+		fetchById(id: string): Survey | undefined {
 			return this.surveys.find(s => String(s.id) == id);
 		},
 

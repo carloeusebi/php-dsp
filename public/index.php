@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use app\app\App;
 
+
 set_error_handler('app\core\exceptions\ErrorHandler::handleError');
 set_exception_handler('app\core\exceptions\ErrorHandler::handleException');
 
