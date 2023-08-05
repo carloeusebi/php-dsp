@@ -9,9 +9,10 @@ import SurveyDelete from './SurveyDelete.vue';
 
 import axiosInstance from '@/assets/axios';
 import { SurveyCell } from '@/pages/SurveysPage.vue';
-import { useLoaderStore } from '@/stores';
-import { Errors, Survey } from '@/assets/data/interfaces';
+import { useLoaderStore, usePatientsStore } from '@/stores';
+import { Errors, Patient, Survey } from '@/assets/data/interfaces';
 import { isAxiosError } from 'axios';
+import PatientRow from '../patients/PatientRow.vue';
 
 // interfaces
 
@@ -166,11 +167,13 @@ const handleCloseModal = () => {
 				:message="emailAlert.message"
 			/>
 			<!-- patient name -->
-			<p><strong>Paziente: </strong>{{ survey.patient_name }}</p>
-			<p><strong>Email: </strong><span v-html="patientEmail"></span></p>
-			<p><strong>Numero di telefono: </strong><span v-html="patientPhone"></span></p>
+			<p class="flex items-center">
+				<span class="me-5"><strong>Paziente: </strong>{{ survey.patient_name }}</span>
+				<PatientRow :patient="(usePatientsStore().getById(survey.patient_id) as Patient)" />
+			</p>
 			<p><strong>Creato il: </strong>{{ survey.created_at }}</p>
 			<p><strong>Ultima modifica: </strong>{{ survey.last_update || '-' }}</p>
+			<p><strong>Completato: </strong>{{ survey.completed ? 'Si' : 'No' }}</p>
 			<!-- link -->
 			<p>
 				<strong>Link al sondaggio per il paziente: </strong>

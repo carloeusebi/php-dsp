@@ -6,7 +6,7 @@ import { emptyPatient } from '@/assets/data/data';
 
 interface Props {
 	patient: Patient;
-	isTest: boolean;
+	isTest?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

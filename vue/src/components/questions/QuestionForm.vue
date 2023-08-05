@@ -4,9 +4,12 @@ import { Ref, computed, reactive, ref } from 'vue';
 
 import AppInputElement from '@/components/AppInputElement.vue';
 
+import { useGenerateId } from '@/composables';
 import { questionTypes } from '@/assets/data/data';
-import { Question, QuestionItem, QuestionLegend } from '@/assets/data/interfaces';
+import { Question, QuestionLegend } from '@/assets/data/interfaces';
 import { useQuestionsStore } from '@/stores';
+import QuestionVariables from './QuestionVariables.vue';
+import QuestionItem from './QuestionItem.vue';
 
 interface Props {
 	question: Question;
@@ -20,6 +23,8 @@ const form = reactive(props.question);
 const types = ref(questionTypes);
 const newItem: Ref = ref('');
 const newItemReversed = ref(false);
+
+const itemsListRef = ref<HTMLDivElement | null>(null);
 
 // calculate number of answers
 const numberOfAnswers = computed(() => {
@@ -49,29 +54,22 @@ const deleteItem = (id: number): void => {
  * Adds a new item to the list of the Questionnaire's items
  */
 const addItem = () => {
-	/**
-	 * Generates a new id for the item
-	 * @param items The list of items
-	 * @returns The id for the new item
-	 */
-	const generateId = (items: QuestionItem[]): number =>
-		items.reduce((newId, { id }) => (newId > id ? newId : id), 0) + 1;
 	const capitalizeItem = (textToCapitalize: string): string =>
 		textToCapitalize.at(0)?.toUpperCase() + textToCapitalize.slice(1);
 
 	if (!newItem.value) return;
 
-	const id = generateId(form.items);
+	const id = useGenerateId(form.items);
 	const text = capitalizeItem(newItem.value);
 	form.items.push({ id, text, reversed: newItemReversed.value });
 
-	emit('answer-added');
+	emit('answer-added', itemsListRef.value?.scrollHeight);
 
 	newItem.value = '';
 	newItemReversed.value = false;
 };
 
-const emit = defineEmits(['answer-added']);
+const emit = defineEmits(['answer-added', 'variable-added']);
 </script>
 
 <template>
@@ -111,7 +109,7 @@ const emit = defineEmits(['answer-added']);
 		/>
 	</div>
 	<hr class="my-5" />
-	<p class="text-sm text-gray-500 mb-3">{{ labels.legend }}</p>
+	<p class="text-gray-500 mb-3">{{ labels.legend }}</p>
 
 	<!-- LEGEND -->
 	<div class="grid md:grid-cols-2 md:gap-x-6 relative mb-8">
@@ -128,45 +126,30 @@ const emit = defineEmits(['answer-added']);
 		</div>
 	</div>
 	<hr class="my-5" />
-	<p class="text-sm text-gray-500 mb-3">{{ labels.items }} - Spuntare quelle a punteggio invertito</p>
+	<p class="text-gray-500 mb-3">{{ labels.items }} - Spuntare quelle a punteggio invertito</p>
 
-	<!-- ANSWERS -->
-	<!-- @vue-ignore -->
-	<draggable
-		item-key="id"
-		tag="ul"
-		v-model="form.items"
-		:animation="150"
-		:delay="250"
-		:delay-on-touch-only="true"
-	>
-		<template #item="{ element: item }">
-			<li class="flex items-end">
-				<div class="grow">
-					<!-- CHECKBOX -->
-					<label class="container shrink">
-						<input
-							v-model="item.reversed"
-							type="checkbox"
-							class="me-2 cursor-pointer"
-						/>
-						<span class="checkmark"></span>
-					</label>
-					<AppInputElement
-						class="grow ms-8"
-						v-model="item.text"
-						:id="`answer-${item.id}`"
+	<div ref="itemsListRef">
+		<!-- ITEMS -->
+		<draggable
+			item-key="id"
+			tag="ul"
+			v-model="form.items"
+			:animation="150"
+			:delay="250"
+			:delay-on-touch-only="true"
+		>
+			<template #item="{ element: item }">
+				<li>
+					<QuestionItem
+						:item="item"
+						@delete-item="deleteItem(item.id)"
 					/>
-				</div>
-				<font-awesome-icon
-					@click="deleteItem(item.id)"
-					class="ms-3 cursor-pointer text-red-700 hover:text-red-800 mb-2 md:mb-0"
-					:icon="['fas', 'trash-can']"
-				/>
-			</li>
-		</template>
-	</draggable>
+				</li>
+			</template>
+		</draggable>
+	</div>
 
+	<!-- ADD NEW ITEM -->
 	<div class="flex items-end bg-white">
 		<div class="grow">
 			<label class="container shrink">
@@ -190,6 +173,16 @@ const emit = defineEmits(['answer-added']);
 			:icon="['fas', 'plus']"
 		/>
 	</div>
+
+	<hr class="my-8" />
+	<p class="text-gray-500 mb-8">Variabili</p>
+
+	<!-- VARIABLES -->
+	<QuestionVariables
+		v-model="question.variables"
+		:items="question.items"
+		@add-variable="emit('variable-added', -1)"
+	/>
 </template>
 
 <style lang="scss" scoped>

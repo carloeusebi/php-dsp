@@ -35,26 +35,26 @@ const handleClick = (action: number | 'prev' | 'next'): void => {
 const offset = computed(() => {
 	const { currentPage, totalPages } = props;
 	// Calculate the offset using a mathematical formula
-	const offset = Math.min(Math.max(currentPage - 4, 1), totalPages - 10);
+	const offset = Math.min(Math.max(currentPage - 3, 1), totalPages - 7);
 	return offset;
 });
 </script>
 
 <template>
-	<div class="flex items-center justify-between border-t border-gray-20 px-4 py-3 sm:px-6">
+	<div class="flex items-center justify-between border-t border-gray-20 px-4 py-3 sm:px-3">
 		<div
 			v-if="totalPages > 1"
 			class="flex flex-1 justify-between sm:hidden"
 		>
 			<div
 				@click="handleClick('prev')"
-				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
 			>
 				Precedente
 			</div>
 			<div
 				@click="handleClick('next')"
-				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
 			>
 				Successiva
 			</div>
@@ -117,7 +117,7 @@ const offset = computed(() => {
 						</div>
 
 						<div
-							v-for="n in 9"
+							v-for="n in 6"
 							role="button"
 							@click="handleClick(n + offset)"
 							:class="[

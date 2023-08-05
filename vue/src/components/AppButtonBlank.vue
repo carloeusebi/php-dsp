@@ -15,8 +15,9 @@ defineProps({
 <template>
 	<button
 		type="button"
-		:class="`text-${color}-700 hover:text-${color}-800`"
-		class="font-medium rounded-md px-5 py-2.5 outline-none">
+		:class="`text-${color}-700 hover:text-${color}-800 focus:text-${color}-900`"
+		class="font-medium rounded-md px-5 py-2.5 focus:outline focus:outline-2"
+	>
 		<slot></slot>
 	</button>
 </template>

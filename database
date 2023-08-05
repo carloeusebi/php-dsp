@@ -8,7 +8,7 @@ set_exception_handler('app\core\exceptions\ErrorHandler::handleCliException');
 
 $app = new App();
 
-$commands = ['migrate' => 'Migrate the database', 'seed' => 'Seed the database using factories', 'drop' => 'Drop all database tables', 'truncate' => 'truncate all database tables'];
+$commands = ['migrate' => 'Migrate the database', 'seed' => 'Seed the database using factories', 'drop' => 'Drop all database tables'];
 
 
 function help(array $commands): void

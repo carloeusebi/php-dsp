@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, ref, nextTick, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 
 import { Errors, Question } from '@/assets/data/interfaces';
 import { useQuestionsStore } from '@/stores';
-import { useSaveToStore } from '@/composables';
+import { useSaveToStore, useScrollTo } from '@/composables';
 
 import AppModal from '@/components/AppModal.vue';
 import AppButton from '@/components/AppButton.vue';
@@ -29,13 +29,14 @@ const errorsStr = computed(() => {
 	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
 });
 
-const scrollToBottom = () => {
-	// scroll to bottom
-	nextTick(() => {
-		const modal = modalComponent.value?.$refs.modal as HTMLTemplateElement;
-		if (!modalComponent.value) return;
-		modal.scrollTo(0, modal.scrollHeight);
-	});
+/**
+ * Scrolls the modal using the composable `useScrollTo`
+ * @param where Where to scroll in pixel, 0 top, -1 bottom.
+ */
+const scrollTo = (where: number) => {
+	const modal = modalComponent.value?.$refs.modal as HTMLTemplateElement;
+	if (!modalComponent.value) return;
+	useScrollTo(modal, where);
 };
 
 /***************************************** */
@@ -82,6 +83,7 @@ const saveQuestion = async () => {
 	const questionsStore = useQuestionsStore();
 	errors.value = await useSaveToStore(questionRef.value, questionsStore);
 	if (!errorsStr.value) closeModal();
+	else useScrollTo(modalComponent.value?.$refs.modal as HTMLTemplateElement, 0);
 };
 
 const closeModal = () => {
@@ -139,7 +141,8 @@ const closeModal = () => {
 				@submit.prevent="saveQuestion"
 			>
 				<QuestionForm
-					@answer-added="scrollToBottom"
+					@answer-added="scrollTo($event)"
+					@variable-added="scrollTo($event)"
 					:question="questionRef"
 				/>
 			</form>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-type Type = 'text' | 'date' | 'email' | 'file' | 'tel' | 'select' | 'textarea';
+type Type = 'text' | 'date' | 'email' | 'file' | 'tel' | 'select' | 'textarea' | 'number';
 
 interface Props {
 	modelValue?: string | number;

@@ -30,7 +30,11 @@ export const useQuestionsStore = defineStore('questions', {
 		 * @param questions An object with labels and questions list
 		 */
 		load(questionsAndLabels: QuestionsAndLabels) {
-			this.loadQuestions(questionsAndLabels.list);
+			const questions = questionsAndLabels.list.map(question => {
+				question.variables = question.variables || [];
+				return question;
+			});
+			this.loadQuestions(questions);
 			this.loadLabels(questionsAndLabels.labels);
 		},
 

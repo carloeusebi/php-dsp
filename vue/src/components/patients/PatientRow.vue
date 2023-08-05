@@ -17,7 +17,7 @@ import { useSort } from '@/composables';
 
 interface Props {
 	patient: Patient;
-	cells: PatientCell[];
+	cells?: PatientCell[];
 }
 
 const patientStore = usePatientsStore();
@@ -141,7 +141,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([
 				</div>
 				<hr class="lg:hidden my-1" />
 				<!-- SURVEYS TABLE -->
-				<div class="survey-table col-span-1">
+				<div class="survey-table col-span-1 overflow-auto">
 					<AppTable
 						v-if="(patientSurveys as Survey[]).length > 0"
 						:cells="surveyCell"

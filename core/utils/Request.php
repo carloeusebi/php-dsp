@@ -63,7 +63,7 @@ class Request
         }
 
         if (!$data) {
-            $data = (array) json_decode(file_get_contents("php://input"));
+            $data = (array) json_decode(file_get_contents("php://input"), true);
         }
 
         return $data;

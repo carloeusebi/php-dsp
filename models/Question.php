@@ -13,8 +13,9 @@ class Question extends DbModel
     public $type;
     public $items;
     public $legend;
+    public $variables;
 
-    protected array $fields_to_decode = ['legend', 'items'];
+    protected array $fields_to_decode = ['legend', 'items', 'variables'];
 
 
     public static function tableName(): string
@@ -25,7 +26,7 @@ class Question extends DbModel
 
     static function attributes(): array
     {
-        return ['question', 'description', 'type', 'items', 'legend', 'id'];
+        return ['question', 'description', 'type', 'items', 'legend', 'variables', 'id'];
     }
 
 
@@ -57,10 +58,21 @@ class Question extends DbModel
         if (!$this->description) $errors['description'] = "La descrizione è obbligatoria";
         if (!$this->type) $errors['type'] = "Il tipo della domanda è obbligatorio";
 
-        $this->legend = json_encode($this->legend);
-        $this->items = json_encode($this->items);
+        if ($this->variables) {
+            $i = 1;
+            foreach ($this->variables as $variable) {
+                if (!isset($variable['name']) || strlen($variable['name']) === 0) {
+                    $errors["variable-$i"] = "La variabile numero $i non ha un nome!";
+                }
+                $i++;
+            }
+        }
 
         if (empty($errors)) {
+            $this->legend = json_encode($this->legend);
+            $this->items = json_encode($this->items);
+            $this->variables = json_encode($this->variables);
+
             if ($this->id) self::update();
             else self::create();
         }

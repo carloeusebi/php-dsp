@@ -158,18 +158,23 @@ const saveSurvey = async () => {
 					:delay-on-touch-only="true"
 				>
 					<template #item="{ element: question }">
-						<li class="select-none flex items-center">
-							<label>
+						<li class="select-none">
+							<!-- CHECKBOX -->
+							<label class="container shrink">
 								<input
-									type="checkbox"
+									:id="question.id"
 									:value="question.id"
 									v-model="question.selected"
+									type="checkbox"
+									class="me-2 cursor-pointer"
 								/>
-								<span
-									class="ms-3 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
-									>{{ question.question }}</span
-								>
+								<span class="checkmark"></span>
 							</label>
+							<label
+								:for="question.id"
+								class="ms-7 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
+								>{{ question.question }}</label
+							>
 						</li>
 					</template>
 				</draggable>
@@ -180,3 +185,11 @@ const saveSurvey = async () => {
 		</template>
 	</AppModal>
 </template>
+
+<style lang="scss" scoped>
+@use '@/assets/scss/checkbox';
+
+label.container {
+	bottom: 5px;
+}
+</style>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, nextTick, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 
 import AppModal from '@/components/AppModal.vue';
 import AppAlert from '@/components/AppAlert.vue';
@@ -9,7 +9,7 @@ import PatientForm from './PatientForm.vue';
 
 import { Errors, Patient } from '@/assets/data/interfaces';
 import { emptyPatient } from '@/assets/data/data';
-import { useSaveToStore } from '@/composables';
+import { useSaveToStore, useScrollTo } from '@/composables';
 import { usePatientsStore } from '@/stores';
 
 interface Props {
@@ -36,26 +36,10 @@ const errorsStr = computed(() => {
 });
 
 /**
- * Scrolls the modal to top
- */
-const scrollModalToTop = () => {
-	nextTick(() => {
-		if (!modalComponent.value) return;
-		(modalComponent.value.$refs.modal as HTMLTemplateElement).scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
-	});
-};
-
-/**
  * Prepares patient's info and then loads store
  */
 const handleSavePatient = async () => {
 	errors.value = {};
-
-	// scrolls the modal to the top, needed to show errors when on smartphones
-	scrollModalToTop();
 
 	const patientStore = usePatientsStore();
 
@@ -71,7 +55,9 @@ const handleSavePatient = async () => {
 	// the store handles the patient saving
 
 	errors.value = await useSaveToStore(patientFormData, patientStore);
+
 	if (!errorsStr.value) showModal.value = false;
+	else useScrollTo(modalComponent.value?.$refs.modal as HTMLTemplateElement, 0); // scrolls the modal to the top, needed to show errors when on smartphones
 };
 </script>
 

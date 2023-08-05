@@ -121,14 +121,14 @@ class SurveysFactory extends BaseFactory
 
         $avg_surveys_per_patient = (float) readline("Average surveys per patients (float): ");
 
-        $total_num_of_surveys =  $number_of_patients * (int) $avg_surveys_per_patient;
+        $total_num_of_surveys =  $number_of_patients * $avg_surveys_per_patient;
 
         for ($i = 1; $i <= $total_num_of_surveys; $i++) {
             $patient = $this->randomItem($patients);
             $survey = $this->generateSurvey($patient['id'], $questions);
             $this->insertSurvey($survey);
 
-            $this->printProgressBar($i, $total_num_of_surveys);
+            $this->printProgressBar($i, (int) $total_num_of_surveys);
         }
         echo "\n$total_num_of_surveys Surveys generated.\n";
     }

@@ -33,6 +33,7 @@ const create = async () => {
 
 	newQuestion.value.legend = [];
 	newQuestion.value.items = [];
+	newQuestion.value.variables = [];
 
 	try {
 		await questionStore.save({ ...newQuestion.value });

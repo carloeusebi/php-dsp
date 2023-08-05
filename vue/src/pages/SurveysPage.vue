@@ -35,7 +35,7 @@ const tableCells: Ref<SurveyCell[]> = ref([
 	{ label: 'Titolo', key: 'title' },
 	{ label: 'Creato il', key: 'created_at' },
 	{ label: 'Ultima modifica', key: 'last_update' },
-	{ label: 'Completato', key: 'completed' },
+	{ label: 'Compl', key: 'completed' },
 ]);
 
 const handleSearchbarKeypress = (word: string) => {
@@ -122,8 +122,19 @@ const handlePageClick = (newPage: number) => {
 </template>
 
 <style scoped>
+/* name column */
+:deep(td:first-of-type) {
+	max-width: 200px;
+}
+
 /* min width to prevent dates to break line */
-:deep(tr :is(td:nth-child(3), td:nth-child(4))) {
-	min-width: 120px;
+:deep(td:nth-child(3)),
+:deep(td:nth-child(4)) {
+	max-width: 100px;
+}
+
+/* completed column */
+:deep(th:nth-of-type(5)) {
+	width: 40px;
 }
 </style>

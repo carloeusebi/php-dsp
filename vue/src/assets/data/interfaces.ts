@@ -33,7 +33,7 @@ export interface Patient {
 	cohabitants?: string;
 }
 
-export interface QuestionItem {
+export interface QuestionItemI {
 	id: number;
 	text: string;
 	answer?: number;
@@ -46,13 +46,29 @@ export interface QuestionLegend {
 	legend: string;
 }
 
+export interface QuestionVariableCutoff {
+	id: number;
+	name: string;
+	type: 'range' | 'greater-than';
+	from: number;
+	to: number;
+}
+
+export interface QuestionVariableI {
+	id: number;
+	name: string;
+	items: number[]; //array of items ID
+	cutoffs: QuestionVariableCutoff[];
+}
+
 export interface Question {
 	id: number;
 	question: string;
 	description: string;
 	type: '' | '1-4' | '1-6' | '0-5' | '0-3' | '1-7' | '0-4' | '1-4' | '1-5';
-	items: QuestionItem[];
 	legend: QuestionLegend[];
+	items: QuestionItemI[];
+	variables: QuestionVariableI[];
 	selected?: boolean;
 	completed?: boolean;
 }
