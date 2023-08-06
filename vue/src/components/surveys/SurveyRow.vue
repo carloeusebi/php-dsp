@@ -167,13 +167,22 @@ const handleCloseModal = () => {
 				:message="emailAlert.message"
 			/>
 			<!-- patient name -->
-			<p class="flex items-center">
-				<span class="me-5"><strong>Paziente: </strong>{{ survey.patient_name }}</span>
-				<PatientRow :patient="(usePatientsStore().getById(survey.patient_id) as Patient)" />
-			</p>
-			<p><strong>Creato il: </strong>{{ survey.created_at }}</p>
-			<p><strong>Ultima modifica: </strong>{{ survey.last_update || '-' }}</p>
-			<p><strong>Completato: </strong>{{ survey.completed ? 'Si' : 'No' }}</p>
+			<p><strong>Paziente:</strong></p>
+			<table class="patient-table mb-2">
+				<PatientRow
+					:patient="(usePatientsStore().getById(survey.patient_id) as Patient)"
+					:cells="[{ key: 'fname' }, { key: 'lname' }]"
+				/>
+			</table>
+			<div class="border-b max-w-fit pb-3 mb-3">
+				<p><strong>Email: </strong><span v-html="patientEmail"></span></p>
+				<p><strong>Telefono: </strong><span v-html="patientPhone"></span></p>
+			</div>
+			<div class="mt-3">
+				<p><strong>Creato il: </strong>{{ survey.created_at }}</p>
+				<p><strong>Ultima modifica: </strong>{{ survey.last_update || '-' }}</p>
+				<p><strong>Completato: </strong>{{ survey.completed ? 'Si' : 'No' }}</p>
+			</div>
 			<!-- link -->
 			<p>
 				<strong>Link al sondaggio per il paziente: </strong>
@@ -209,3 +218,13 @@ const handleCloseModal = () => {
 		</template>
 	</AppModal>
 </template>
+
+<style lang="scss" scoped>
+.patient-table {
+	border: 1px solid rgb(229, 231, 235);
+
+	:deep(td) {
+		border-width: 0;
+	}
+}
+</style>

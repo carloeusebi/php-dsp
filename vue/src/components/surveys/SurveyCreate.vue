@@ -4,7 +4,7 @@ import draggable from 'vuedraggable';
 
 import { Errors, Patient, Survey } from '@/assets/data/interfaces';
 import { emptySurvey } from '@/assets/data/data';
-import { useSaveToStore, useSort } from '@/composables';
+import { useSaveToStore, useSearchFilter, useSort } from '@/composables';
 import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
 
 import AppButtonBlank from '@/components/AppButtonBlank.vue';
@@ -12,6 +12,7 @@ import AppModal from '@/components/AppModal.vue';
 import AppInputElement from '@/components/AppInputElement.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppAlert from '@/components/AppAlert.vue';
+import AppSearchbar from '../AppSearchbar.vue';
 
 interface Props {
 	patient?: Patient;
@@ -23,7 +24,21 @@ if (props.patient) emptySurvey.patient_id = props.patient.id as number;
 
 const showModal = ref(false);
 const patients = useSort(usePatientsStore().getPatients, 'lname', 'down');
+
 const questions = ref(useQuestionsStore().getQuestions);
+const questionsFilter = ref('');
+const handleKeyBarPress = (word: string) => {
+	questionsFilter.value = word;
+};
+
+/**
+ * Returns an array of IDs because the draggable component can't reorder a computed property
+ */
+const filteredQuestionsIds = computed(() => {
+	if (!questions.value) return [];
+	const filteredQuestions = useSearchFilter(questions.value, questionsFilter.value, ['question']);
+	return filteredQuestions.map(({ id }) => id);
+});
 
 const newSurvey: Ref<Survey> = ref({ ...emptySurvey });
 
@@ -149,35 +164,56 @@ const saveSurvey = async () => {
 				<!-- QUESTIONS -->
 				<p class="text-black my-5 text-xl">Seleziona i questionari da aggiungere al sondaggio e il loro ordine</p>
 
-				<draggable
-					item-key="id"
-					tag="ul"
-					v-model="questions"
-					:animation="150"
-					:delay="250"
-					:delay-on-touch-only="true"
+				<!-- SEARCHBAR -->
+				<div class="searchbar-container relative my-5">
+					<AppSearchbar @key-press="handleKeyBarPress" />
+				</div>
+
+				<div
+					v-if="filteredQuestionsIds.length"
+					class="min-h-[80px]"
 				>
-					<template #item="{ element: question }">
-						<li class="select-none">
-							<!-- CHECKBOX -->
-							<label class="container shrink">
-								<input
-									:id="question.id"
-									:value="question.id"
-									v-model="question.selected"
-									type="checkbox"
-									class="me-2 cursor-pointer"
-								/>
-								<span class="checkmark"></span>
-							</label>
-							<label
-								:for="question.id"
-								class="ms-7 py-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
-								>{{ question.question }}</label
+					<draggable
+						item-key="id"
+						tag="ul"
+						v-model="questions"
+						:animation="150"
+						:delay="250"
+						:delay-on-touch-only="true"
+					>
+						<template #item="{ element: question }">
+							<li
+								v-if="filteredQuestionsIds.includes(question.id)"
+								class="select-none"
 							>
-						</li>
-					</template>
-				</draggable>
+								<!-- CHECKBOX -->
+								<label class="container shrink">
+									<input
+										:id="question.id"
+										:value="question.id"
+										v-model="question.selected"
+										type="checkbox"
+										class="me-2 cursor-pointer"
+									/>
+									<span class="checkmark"></span>
+								</label>
+								<label
+									:for="question.id"
+									class="ms-7 pn-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
+									>{{ question.question }}</label
+								>
+							</li>
+						</template>
+					</draggable>
+				</div>
+				<div v-else>
+					<AppAlert
+						:show="true"
+						title="Oops!"
+					>
+						Nessun questionario trovato!
+					</AppAlert>
+				</div>
 			</form>
 		</template>
 		<template #button>
@@ -191,5 +227,9 @@ const saveSurvey = async () => {
 
 label.container {
 	bottom: 5px;
+}
+
+:deep(.searchbar-container input) {
+	width: 100%;
 }
 </style>

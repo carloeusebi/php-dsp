@@ -84,7 +84,7 @@ fetchPatient(props.token);
 </script>
 
 <template>
-	<div class="container md:max-w-4xl mx-auto my-8">
+	<div class="container md:max-w-4xl mx-auto py-5">
 		<h2 class="text-center text-3xl">Inserisci prima delle informazioni su di te</h2>
 		<AppAlert
 			:show="errorsStr.length > 0"
@@ -96,10 +96,7 @@ fetchPatient(props.token);
 		<hr class="my-8" />
 
 		<!-- FORM -->
-		<form
-			@submit.prevent="handleFormSubmit"
-			class="mb-8"
-		>
+		<form @submit.prevent="handleFormSubmit">
 			<PatientForm
 				v-if="patient"
 				@form-emptied="errors = {}"
@@ -108,11 +105,11 @@ fetchPatient(props.token);
 			/>
 			<!-- FORM BUTTON -->
 			<hr class="my-5" />
-			<div class="flex justify-end">
+			<div class="flex justify-end items-center">
 				<button
 					v-if="errorsStr.length > 0"
 					type="button"
-					class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto me-4"
+					class="inline-flex justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto me-4"
 					@click="$emit('form-submit')"
 				>
 					Salta

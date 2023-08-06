@@ -94,7 +94,7 @@ export interface LoginForm {
 }
 
 export interface Cell {
-	label: string;
+	label?: string;
 	key: string;
 }
 

@@ -25,6 +25,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(['update:modelValue', 'add-variable']);
 
 const deleteModal = ref<Modal>({ show: false });
+const variableNameInputs = ref<InstanceType<typeof AppInputElement>[] | null>();
 
 const closeDeleteModal = () => {
 	deleteModal.value.show = false;
@@ -40,6 +41,9 @@ const addNewVariable = () => {
 	props.modelValue.push({ id, name: '', items: [], cutoffs: [] });
 	emit('update:modelValue', props.modelValue);
 	emit('add-variable');
+	setTimeout(() => {
+		variableNameInputs.value?.at(-1)?.inputElement?.focus();
+	}, 50);
 };
 
 /**
@@ -82,6 +86,7 @@ const updateVariable = <T>(newArray: T[], variableId: number, prop: 'items' | 'c
 
 				<div class="flex-grow me-10 col-span-3 md:col-span-2">
 					<AppInputElement
+						ref="variableNameInputs"
 						v-model="variable.name"
 						label="Nome della variabile"
 						:required="true"
@@ -122,10 +127,11 @@ const updateVariable = <T>(newArray: T[], variableId: number, prop: 'items' | 'c
 	<AppModal
 		:open="deleteModal.show"
 		@close="deleteModal.show = false"
+		dimensions="max-w-md"
 	>
 		<template #content>
 			<h2>Elimina</h2>
-			<hr class="my-8" />
+			<hr class="my-2" />
 			Sicuro di voler eliminare {{ deleteModal.variable?.name || 'questa variabile' }}?
 		</template>
 		<template #button>

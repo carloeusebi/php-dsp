@@ -2,42 +2,58 @@
 import { ref } from 'vue';
 
 import AppModal from '../AppModal.vue';
-
-import { QuestionVariableCutoff } from '@/assets/data/interfaces';
 import AppButton from '../AppButton.vue';
 import AppButtonBlank from '../AppButtonBlank.vue';
-import { useGenerateId } from '@/composables';
 import AppInputElement from '../AppInputElement.vue';
+
+import { QuestionVariableCutoff } from '@/assets/data/interfaces';
+import { useGenerateId } from '@/composables';
 
 interface Props {
 	variableCutoffs: QuestionVariableCutoff[];
 }
+
+interface DeleteModal {
+	show: boolean;
+	cutoff?: QuestionVariableCutoff;
+}
+
 const props = defineProps<Props>();
 const emit = defineEmits(['save']);
 
 // REFS
 
 const showModal = ref(false);
+const deleteModal = ref<DeleteModal>({ show: false });
 const cutoffs = ref<QuestionVariableCutoff[]>([...props.variableCutoffs]);
-const cutoffNamesInput = ref<InstanceType<typeof AppInputElement>[] | null>();
+const cutoffNameInputs = ref<InstanceType<typeof AppInputElement>[] | null>();
 
+/**
+ * Adds a new cutoff to the list, then focuses it.
+ */
 const addCutoff = () => {
 	const id = useGenerateId(cutoffs.value);
 	cutoffs.value.push({ id, name: '', type: 'greater-than', from: 0, to: 0 });
 	// Waits for the new HTMLInputElement to be crated, and then focuses on it
 	setTimeout(() => {
-		cutoffNamesInput.value?.at(-1)?.inputElement?.focus();
+		cutoffNameInputs.value?.at(-1)?.inputElement?.focus();
 	}, 50);
 };
 
-const deleteCutoff = (toDeleteId: number, name: string) => {
+/**
+ * Removes the cutoff withe given ID from the cutoffs array.
+ * @param toDeleteId The ID of the cutoff to delete.
+ */
+const deleteCutoff = (toDeleteId: number | undefined) => {
 	if (toDeleteId) {
-		const proceed = confirm(`Sicuro di voler eliminare ${name || 'questo cutoff'}?`);
-		if (!proceed) return;
 		cutoffs.value = cutoffs.value.filter(({ id }) => id !== toDeleteId);
 	}
+	deleteModal.value.show = false;
 };
 
+/**
+ * Emits `save` and closes the modal.
+ */
 const handleSave = () => {
 	emit('save', cutoffs.value);
 	showModal.value = false;
@@ -72,15 +88,19 @@ const handleSave = () => {
 						<div class="flex gap-10 mb-1 justify-between items-center">
 							<!-- NAME -->
 							<AppInputElement
-								ref="cutoffNamesInput"
+								ref="cutoffNameInputs"
 								v-model="cutoff.name"
 								label="Nome"
 								class="grow"
 								:required="true"
 							/>
 							<!-- DELETE BUTTON -->
+							<!-- @click="deleteCutoff(cutoff.id, cutoff.name)" -->
 							<AppButtonBlank
-								@click="deleteCutoff(cutoff.id, cutoff.name)"
+								@click="
+									deleteModal.show = true;
+									deleteModal.cutoff = cutoff;
+								"
 								color="red"
 								type="button"
 							>
@@ -150,8 +170,31 @@ const handleSave = () => {
 			<AppButtonBlank
 				type="button"
 				@click="addCutoff"
-				>Aggiungi Cutoff</AppButtonBlank
 			>
+				Aggiungi Cutoff
+			</AppButtonBlank>
+
+			<!-- DELETE MODAL -->
+			<AppModal
+				:open="deleteModal.show"
+				@close="deleteModal.show = false"
+				dimensions="max-w-md"
+			>
+				<template #content>
+					<h2>Elimina</h2>
+					<hr class="my-2" />
+					Sicuro di voler eliminare {{ deleteModal.cutoff?.name || 'questo cutoff' }}?
+				</template>
+				<template #button>
+					<AppButton
+						color="red"
+						type="button"
+						@click="deleteCutoff(deleteModal.cutoff?.id)"
+					>
+						Elimina
+					</AppButton>
+				</template>
+			</AppModal>
 		</template>
 		<template #button>
 			<AppButton form="cutoffs-form"> Salva </AppButton>

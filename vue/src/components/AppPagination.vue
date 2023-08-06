@@ -48,13 +48,15 @@ const offset = computed(() => {
 		>
 			<div
 				@click="handleClick('prev')"
-				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				:class="[currentPage === 0 ? 'text-gray-400' : 'text-gray-700']"
+				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium hover:bg-gray-50"
 			>
 				Precedente
 			</div>
 			<div
 				@click="handleClick('next')"
-				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+				:class="[currentPage === totalPages - 1 ? 'text-gray-400' : 'text-gray-700']"
+				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium hover:bg-gray-50"
 			>
 				Successiva
 			</div>
