@@ -2,48 +2,37 @@
 import { Ref, computed, ref } from 'vue';
 import draggable from 'vuedraggable';
 
-import { Errors, Patient, Survey } from '@/assets/data/interfaces';
-import { emptySurvey } from '@/assets/data/data';
-import { useSaveToStore, useSearchFilter, useSort } from '@/composables';
-import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
-
-import AppButtonBlank from '@/components/AppButtonBlank.vue';
-import AppModal from '@/components/AppModal.vue';
 import AppInputElement from '@/components/AppInputElement.vue';
+import AppButtonBlank from '@/components/AppButtonBlank.vue';
 import AppButton from '@/components/AppButton.vue';
+import AppModal from '@/components/AppModal.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import AppSearchbar from '../AppSearchbar.vue';
+import QuestionTags from '@/components/questions/QuestionTags.vue';
+
+import { Errors, Patient, Survey, Tag } from '@/assets/data/interfaces';
+import { emptySurvey } from '@/assets/data/data';
+import {
+	useFilterQuestionsByTags,
+	useSaveToStore,
+	useSearchFilter,
+	useSort,
+	useStringifyQuestionTags,
+} from '@/composables';
+import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
 
 interface Props {
 	patient?: Patient;
 }
 
 const props = defineProps<Props>();
-
 if (props.patient) emptySurvey.patient_id = props.patient.id as number;
-
 const showModal = ref(false);
 const patients = useSort(usePatientsStore().getPatients, 'lname', 'down');
-
-const questions = ref(useQuestionsStore().getQuestions);
-const questionsFilter = ref('');
-const handleKeyBarPress = (word: string) => {
-	questionsFilter.value = word;
-};
-
-/**
- * Returns an array of IDs because the draggable component can't reorder a computed property
- */
-const filteredQuestionsIds = computed(() => {
-	if (!questions.value) return [];
-	const filteredQuestions = useSearchFilter(questions.value, questionsFilter.value, ['question']);
-	return filteredQuestions.map(({ id }) => id);
-});
 
 const newSurvey: Ref<Survey> = ref({ ...emptySurvey });
 
 const errors: Ref<Errors> = ref({});
-
 const errorsStr = computed(() => {
 	const keys = Object.keys(errors.value);
 	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
@@ -91,6 +80,45 @@ const saveSurvey = async () => {
 		});
 	}
 };
+
+//**************************************************** */
+//**************** QUESTIONS ************************* */
+//**************************************************** */
+
+const questions = ref(useQuestionsStore().getQuestions);
+const questionsFilter = ref('');
+const searchableQuestions = useStringifyQuestionTags(questions.value);
+
+let selectedTagsIds = ref<number[]>([]);
+
+const handleKeyBarPress = (word: string) => {
+	questionsFilter.value = word;
+};
+
+/**
+ * Updates `selectedTagsIds` at the change from the `QuestionTags` component. Used to filter the Questionnaires by Tag.
+ * @param selectedTags New Value coming for the change event.
+ */
+const handleChangeSelection = (selectedTags: Tag[]) => {
+	selectedTagsIds.value = selectedTags.map(({ id }) => id);
+};
+
+/**
+ * A list of Questions filtered by Tags, if no Tag is selected a list of all Questions.
+ */
+const questionsWithSelectedTags = computed(() => useFilterQuestionsByTags(searchableQuestions, selectedTagsIds.value));
+
+/**
+ * Returns an array of IDs because the draggable component can't reorder a computed property
+ */
+const filteredQuestionsIds = computed(() => {
+	if (!searchableQuestions) return [];
+	const filteredQuestions = useSearchFilter(questionsWithSelectedTags.value, questionsFilter.value, [
+		'question',
+		'tagsString',
+	]);
+	return filteredQuestions.map(({ id }) => id);
+});
 </script>
 
 <template>
@@ -165,8 +193,11 @@ const saveSurvey = async () => {
 				<p class="text-black my-5 text-xl">Seleziona i questionari da aggiungere al sondaggio e il loro ordine</p>
 
 				<!-- SEARCHBAR -->
-				<div class="searchbar-container relative my-5">
-					<AppSearchbar @key-press="handleKeyBarPress" />
+				<div class="searchbar-container flex items-center gap-5 my-5">
+					<div class="relative grow">
+						<AppSearchbar @key-press="handleKeyBarPress" />
+					</div>
+					<QuestionTags @change-selection="handleChangeSelection($event)" />
 				</div>
 
 				<div
@@ -184,7 +215,7 @@ const saveSurvey = async () => {
 						<template #item="{ element: question }">
 							<li
 								v-if="filteredQuestionsIds.includes(question.id)"
-								class="select-none"
+								class="select-none my-1"
 							>
 								<!-- CHECKBOX -->
 								<label class="container shrink">
@@ -197,11 +228,24 @@ const saveSurvey = async () => {
 									/>
 									<span class="checkmark"></span>
 								</label>
+								<!-- question name -->
 								<label
 									:for="question.id"
-									class="ms-7 pn-1 inline-block md:text-lg cursor-pointer text-gray-700 hover:text-black transition-colors"
-									>{{ question.question }}</label
+									class="flex items-end gap-2 ms-7 pn-1 cursor-pointer text-gray-700 hover:text-black transition-colors"
 								>
+									{{ question.question }}
+									<!-- question tags -->
+									<ul class="md:flex gap-1 hidden">
+										<li
+											v-for="tag in question.tags"
+											:key="tag.id"
+											:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
+											class="inline-flex items-center rounded-md px-1 h-5 text-[9px] font-medium"
+										>
+											{{ tag.tag }}
+										</li>
+									</ul>
+								</label>
 							</li>
 						</template>
 					</draggable>
@@ -226,7 +270,7 @@ const saveSurvey = async () => {
 @use '@/assets/scss/checkbox';
 
 label.container {
-	bottom: 5px;
+	bottom: 10px;
 }
 
 :deep(.searchbar-container input) {

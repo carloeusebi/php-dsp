@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+//@ts-ignore
+import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside';
 import { ChevronDownIcon } from '@heroicons/vue/20/solid';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 interface Props {
 	items: Array<any>;
@@ -8,6 +11,18 @@ interface Props {
 defineProps<Props>();
 
 const showDropdown = ref(false);
+const dropdownButton = ref<HTMLButtonElement>();
+const route = useRoute();
+
+/**
+ * Closes the dropdown ONLY if there are no open modals
+ */
+const handleClickOutside = (event: Event) => {
+	if (route.query.modal_id) return;
+	const clickedElement = event.target as HTMLElement;
+	if (dropdownButton.value?.contains(clickedElement)) return;
+	showDropdown.value = false;
+};
 </script>
 
 <template>
@@ -17,7 +32,9 @@ const showDropdown = ref(false);
 	>
 		<div>
 			<button
+				type="button"
 				@click="showDropdown = !showDropdown"
+				ref="dropdownButton"
 				class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
 			>
 				<slot name="button"></slot>
@@ -30,6 +47,7 @@ const showDropdown = ref(false);
 
 		<div
 			v-if="showDropdown"
+			v-click-out-side="handleClickOutside"
 			class="absolute right-0 z-10 mt-2 w-56 px-4 py-2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
 		>
 			<slot name="items"></slot>

@@ -16,6 +16,7 @@
 		"@fortawesome/vue-fontawesome": "^3.0.3",
 		"@headlessui/vue": "^1.7.14",
 		"@heroicons/vue": "^2.0.18",
+		"@mahdikhashan/vue3-click-outside": "^0.1.2",
 		"@vueuse/core": "^10.3.0",
 		"axios": "^1.4.0",
 		"pinia": "^2.1.4",

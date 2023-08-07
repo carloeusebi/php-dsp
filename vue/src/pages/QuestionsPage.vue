@@ -9,17 +9,37 @@ import QuestionCreate from '@/components/questions/QuestionCreate.vue';
 import QuestionTags from '@/components/questions/QuestionTags.vue';
 
 import { useQuestionsStore } from '@/stores';
-import { useSearchFilter } from '@/composables';
+import { useFilterQuestionsByTags, useSearchFilter, useStringifyQuestionTags } from '@/composables';
+import { Tag } from '@/assets/data/interfaces';
+
+const handleSearchbarKeypress = (word: string) => (searchWord.value = word.toLowerCase());
 
 const questionsStore = useQuestionsStore();
 const { questions } = storeToRefs(questionsStore);
 const searchWord = ref('');
 
-const handleSearchbarKeypress = (word: string) => (searchWord.value = word.toLowerCase());
+let selectedTagsIds = ref<number[]>([]);
+const searchableQuestions = useStringifyQuestionTags(questions.value);
 
+/**
+ * Updates `selectedTagsIds` at the change from the `QuestionTags` component. Used to filter the Questionnaires by Tag.
+ * @param selectedTags New Value coming for the change event.
+ */
+const handleChangeSelection = (selectedTags: Tag[]) => {
+	selectedTagsIds.value = selectedTags.map(({ id }) => id);
+};
+
+/**
+ * A list of Questions filtered by Tags, if no Tag is selected a list of all Questions.
+ */
+const questionsWithSelectedTags = computed(() => useFilterQuestionsByTags(searchableQuestions, selectedTagsIds.value));
+
+/**
+ * A list of Questions with selected Tags, filtered using the searchbox.
+ */
 const filteredQuestions = computed(() => {
 	if (questions.value === null) return [];
-	return useSearchFilter(questions.value, searchWord.value, ['question']);
+	return useSearchFilter(questionsWithSelectedTags.value, searchWord.value, ['question', 'tagsString']);
 });
 </script>
 
@@ -37,9 +57,12 @@ const filteredQuestions = computed(() => {
 		</button>
 		<div class="relative flex items-center gap-6">
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
-			<QuestionTags />
+			<QuestionTags
+				:editable="true"
+				@change-selection="handleChangeSelection($event)"
+			/>
 		</div>
-		<div class="flex justify-end">
+		<div class="flex justify-end my-3">
 			<QuestionCreate />
 		</div>
 

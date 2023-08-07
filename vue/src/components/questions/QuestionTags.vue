@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import AppButton from '@/components/AppButton.vue';
 import AppDropdown from '@/components/AppDropdown.vue';
@@ -11,13 +11,27 @@ import { useTagsStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { useDeleteFromStore } from '@/composables';
 
-const tagsStore = useTagsStore();
-const { tags } = storeToRefs(tagsStore);
-tags.value.forEach(t => {
-	t.selected = true;
+defineProps({
+	editable: {
+		type: Boolean,
+		default: false,
+	},
 });
 
+const tagsStore = useTagsStore();
+const { tags } = storeToRefs(tagsStore);
+const selectedTags = computed(() => tags.value.filter(({ selected }) => selected));
+
 const showSaveModal = ref(false);
+
+const emit = defineEmits(['change-selection']);
+
+watch(
+	() => selectedTags.value,
+	newValue => {
+		emit('change-selection', newValue);
+	}
+);
 
 /**
  * Selects all or unselects all Tags, based on `allOrNone`
@@ -56,13 +70,22 @@ const deleteTag = (id: number) => {
 				>
 					<QuestionTag
 						:tag="tag"
+						:editable="editable"
 						@delete="deleteTag($event)"
 					/>
 				</li>
 			</ul>
-			<hr class="my-3" />
+			<hr
+				v-if="editable"
+				class="my-3"
+			/>
 			<div class="flex justify-center">
-				<AppButton @click="showSaveModal = true"> Crea nuovo tag </AppButton>
+				<AppButton
+					v-if="editable"
+					@click="showSaveModal = true"
+				>
+					Crea nuovo tag
+				</AppButton>
 			</div>
 		</template>
 	</AppDropdown>

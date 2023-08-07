@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\app\App;
 use app\db\DbModel;
 
 class Question extends DbModel
@@ -14,6 +15,7 @@ class Question extends DbModel
     public $items;
     public $legend;
     public $variables;
+    public $tags;
 
     protected array $fields_to_decode = ['legend', 'items', 'variables'];
 
@@ -48,6 +50,18 @@ class Question extends DbModel
     }
 
 
+    public function get(string $fields = '*'): array
+    {
+        $questions = parent::get();
+
+        // Maps t
+        return array_map(function ($question) {
+            $question['tags'] = $this->getQuestionTags($question['id']);
+            return $question;
+        }, $questions);
+    }
+
+
     public function save(): array
     {
         $errors = [];
@@ -68,6 +82,8 @@ class Question extends DbModel
             }
         }
 
+        dd($this->tags);
+
         if (empty($errors)) {
             $this->legend = json_encode($this->legend);
             $this->items = json_encode($this->items);
@@ -78,6 +94,23 @@ class Question extends DbModel
         }
 
         return $errors;
+    }
+
+
+    /**
+     * Returns all the Tags that have a many-to-many relationship with the Questionnaire with the given ID.
+     * @param int $question_id The Questionnaire's ID from which to fetch the Tags.
+     * @return array The Questionnaire's Tags.
+     */
+    protected function getQuestionTags(int $question_id): array
+    {
+        $sql = "SELECT `tags`.*
+                FROM `tags`
+                JOIN `question_tag` AS QT ON QT.`tag_id` = `tags`.`id`
+                WHERE QT.`question_id` = $question_id";
+        $statement = $this->prepare($sql);
+        $statement->execute();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
 

@@ -61,13 +61,11 @@ const closeModal = () => {
 	<TransitionRoot
 		as="template"
 		:show="open"
-		@click.stop
 	>
 		<Dialog
 			as="div"
 			class="relative z-30"
 			@close="closeModal"
-			@click.stop
 		>
 			<TransitionChild
 				as="template"

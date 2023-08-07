@@ -72,6 +72,11 @@ export interface Question {
 	variables: QuestionVariableI[];
 	selected?: boolean;
 	completed?: boolean;
+	tags?: Tag[];
+}
+
+export interface SearchableQuestion extends Question {
+	tagsString?: string;
 }
 
 export interface Survey extends Patient {

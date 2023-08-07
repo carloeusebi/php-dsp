@@ -99,8 +99,23 @@ const closeModal = () => {
 		@click="showModal = true"
 		class="py-4 border-y border-gray-200 bg-gray-50 hover:scale-110 transition duration-300 cursor-pointer"
 	>
-		<span class="font-semibold me-2">{{ question.question }}:</span>
-		<span class="text-sm hidden md:inline">{{ question.description }}</span>
+		<div class="flex items-center">
+			<!-- title -->
+			<div class="font-semibold me-2">{{ question.question }}:</div>
+			<!-- tags -->
+			<ul class="flex gap-2">
+				<li
+					v-for="tag in question.tags"
+					:key="tag.id"
+					:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
+					class="inline-flex items-center rounded-md px-2 py-[2px] text-xs font-medium"
+				>
+					{{ tag.tag }}
+				</li>
+			</ul>
+		</div>
+		<!-- description -->
+		<p class="text-sm hidden md:inline">{{ question.description }}</p>
 	</li>
 
 	<AppModal
@@ -122,6 +137,16 @@ const closeModal = () => {
 					>
 				</div>
 			</div>
+			<ul class="flex gap-2">
+				<li
+					v-for="tag in question.tags"
+					:key="tag.id"
+					:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
+					class="inline-flex items-center rounded-md px-2 py-[2px] text-xs font-medium"
+				>
+					{{ tag.tag }}
+				</li>
+			</ul>
 			<hr class="my-6" />
 
 			<!-- ALERT -->

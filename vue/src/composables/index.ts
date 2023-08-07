@@ -1,5 +1,7 @@
 import { useGetIndexOfFirstItemWithoutProp } from './_useGetIndexOfFirstItemWithoutProp';
 import { useGetTimeDifferenceFromNow } from './_useGetTimeDifferenceFromNow';
+import { useFilterQuestionsByTags } from './_useFilterQuestionsByTags';
+import { useStringifyQuestionTags } from './_useStringifyQuestionTags';
 import { useSplitArrayIntoChunks } from './_useSplitArrIntoChunks';
 import { useDeleteFromStore } from './_useDeleteFromStore';
 import { useSearchFilter } from './_useSearchFilter';
@@ -10,7 +12,9 @@ import { useSort } from './_useSort';
 
 export {
 	useGetIndexOfFirstItemWithoutProp,
+	useFilterQuestionsByTags,
 	useGetTimeDifferenceFromNow,
+	useStringifyQuestionTags,
 	useSplitArrayIntoChunks,
 	useDeleteFromStore,
 	useSearchFilter,

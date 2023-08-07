@@ -7,6 +7,7 @@ import AppButton from '../AppButton.vue';
 
 interface Props {
 	tag: Tag;
+	editable: boolean;
 }
 
 const showEditModal = ref(false);
@@ -41,19 +42,21 @@ const deleteTag = (id: number) => {
 			{{ tag.tag }}
 		</label>
 		<!-- EDIT BUTTON -->
-		<font-awesome-icon
-			role="button"
-			@click="showEditModal = true"
-			class="text-blue-600 hover:text-blue-800 focus:text-blue-800 p-1"
-			:icon="['fas', 'pen']"
-		/>
-		<!-- DELETE BUTTON -->
-		<font-awesome-icon
-			role="button"
-			@click="showDeleteModal = true"
-			class="text-red-600 hover:text-red-800 focus:text-red-800 p-1"
-			:icon="['fas', 'trash-can']"
-		/>
+		<div v-if="editable">
+			<font-awesome-icon
+				role="button"
+				@click="showEditModal = true"
+				class="text-blue-600 hover:text-blue-800 focus:text-blue-800 p-1"
+				:icon="['fas', 'pen']"
+			/>
+			<!-- DELETE BUTTON -->
+			<font-awesome-icon
+				role="button"
+				@click="showDeleteModal = true"
+				class="text-red-600 hover:text-red-800 focus:text-red-800 p-1"
+				:icon="['fas', 'trash-can']"
+			/>
+		</div>
 	</div>
 
 	<QuestionTagSave

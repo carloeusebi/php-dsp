@@ -43,7 +43,6 @@ const saveTag = async () => {
 		:open="open"
 		@close="emit('close')"
 		dimensions="max-w-xs"
-		@click.stop.prevent="console.log('stopping')"
 	>
 		<template #content>
 			<h2>{{ title }}</h2>

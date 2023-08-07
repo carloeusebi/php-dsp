@@ -30,11 +30,7 @@ export const useQuestionsStore = defineStore('questions', {
 		 * @param questions An object with labels and questions list
 		 */
 		load(questionsAndLabels: QuestionsAndLabels) {
-			const questions = questionsAndLabels.list.map(question => {
-				question.variables = question.variables || [];
-				return question;
-			});
-			this.loadQuestions(questions);
+			this.loadQuestions(questionsAndLabels.list);
 			this.loadLabels(questionsAndLabels.labels);
 		},
 
@@ -46,6 +42,7 @@ export const useQuestionsStore = defineStore('questions', {
 			questions.forEach(q => {
 				if (!q.items) q.items = [];
 				if (!q.legend) q.legend = [];
+				if (!q.variables) q.variables = [];
 			});
 			this.questions = questions;
 			localStorage.setItem('QUESTIONS', JSON.stringify(questions));

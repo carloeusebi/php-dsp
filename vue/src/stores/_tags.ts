@@ -28,7 +28,7 @@ export const useTagsStore = defineStore('tags', {
 		 * @param tags The tags' list.
 		 */
 		load(tags: Tag[]) {
-			tags = tags.map(t => ({ ...t, selected: true }));
+			tags = tags.map(t => ({ ...t, selected: false }));
 			this.tags = tags;
 			localStorage.setItem('TAGS', JSON.stringify(tags));
 		},
