@@ -1,8 +1,8 @@
-import { MyStore, Errors, Question, Survey } from '@/assets/data/interfaces';
+import { MyStore, Errors, Question, Survey, NewTag } from '@/assets/data/interfaces';
 import { useLoaderStore } from '@/stores';
 import { isAxiosError } from 'axios';
 
-type DataToStore = FormData | Question | Survey;
+type DataToStore = FormData | Question | Survey | NewTag;
 
 /**
  * Saves to store an updated or created entity of the type Patient Question or Survey. The store then will handle the ajax call to update the entity on the database

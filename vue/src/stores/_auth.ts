@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { usePatientsStore, useSurveysStore, useQuestionsStore } from './index';
+import { usePatientsStore, useSurveysStore, useQuestionsStore, useTagsStore } from './index';
 import { LoginForm } from '@/assets/data/interfaces';
 import { isAxiosError } from 'axios';
 
@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
 			useSurveysStore().fetch();
 			usePatientsStore().fetch();
 			useQuestionsStore().fetch();
+			useTagsStore().fetch();
 		},
 
 		/**

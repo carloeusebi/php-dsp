@@ -12,6 +12,7 @@ import {
 	faFloppyDisk,
 	faFilePdf,
 	faUpload,
+	faFilter,
 	faEyeSlash,
 	faEye,
 } from '@fortawesome/free-solid-svg-icons';
@@ -34,6 +35,7 @@ export const faIcons = [
 	faFloppyDisk,
 	faFilePdf,
 	faUpload,
+	faFilter,
 	faEyeSlash,
 	faEye,
 ];

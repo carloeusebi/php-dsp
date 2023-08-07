@@ -6,6 +6,7 @@ use app\controllers\FilesController;
 use app\controllers\PatientsController;
 use app\controllers\SurveysController;
 use app\controllers\QuestionsController;
+use app\controllers\TagsController;
 use app\controllers\MailController;
 use app\controllers\TestsController;
 
@@ -31,6 +32,10 @@ $router->delete('/api/surveys', [SurveysController::class, 'delete']);
 $router->get('/api/questions', [QuestionsController::class, 'get']);
 $router->post('/api/questions', [QuestionsController::class, 'save']);
 $router->delete('/api/questions', [QuestionsController::class, 'delete']);
+
+$router->get('/api/tags', [TagsController::class, 'get']);
+$router->post('/api/tags', [TagsController::class, 'save']);
+$router->delete('/api/tags', [TagsController::class, 'delete']);
 
 $router->get('/api/tests', [TestsController::class, 'get']);
 $router->post('/api/tests', [TestsController::class, 'save']);

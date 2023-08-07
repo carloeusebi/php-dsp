@@ -2,6 +2,7 @@ import { useQuestionsStore } from './_questions';
 import { usePatientsStore } from './_patients';
 import { useSurveysStore } from './_surveys';
 import { useLoaderStore } from './_loader';
+import { useTagsStore } from './_tags';
 import { AxiosInstance } from 'axios';
 import { useTestsStore } from './_tests';
 import { useAuthStore } from './_auth';
@@ -25,4 +26,13 @@ pinia.use(({ store }) => {
 	store.axios = markRaw(axiosInstance);
 });
 
-export { pinia, useAuthStore, usePatientsStore, useLoaderStore, useSurveysStore, useQuestionsStore, useTestsStore };
+export {
+	pinia,
+	useAuthStore,
+	usePatientsStore,
+	useLoaderStore,
+	useSurveysStore,
+	useQuestionsStore,
+	useTestsStore,
+	useTagsStore,
+};

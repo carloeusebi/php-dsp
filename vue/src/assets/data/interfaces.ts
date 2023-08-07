@@ -1,4 +1,5 @@
 import { usePatientsStore, useQuestionsStore, useSurveysStore } from '@/stores';
+import { useTagsStore } from '@/stores/_tags';
 
 export interface AppFile {
 	[foreignId: string]: any;
@@ -84,6 +85,15 @@ export interface Survey extends Patient {
 	token: string;
 }
 
+export interface Tag {
+	id: number;
+	tag: string;
+	color: string;
+	selected?: boolean;
+}
+
+export type NewTag = Omit<Tag, 'id'>;
+
 export type NewPatient = Omit<Patient, 'id'>;
 export type NewQuestion = Omit<Question, 'id'>;
 export type NewSurvey = Omit<Survey, 'id' | 'token'>;
@@ -110,5 +120,6 @@ export interface Errors {
 type PatientsStore = ReturnType<typeof usePatientsStore>;
 type QuestionStore = ReturnType<typeof useQuestionsStore>;
 type SurveyStore = ReturnType<typeof useSurveysStore>;
+type TagsStore = ReturnType<typeof useTagsStore>;
 
-export type MyStore = PatientsStore | QuestionStore | SurveyStore;
+export type MyStore = PatientsStore | QuestionStore | SurveyStore | TagsStore;

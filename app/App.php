@@ -17,6 +17,7 @@ use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
 use app\models\File;
+use app\models\Tag;
 
 class App
 {
@@ -31,6 +32,7 @@ class App
     public Survey $survey;
     public Question $question;
     public File $file;
+    public Tag $tag;
 
 
     public function __construct()
@@ -52,11 +54,14 @@ class App
         $this->db = new Database();
         $this->router = new Router();
         $this->session = new Session();
+
+        // models
         $this->admin = new Admin();
         $this->patient = new Patient();
         $this->question = new Question();
         $this->survey = new Survey();
         $this->file = new File();
+        $this->tag = new Tag();
     }
 
     /**

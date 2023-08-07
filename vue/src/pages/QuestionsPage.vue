@@ -3,9 +3,10 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 
 import AppSearchbar from '@/components/AppSearchbar.vue';
-import QuestionsRow from '@/components/questions/QuestionsRow.vue';
 import AppAlert from '@/components/AppAlert.vue';
+import QuestionsRow from '@/components/questions/QuestionsRow.vue';
 import QuestionCreate from '@/components/questions/QuestionCreate.vue';
+import QuestionTags from '@/components/questions/QuestionTags.vue';
 
 import { useQuestionsStore } from '@/stores';
 import { useSearchFilter } from '@/composables';
@@ -34,8 +35,11 @@ const filteredQuestions = computed(() => {
 			/>
 			Indietro
 		</button>
-		<div class="relative flex mb-10">
+		<div class="relative flex items-center gap-6">
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
+			<QuestionTags />
+		</div>
+		<div class="flex justify-end">
 			<QuestionCreate />
 		</div>
 
