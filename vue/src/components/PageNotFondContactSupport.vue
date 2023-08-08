@@ -15,7 +15,7 @@ const issue = ref('');
 const emit = defineEmits(['contact-support', 'error']);
 
 const handleFormSubmitted = async () => {
-	if (!name.value || !email.value || !issue.value) {
+	if (!name.value || !issue.value) {
 		return;
 	}
 
@@ -78,12 +78,9 @@ const handleFormSubmitted = async () => {
 						v-model.trim="email"
 						label="Email"
 						type="email"
-						:required="true"
 					/>
 				</div>
-				<p class="my-6">
-					Descrivi cosa stavi cercando quando ti sei trovato su questa pagina
-				</p>
+				<p class="my-6">Descrivi cosa stavi cercando quando ti sei trovato su questa pagina</p>
 				<AppInputElement
 					v-model="issue"
 					label="Il problema riscontrato"

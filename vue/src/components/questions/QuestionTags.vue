@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 import AppButton from '@/components/AppButton.vue';
 import AppDropdown from '@/components/AppDropdown.vue';
@@ -11,23 +11,26 @@ import { useTagsStore } from '@/stores';
 import { storeToRefs } from 'pinia';
 import { useDeleteFromStore } from '@/composables';
 
-defineProps({
-	editable: {
-		type: Boolean,
-		default: false,
-	},
+interface Props {
+	editable?: boolean;
+	startingSelection?: number[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+	editable: () => false,
+	startingSelection: () => [],
 });
 
 const tagsStore = useTagsStore();
 const { tags } = storeToRefs(tagsStore);
-const selectedTags = computed(() => tags.value.filter(({ selected }) => selected));
+const selectedTagsIds = ref<Array<number>>(props.startingSelection);
 
 const showSaveModal = ref(false);
 
 const emit = defineEmits(['change-selection']);
 
 watch(
-	() => selectedTags.value,
+	() => selectedTagsIds.value,
 	newValue => {
 		emit('change-selection', newValue);
 	}
@@ -38,13 +41,29 @@ watch(
  * @param allOrNone True to select all, False to unselect all.
  */
 const select = (allOrNone: boolean) => {
-	tags.value.forEach(t => {
-		t.selected = allOrNone;
-	});
+	selectedTagsIds.value = [];
+	if (allOrNone) {
+		tags.value.forEach(tag => {
+			selectedTagsIds.value.push(tag.id);
+		});
+	}
 };
 
 const deleteTag = (id: number) => {
 	useDeleteFromStore(tagsStore, id);
+};
+
+/**
+ * Handles the click event on a checkbox associated with a tag.
+ *
+ * If the tag ID is already selected, removes it from the selectedTagsIds array.
+ * If the tag ID is not selected, adds it to the selectedTagsIds array.
+ * @param {number} id - The ID of the tag being clicked.
+ */
+const handleCheckboxClick = (id: number) => {
+	selectedTagsIds.value.includes(id)
+		? (selectedTagsIds.value = selectedTagsIds.value.filter(tagId => tagId !== id))
+		: (selectedTagsIds.value = [...selectedTagsIds.value, id]);
 };
 </script>
 
@@ -68,6 +87,17 @@ const deleteTag = (id: number) => {
 					v-for="tag in tags"
 					:key="tag.id"
 				>
+					<!-- CHECKBOX -->
+					<label class="container shrink w-5">
+						<input
+							:id="`tag-${tag.id}`"
+							type="checkbox"
+							class="me-2 cursor-pointer"
+							:checked="selectedTagsIds.includes(tag.id)"
+							@change="handleCheckboxClick(tag.id)"
+						/>
+						<span class="checkmark"></span>
+					</label>
 					<QuestionTag
 						:tag="tag"
 						:editable="editable"
@@ -95,4 +125,10 @@ const deleteTag = (id: number) => {
 	/>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+@use '@/assets/scss/checkbox';
+
+label.container {
+	bottom: 10px;
+}
+</style>

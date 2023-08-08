@@ -94,7 +94,6 @@ export interface Tag {
 	id: number;
 	tag: string;
 	color: string;
-	selected?: boolean;
 }
 
 export type NewTag = Omit<Tag, 'id'>;

@@ -24,25 +24,18 @@ const deleteTag = (id: number) => {
 
 <template>
 	<div class="flex gap-3">
-		<!-- CHECKBOX -->
-		<label class="container shrink w-5">
-			<input
-				:id="`tag-${tag.id}`"
-				type="checkbox"
-				class="me-2 cursor-pointer"
-				v-model="tag.selected"
-			/>
-			<span class="checkmark"></span>
-		</label>
 		<label
 			:for="`tag-${tag.id}`"
-			class="grow cursor-pointer"
+			class="grow cursor-pointer ms-7"
 			:style="`color: ${tag.color}`"
 		>
 			{{ tag.tag }}
 		</label>
 		<!-- EDIT BUTTON -->
-		<div v-if="editable">
+		<div
+			v-if="editable"
+			class="flex"
+		>
 			<font-awesome-icon
 				role="button"
 				@click="showEditModal = true"
@@ -86,11 +79,3 @@ const deleteTag = (id: number) => {
 		</template>
 	</AppModal>
 </template>
-
-<style lang="scss" scoped>
-@use '@/assets/scss/checkbox';
-
-label.container {
-	bottom: 10px;
-}
-</style>

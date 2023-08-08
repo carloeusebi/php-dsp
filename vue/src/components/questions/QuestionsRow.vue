@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, Ref } from 'vue';
 
-import { Errors, Question } from '@/assets/data/interfaces';
-import { useQuestionsStore } from '@/stores';
+import { Errors, Question, Tag } from '@/assets/data/interfaces';
+import { useQuestionsStore, useTagsStore } from '@/stores';
 import { useSaveToStore, useScrollTo } from '@/composables';
 
 import AppModal from '@/components/AppModal.vue';
@@ -10,6 +10,7 @@ import AppButton from '@/components/AppButton.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import QuestionForm from './QuestionForm.vue';
 import QuestionDelete from './QuestionDelete.vue';
+import QuestionTags from './QuestionTags.vue';
 
 interface Props {
 	question: Question;
@@ -92,6 +93,23 @@ const closeModal = () => {
 		questionRef.value = { ...props.question };
 	}, 250);
 };
+
+// TAGS
+// ***********************************
+
+/**
+ * Updates the selected tags for a question based on the new tag IDs provided.
+ * @param {number[]} newValue - An array of tag IDs to set as selected for the question.
+ */
+const handleTagSelectionChange = (newValue: number[]) => {
+	questionRef.value.tags = [];
+	newValue.forEach(tagId => {
+		const tagToAdd = useTagsStore().getById(tagId);
+		if (tagToAdd) {
+			questionRef.value.tags = [...(questionRef.value.tags as Tag[]), tagToAdd];
+		}
+	});
+};
 </script>
 
 <template>
@@ -125,21 +143,32 @@ const closeModal = () => {
 		ref="modalComponent"
 	>
 		<template v-slot:content>
-			<div class="flex justify-between items-center">
-				<h2 class="text-2xl font-medium">{{ questionRef.question }}</h2>
-				<div class="flex flex-col md:flex-row gap-y-1">
+			<header class="flex flex-col lg:flex-row justify-between items-center gap-2">
+				<h2 class="text-2xl font-medium self-start order-1">{{ questionRef.question }}</h2>
+				<!-- HEADER BUTTONS AND TITLE ^ -->
+				<div class="flex flex-col md:flex-row gap-y-1 gap-2 self-end lg:order-1">
+					<!-- close button -->
+					<button
+						type="button"
+						class="inline-flex grow md:grow-0 justify-center items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mt-0 sm:w-auto"
+						@click="closeModal"
+					>
+						Chiudi
+					</button>
+					<!-- tags -->
+					<QuestionTags
+						:starting-selection="questionRef.tags?.map(({ id }) => id)"
+						@change-selection="handleTagSelectionChange"
+					/>
+					<!-- delete button -->
 					<QuestionDelete :to-delete-question="questionRef" />
-					<AppButton
-						form="question-form"
-						class="ms-2"
-					>
-						Salva</AppButton
-					>
+					<!-- save button -->
+					<AppButton form="question-form"> Salva</AppButton>
 				</div>
-			</div>
-			<ul class="flex gap-2">
+			</header>
+			<ul class="flex gap-2 min-h-[22px]">
 				<li
-					v-for="tag in question.tags"
+					v-for="tag in questionRef.tags"
 					:key="tag.id"
 					:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
 					class="inline-flex items-center rounded-md px-2 py-[2px] text-xs font-medium"

@@ -10,7 +10,6 @@ import QuestionTags from '@/components/questions/QuestionTags.vue';
 
 import { useQuestionsStore } from '@/stores';
 import { useFilterQuestionsByTags, useSearchFilter, useStringifyQuestionTags } from '@/composables';
-import { Tag } from '@/assets/data/interfaces';
 
 const handleSearchbarKeypress = (word: string) => (searchWord.value = word.toLowerCase());
 
@@ -19,20 +18,22 @@ const { questions } = storeToRefs(questionsStore);
 const searchWord = ref('');
 
 let selectedTagsIds = ref<number[]>([]);
-const searchableQuestions = useStringifyQuestionTags(questions.value);
+const searchableQuestions = computed(() => useStringifyQuestionTags(questions.value));
 
 /**
  * Updates `selectedTagsIds` at the change from the `QuestionTags` component. Used to filter the Questionnaires by Tag.
- * @param selectedTags New Value coming for the change event.
+ * @param newValue New Value coming for the change event.
  */
-const handleChangeSelection = (selectedTags: Tag[]) => {
-	selectedTagsIds.value = selectedTags.map(({ id }) => id);
+const handleChangeSelection = (newValue: number[]) => {
+	selectedTagsIds.value = [...newValue];
 };
 
 /**
  * A list of Questions filtered by Tags, if no Tag is selected a list of all Questions.
  */
-const questionsWithSelectedTags = computed(() => useFilterQuestionsByTags(searchableQuestions, selectedTagsIds.value));
+const questionsWithSelectedTags = computed(() =>
+	useFilterQuestionsByTags(searchableQuestions.value, selectedTagsIds.value)
+);
 
 /**
  * A list of Questions with selected Tags, filtered using the searchbox.
@@ -73,7 +74,7 @@ const filteredQuestions = computed(() => {
 		>
 			<QuestionsRow
 				v-for="question in filteredQuestions"
-				:question="{ ...question }"
+				:question="question"
 				:key="question.id || question.question"
 			/>
 		</ul>

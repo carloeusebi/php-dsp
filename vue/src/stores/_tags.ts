@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { Tag } from '@/assets/data/interfaces';
 import { deleteMixin, saveMixin } from '@/mixins';
+import { useQuestionsStore } from '.';
 
 const endpoint = 'tags';
 
@@ -24,11 +25,19 @@ export const useTagsStore = defineStore('tags', {
 		},
 
 		/**
+		 * Returns the Tag with the given ID.
+		 * @param id The Tag ID.
+		 * @returns The Tag with the given ID.
+		 */
+		getById(id: number): Tag | undefined {
+			return this.tags.find(tag => tag.id === id);
+		},
+
+		/**
 		 * Load the tags list.
 		 * @param tags The tags' list.
 		 */
 		load(tags: Tag[]) {
-			tags = tags.map(t => ({ ...t, selected: false }));
 			this.tags = tags;
 			localStorage.setItem('TAGS', JSON.stringify(tags));
 		},
@@ -38,9 +47,13 @@ export const useTagsStore = defineStore('tags', {
 		 * @param tag The tag to be saved.
 		 */
 		async save(tag: Tag): Promise<void> {
-			return await saveMixin(this, endpoint, tag, this.tags, this.load).catch(e => {
-				throw e;
-			});
+			return await saveMixin(this, endpoint, tag, this.tags, this.load)
+				.then(() => {
+					useQuestionsStore().fetch();
+				})
+				.catch(e => {
+					throw e;
+				});
 		},
 
 		/**
@@ -48,7 +61,9 @@ export const useTagsStore = defineStore('tags', {
 		 * @param id The ID of the tag to delete.
 		 */
 		async delete(id: number) {
-			await deleteMixin(this, endpoint, id, this.tags, this.load);
+			await deleteMixin(this, endpoint, id, this.tags, this.load).then(() => {
+				useQuestionsStore().fetch();
+			});
 		},
 	},
 });

@@ -10,7 +10,7 @@ import AppAlert from '@/components/AppAlert.vue';
 import AppSearchbar from '../AppSearchbar.vue';
 import QuestionTags from '@/components/questions/QuestionTags.vue';
 
-import { Errors, Patient, Survey, Tag } from '@/assets/data/interfaces';
+import { Errors, Patient, Survey } from '@/assets/data/interfaces';
 import { emptySurvey } from '@/assets/data/data';
 import {
 	useFilterQuestionsByTags,
@@ -97,10 +97,10 @@ const handleKeyBarPress = (word: string) => {
 
 /**
  * Updates `selectedTagsIds` at the change from the `QuestionTags` component. Used to filter the Questionnaires by Tag.
- * @param selectedTags New Value coming for the change event.
+ * @param newValue New Value coming for the change event.
  */
-const handleChangeSelection = (selectedTags: Tag[]) => {
-	selectedTagsIds.value = selectedTags.map(({ id }) => id);
+const handleChangeSelection = (newValue: number[]) => {
+	selectedTagsIds.value = [...newValue];
 };
 
 /**

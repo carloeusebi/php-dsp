@@ -54,11 +54,19 @@ class Question extends DbModel
     {
         $questions = parent::get();
 
-        // Maps t
+        // Map each question with its associated tags
         return array_map(function ($question) {
             $question['tags'] = $this->getQuestionTags($question['id']);
             return $question;
         }, $questions);
+    }
+
+
+    public function getById(int $id)
+    {
+        $question = parent::getById($id);
+        $question['tags'] = $this->getQuestionTags($question['id']);
+        return $question;
     }
 
 
@@ -82,9 +90,11 @@ class Question extends DbModel
             }
         }
 
-        dd($this->tags);
+        $this->tags = $this->tags ?? [];
 
         if (empty($errors)) {
+            $this->updateTags();
+
             $this->legend = json_encode($this->legend);
             $this->items = json_encode($this->items);
             $this->variables = json_encode($this->variables);
@@ -114,6 +124,27 @@ class Question extends DbModel
     }
 
 
+    /**
+     * Updates the tag relationships for the current question based on its tags and existing relationships.
+     * Adds new relationships and removes unnecessary relationships to keep the question's tags up to date.
+     */
+    protected function updateTags()
+    {
+        $tag = App::$app->tag;
+        $tags_relationships = $this->id ? $this->getQuestionTags($this->id) : [];
+
+        $tags_to_add = $this->getTagsToAdd($tags_relationships);
+        $tag->addRelationships($this->id, $tags_to_add);
+
+        $tags_to_remove = $this->getTagsToRemove($tags_relationships);
+        $tag->removeRelationship($this->id, $tags_to_remove);
+    }
+
+
+    /**
+     * Checks that there isn't another Questionnaire in the database with the same name.
+     * @return bool True if another record is found, false otherwise.
+     */
     protected function checkIfExists(): bool
     {
         $questions = self::get();
@@ -121,5 +152,16 @@ class Question extends DbModel
             if ($this->question === $question['question'] && $this->id != $question['id']) return true;
         }
         return false;
+    }
+
+
+    protected function getTagsToAdd(array $rel): array
+    {
+        return array_diff(array_column($this->tags, 'id'), array_column($rel, 'id'));
+    }
+
+    protected function getTagsToRemove(array $rel): array
+    {
+        return array_diff(array_column($rel, 'id'), array_column($this->tags, 'id'));
     }
 }

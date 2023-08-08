@@ -88,7 +88,7 @@ const sendEmail = async () => {
 	loader.setLoader();
 
 	const data = {
-		email: props.survey?.email,
+		email_to: props.survey?.email,
 		subject: 'Questionario per la valutazione',
 		body: `<a href="${link}">Link al questionario per la valutazione psicologica</a>`,
 	};

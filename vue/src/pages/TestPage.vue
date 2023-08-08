@@ -10,7 +10,7 @@ import TestQuestion from '@/components/tests/TestQuestion.vue';
 import TestForm from '@/components/tests/TestForm.vue';
 
 import router from '@/routes';
-import { Question, QuestionItem } from '@/assets/data/interfaces';
+import { Question, QuestionItemI } from '@/assets/data/interfaces';
 import { useGetIndexOfFirstItemWithoutProp, useGetTimeDifferenceFromNow } from '@/composables';
 import { useLoaderStore, useTestsStore } from '@/stores';
 
@@ -70,6 +70,8 @@ const fetchTest = async (token: string) => {
 			pages.value.push({ question });
 		});
 
+		showForm.value = test.value.last_update === null;
+
 		// sets the first non-completed Questionnaire as the active one
 		active.value = useGetIndexOfFirstItemWithoutProp(test.value.questions, 'completed');
 
@@ -110,7 +112,7 @@ interface Page {
 
 const { test } = storeToRefs(testsStore);
 const showLanding = ref(true);
-const showForm = ref(test.value.last_update === null);
+const showForm = ref(false);
 
 /**
  * The index of the active Questionnaire, the same of the active Page
@@ -128,7 +130,7 @@ const pages: Ref<Page[]> = ref([]);
  * Handle the patient's answer and saves it to the database
  */
 const handleAnswer = (itemId: number, answer: number): void => {
-	const itemToUpdate = test.value.questions[active.value].items.find(({ id }) => id === itemId) as QuestionItem;
+	const itemToUpdate = test.value.questions[active.value].items.find(({ id }) => id === itemId) as QuestionItemI;
 
 	itemToUpdate.answer = answer;
 

@@ -79,7 +79,7 @@ class MailController extends Controller
         extract($data);
 
         // checks if inputs are valid
-        if (!isset($email) || !$email) $errors['no-email'] = "Nessuna email inserita";
+        if (!isset($email_to) || !$email_to) $errors['no-email'] = "Nessuna email inserita";
         if (!isset($subject) || !$subject) $errors['no-subject'] = "Nessun soggetto inserito";
         if (!isset($body) || !$body) $errors['no-body'] = "Nessun corpo della mail inserito";
 
@@ -111,20 +111,15 @@ class MailController extends Controller
         $data = Request::getBody();
 
         extract($data);
-        $email_from = $email; // renames the variable for clearer use
+        $email_from = $email ?? '-'; // renames the variable for clearer use
 
         // checks
         if (!isset($name) || !$name) $errors['no-name'] = "Nessun nome inserito";
-        if (!isset($email_from) || !$email_from) $errors['no-email'] = "Nessuna email inserita";
         if (!isset($issue) || !$issue) $errors['no-issue'] = "Nessun problema specificato";
 
         if (!empty($errors)) {
             Response::response(400, $errors);
         }
-
-        // validate email
-        if (Mail::isUndeliverable($email_from, true))
-            Response::response(400, ['error' => Mail::UNDELIVERABLE_ERROR_MESSAGE]);
 
         // only if all checks are passed log the issue to the database (it could be a bot completing the form we don't want to log junks)
 
