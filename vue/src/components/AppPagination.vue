@@ -41,28 +41,31 @@ const offset = computed(() => {
 </script>
 
 <template>
-	<div class="flex items-center justify-between border-t border-gray-20 px-4 py-3 sm:px-3">
+	<div
+		class="flex flex-col md:flex-row items-between sm:items-center justify-between border-t border-gray-20 px-4 py-3 sm:px-3"
+	>
 		<div
 			v-if="totalPages > 1"
-			class="flex flex-1 justify-between sm:hidden"
+			class="flex flex-1 justify-between items-center sm:hidden order-1"
 		>
 			<div
 				@click="handleClick('prev')"
 				:class="[currentPage === 0 ? 'text-gray-400' : 'text-gray-700']"
-				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium hover:bg-gray-50"
+				class="relative inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium"
 			>
 				Precedente
 			</div>
+			<div>{{ currentPage + 1 }} di {{ totalPages }}</div>
 			<div
 				@click="handleClick('next')"
 				:class="[currentPage === totalPages - 1 ? 'text-gray-400' : 'text-gray-700']"
-				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium hover:bg-gray-50"
+				class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white justify-center py-2 px-4 text-sm font-medium"
 			>
 				Successiva
 			</div>
 		</div>
-		<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-			<div>
+		<div class="flex flex-1 items-center justify-between">
+			<div class="mb-3 sm:mb-0">
 				<p class="text-sm text-gray-700">
 					Mostrando da
 					<span class="font-medium">{{ showingFrom }}</span>
@@ -76,7 +79,7 @@ const offset = computed(() => {
 			<div>
 				<nav
 					v-if="totalPages > 1"
-					class="isolate inline-flex -space-x-px rounded-md shadow-sm"
+					class="hidden isolate sm:inline-flex -space-x-px rounded-md shadow-sm"
 				>
 					<div
 						@click="handleClick('prev')"

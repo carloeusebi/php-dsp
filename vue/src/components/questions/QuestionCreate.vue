@@ -53,7 +53,10 @@ const create = async () => {
 		@click="showModal = true"
 		color="blue"
 	>
-		<font-awesome-icon :icon="['fas', 'plus']" />
+		<font-awesome-icon
+			:icon="['fas', 'plus']"
+			size="xl"
+		/>
 		<span class="hidden md:inline ms-2">Aggiungi nuovo questionario </span>
 	</AppButtonBlank>
 

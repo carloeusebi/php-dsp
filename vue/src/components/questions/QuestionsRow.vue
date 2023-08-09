@@ -115,11 +115,11 @@ const handleTagSelectionChange = (newValue: number[]) => {
 <template>
 	<li
 		@click="showModal = true"
-		class="py-4 border-y border-gray-200 bg-gray-50 hover:scale-110 transition duration-300 cursor-pointer"
+		class="py-4 border-y border-gray-200 bg-gray-50 hover:scale-[1.01] transition duration-300 cursor-pointer"
 	>
-		<div class="flex items-center">
+		<div class="flex flex-col sm:flex-row items-start sm:items-center gap-1">
 			<!-- title -->
-			<div class="font-semibold me-2">{{ question.question }}:</div>
+			<div class="font-semibold me-2">{{ question.question }}</div>
 			<!-- tags -->
 			<ul class="flex gap-2">
 				<li
@@ -143,10 +143,10 @@ const handleTagSelectionChange = (newValue: number[]) => {
 		ref="modalComponent"
 	>
 		<template v-slot:content>
-			<header class="flex flex-col lg:flex-row justify-between items-center gap-2">
+			<header class="flex flex-col lg:flex-row lg:justify-between items-stretch gap-2">
 				<h2 class="text-2xl font-medium self-start order-1">{{ questionRef.question }}</h2>
 				<!-- HEADER BUTTONS AND TITLE ^ -->
-				<div class="flex flex-col md:flex-row gap-y-1 gap-2 self-end lg:order-1">
+				<div class="flex flex-wrap w-full md:w-auto justify-center gap-y-1 gap-2 self-end lg:order-1">
 					<!-- close button -->
 					<button
 						type="button"
@@ -155,13 +155,13 @@ const handleTagSelectionChange = (newValue: number[]) => {
 					>
 						Chiudi
 					</button>
+					<!-- delete button -->
+					<QuestionDelete :to-delete-question="questionRef" />
 					<!-- tags -->
 					<QuestionTags
 						:starting-selection="questionRef.tags?.map(({ id }) => id)"
 						@change-selection="handleTagSelectionChange"
 					/>
-					<!-- delete button -->
-					<QuestionDelete :to-delete-question="questionRef" />
 					<!-- save button -->
 					<AppButton form="question-form"> Salva</AppButton>
 				</div>

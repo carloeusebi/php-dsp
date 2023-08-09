@@ -34,9 +34,7 @@ const navigation = [
 					</DisclosureButton>
 				</div>
 
-				<div
-					class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
-				>
+				<div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
 					<div class="flex flex-shrink-0 items-center">
 						<img
 							class="h-10 lg:h-14 w-auto"
@@ -71,7 +69,7 @@ const navigation = [
 				<router-link
 					v-for="item in navigation"
 					:key="item.name"
-					class="rounded-md px-3 py-2 text-md font-medium cursor-pointer"
+					class="text-gray-500 rounded-md px-3 py-2 text-md font-medium cursor-pointer"
 					:to="{ name: item.to }"
 				>
 					{{ item.name }}

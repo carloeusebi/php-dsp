@@ -25,13 +25,19 @@ const modal_id = computed(() => ((route.query.modal_id as string) ? parseInt(rou
  */
 let assignedIdWhenOpened: number;
 
-// Watcher add a route hash, when back button si pressed the back button removes the hash and closes the modal. If it were
+// Watch for changes in the 'open' prop to manage modal behavior
 watch(
 	() => props.open,
-	() => {
-		if (props.open === true) {
+	newValue => {
+		// If modal is being opened
+		if (newValue === true) {
 			router.push({ query: { modal_id: modal_id.value } });
 			assignedIdWhenOpened = modal_id.value;
+		}
+
+		// If modal is being closed from the outside this will update the route history and keep it keep it coherent with the modal state
+		if (newValue === false && parseInt(route.query.modal_id as string) === assignedIdWhenOpened) {
+			router.back();
 		}
 	}
 );
@@ -52,7 +58,6 @@ watch(
 );
 
 const closeModal = () => {
-	router.back();
 	emit('close');
 };
 </script>

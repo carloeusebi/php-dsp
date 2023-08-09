@@ -63,7 +63,10 @@ const handleSavePatient = async () => {
 
 <template>
 	<AppButtonBlank @click="showModal = true">
-		<font-awesome-icon :icon="['fas', icon]" />
+		<font-awesome-icon
+			:icon="['fas', icon]"
+			size="xl"
+		/>
 		<span class="hidden md:inline ms-3">{{ title }}</span>
 	</AppButtonBlank>
 

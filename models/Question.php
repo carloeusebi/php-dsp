@@ -93,14 +93,15 @@ class Question extends DbModel
         $this->tags = $this->tags ?? [];
 
         if (empty($errors)) {
-            $this->updateTags();
 
             $this->legend = json_encode($this->legend);
             $this->items = json_encode($this->items);
             $this->variables = json_encode($this->variables);
 
-            if ($this->id) self::update();
-            else self::create();
+            if ($this->id) {
+                $this->updateTags();
+                self::update();
+            } else self::create();
         }
 
         return $errors;

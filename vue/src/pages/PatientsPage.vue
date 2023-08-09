@@ -72,9 +72,12 @@ const handlePageClick = (newPage: number) => {
 <template>
 	<section class="relative container mx-auto mt-6 p-2 lg:p-6">
 		<!-- SEARCH -->
-		<div class="relative flex justify-between w-full mb-5">
+		<div class="relative flex justify-between w-full">
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
 			<!-- CREATE PATIENTS -->
+		</div>
+		<div class="flex justify-between items-center my-3 px-3">
+			<h1 class="text-3xl font-bold">Pazienti</h1>
 			<PatientSave
 				icon="plus"
 				title="Aggiungi un paziente"
@@ -135,11 +138,26 @@ const handlePageClick = (newPage: number) => {
 	text-align: center;
 }
 
+:deep(th:nth-of-type(3)),
+:deep(td:nth-of-type(3)),
 :deep(th:nth-of-type(4)),
-:deep(td:nth-of-type(4)) {
+:deep(td:nth-of-type(4)),
+:deep(th:nth-of-type(5)),
+:deep(td:nth-of-type(5)) {
 	display: none;
 }
 
+/* tablet */
+@media screen and (min-width: 768px) {
+	:deep(th:nth-of-type(3)),
+	:deep(td:nth-of-type(3)),
+	:deep(th:nth-of-type(5)),
+	:deep(td:nth-of-type(5)) {
+		display: table-cell;
+	}
+}
+
+/* laptop */
 @media screen and (min-width: 992px) {
 	:deep(th:nth-of-type(4)),
 	:deep(td:nth-of-type(4)) {

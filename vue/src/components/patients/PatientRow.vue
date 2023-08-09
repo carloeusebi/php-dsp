@@ -177,5 +177,18 @@ const surveyCell: Ref<SurveyCell[]> = ref([
 	:deep(td:last-of-type) {
 		width: 75px;
 	}
+
+	// last_update row
+	:deep(th:nth-child(2)),
+	:deep(td:nth-child(2)) {
+		display: none;
+	}
+
+	@media screen and (min-width: 650px) {
+		:deep(th:nth-child(2)),
+		:deep(td:nth-child(2)) {
+			display: table-cell;
+		}
+	}
 }
 </style>

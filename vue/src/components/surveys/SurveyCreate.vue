@@ -128,7 +128,7 @@ const filteredQuestionsIds = computed(() => {
 	>
 		<font-awesome-icon
 			:icon="['fas', 'plus']"
-			class="fa-xl"
+			size="xl"
 		/>
 		<span class="hidden md:inline ms-3">Aggiungi nuovo sondaggio</span>
 	</AppButtonBlank>

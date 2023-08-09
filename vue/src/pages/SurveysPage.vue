@@ -74,16 +74,22 @@ const handlePageClick = (newPage: number) => {
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
 		</div>
 
-		<div class="flex justify-end my-3">
+		<div class="flex justify-between my-3 px-3">
+			<h1 class="text-3xl font-bold">Sondaggi</h1>
 			<!-- CREATE BUTTON -->
-			<SurveyCreate />
-			<!-- QUESTIONS BUTTON -->
-			<router-link to="/questionari">
-				<AppButtonBlank>
-					<font-awesome-icon :icon="['fas', 'pen']" />
-					<span class="hidden md:inline ms-3">Modifica questionari</span>
-				</AppButtonBlank>
-			</router-link>
+			<div>
+				<SurveyCreate />
+				<!-- QUESTIONS BUTTON -->
+				<router-link to="/questionari">
+					<AppButtonBlank>
+						<font-awesome-icon
+							:icon="['fas', 'pen']"
+							size="lg"
+						/>
+						<span class="hidden md:inline ms-3">Modifica questionari</span>
+					</AppButtonBlank>
+				</router-link>
+			</div>
 		</div>
 
 		<!-- TABLE -->
@@ -136,5 +142,26 @@ const handlePageClick = (newPage: number) => {
 /* completed column */
 :deep(th:nth-of-type(5)) {
 	width: 40px;
+}
+
+:deep(th:nth-of-type(3)),
+:deep(td:nth-of-type(3)),
+:deep(th:nth-of-type(4)),
+:deep(td:nth-of-type(4)),
+:deep(th:nth-of-type(5)),
+:deep(td:nth-of-type(5)) {
+	display: none;
+}
+
+/* tablet */
+@media screen and (min-width: 768px) {
+	:deep(th:nth-of-type(3)),
+	:deep(td:nth-of-type(3)),
+	:deep(th:nth-of-type(4)),
+	:deep(td:nth-of-type(4)),
+	:deep(th:nth-of-type(5)),
+	:deep(td:nth-of-type(5)) {
+		display: table-cell;
+	}
 }
 </style>

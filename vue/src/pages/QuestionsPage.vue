@@ -46,16 +46,6 @@ const filteredQuestions = computed(() => {
 
 <template>
 	<section class="relative container mx-auto mt-6 p-2 lg:p-6">
-		<button
-			@click="$router.go(-1)"
-			class="text-gray-700 hover:text-gray-800 font-medium rounded-md mb-5"
-		>
-			<font-awesome-icon
-				:icon="['fas', 'circle-chevron-left']"
-				class="me-2"
-			/>
-			Indietro
-		</button>
 		<div class="relative flex items-center gap-6">
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
 			<QuestionTags
@@ -63,7 +53,17 @@ const filteredQuestions = computed(() => {
 				@change-selection="handleChangeSelection($event)"
 			/>
 		</div>
-		<div class="flex justify-end my-3">
+		<div class="flex justify-between items-center my-3">
+			<!-- back button -->
+			<router-link to="/sondaggi">
+				<button class="text-gray-700 hover:text-gray-800 font-medium rounded-md">
+					<font-awesome-icon
+						:icon="['fas', 'circle-chevron-left']"
+						class="me-2"
+					/>
+					Indietro
+				</button>
+			</router-link>
 			<QuestionCreate />
 		</div>
 
