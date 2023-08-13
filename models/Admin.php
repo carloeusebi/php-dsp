@@ -30,11 +30,6 @@ class Admin extends DbModel
         return [];
     }
 
-    protected static function joins(): string
-    {
-        return '';
-    }
-
     /**
      * Attempts login if provided with an username and a password
      * @return bool Returns TRUE if login is successful, FALSE otherwise

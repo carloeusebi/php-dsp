@@ -40,23 +40,35 @@ class Survey extends DbModel
     }
 
 
-    public function get(string $fields = '*')
+    protected static function columns(): array
     {
-        $tableName = $this->tableName();
-        $fields = " $tableName.id, $tableName.patient_id, $tableName.title, $tableName.created_at, $tableName.last_update, $tableName.completed, $tableName.token, P.id AS patient_id, P.fname, P.lname, P.phone, P.email";
+        $table_name = self::tableName();
+        return ["$table_name.`id`", "$table_name.`patient_id`", "$table_name.`title`", "$table_name.`created_at`", "$table_name.`last_update`", "$table_name.`completed`",      "$table_name.`token`", 'P.id AS patient_id', 'P.fname', 'P.lname', 'P.phone', 'P.email'];
+    }
 
-        return parent::get($fields);
+
+    public function get(array $columns = [], array $where = [], string $joins = '')
+    {
+        $columns = count($columns) ? $columns : $this->columns();
+        $joins = $this->joins();
+
+        return parent::get($columns, $where, $joins);
+    }
+
+
+    public function getById(int $id, string $joins = '')
+    {
+        $joins = $this->joins();
+
+        return parent::getById($id, $joins);
     }
 
 
     public function getByToken(string $token)
     {
-        $tableName = $this->tableName();
-        $statement = self::prepare("SELECT * FROM $tableName WHERE token = :token");
-        $statement->bindValue('token', $token);
-        $statement->execute();
-
-        return $this->decodeOne($statement->fetch(PDO::FETCH_ASSOC));
+        $columns = ['`surveys`.*'];
+        $where = ['token' => $token];
+        return $this->get($columns, $where)[0];
     }
 
 

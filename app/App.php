@@ -80,22 +80,4 @@ class App
                 $this->router->renderView('404');
         }
     }
-
-
-    public function logIssueToDb(string $message, string $name = '', string $email = '')
-    {
-        try {
-            $statement = $this->db->prepare('INSERT INTO `issues` (name, email, message) VALUES (:name, :email, :message)');
-            $statement->bindValue('name', $name);
-            $statement->bindValue('email', $email);
-            $statement->bindValue('message', $message);
-
-            $statement->execute();
-
-            return true;
-        } catch (\Exception $exception) {
-            \app\core\exceptions\ErrorHandler::log($exception);
-            return false;
-        }
-    }
 }

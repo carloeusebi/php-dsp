@@ -123,7 +123,7 @@ class MailController extends Controller
 
         // only if all checks are passed log the issue to the database (it could be a bot completing the form we don't want to log junks)
 
-        App::$app->logIssueToDb($issue, $name, $email_from);
+        //TODO LOG TO DATABASE
 
         // build the email body
         $data['subject'] = 'E\' stato contattato il supporto';

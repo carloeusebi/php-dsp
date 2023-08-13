@@ -10,29 +10,40 @@ use PDO;
 abstract class DbModel extends Model
 {
 
-    abstract static protected function joins(): string;
     abstract static function attributes(): array;
     abstract static function tableName(): string;
     abstract static function labels(): array;
     abstract public function save(): array;
 
 
-    public function get(string $fields = '*')
+    /**
+     * Retrieve data from the database based on specified columns and conditions.
+     *
+     * This function constructs and executes an SQL query to retrieve data from a database table.
+     * It allows specifying the desired columns, filtering conditions, and ordering criteria.
+     *
+     * @param array $columns An array of column names to be retrieved from the table. Default is an empty array.
+     * @param array $where An array of conditions to filter the query results. Default is an empty array.
+     * @param string $joins A string containing the table joins;
+     *
+     * @return array|null An array containing the retrieved data as associative arrays or null if no data found.
+     */
+    public function get(array $columns = [], array $where = [], string $joins = '')
     {
         $table_name = $this->tableName();
-        $joins = $this->joins();
 
+        $where_params = array_merge($where, $this->getQueryParams());
+        $where_params_keys = array_keys($where_params);
+
+        $columns = empty($columns) ? '*' : implode(', ', $columns);
+        $where = $where_params ? "WHERE " . implode('AND', array_map(fn ($param) => "$param = :$param", $where_params_keys)) : '';
         $order = $this->getOrder();
-        $params = $this->getQueryParams();
-        $params_keys = array_keys($params);
 
-        $where = $params ? "WHERE " . implode('AND', array_map(fn ($param) => "$param = :$param", $params_keys)) : '';
-
-        $sql = "SELECT $fields FROM $table_name $joins $where ORDER BY $table_name.{$order}";
+        $sql = "SELECT $columns FROM $table_name $joins $where ORDER BY $table_name.{$order}";
 
         $statement = $this->prepare($sql);
 
-        foreach ($params as $key => $value) {
+        foreach ($where_params as $key => $value) {
             $statement->bindValue(":$key", $value);
         }
 
@@ -42,12 +53,23 @@ abstract class DbModel extends Model
         return $result ? $this->decodeMany($result) : $result;
     }
 
-    public function getById(int $id)
+    /**
+     * Retrieve a single record from the database based on the given ID.
+     *
+     * This function constructs and executes an SQL query to retrieve a single record from a database table based on the provided ID.
+     *
+     * @param int $id The unique identifier used to retrieve the record from the table.
+     * @param string $joins Optional SQL JOIN clauses to enhance the query results. Default is an empty string.
+     *
+     * @return array|null An associative array containing the retrieved record's data or null if no record found.
+     */
+    public function getById(int $id, string $joins = '')
     {
         $table_name = $this->tableName();
-        $joins = $this->joins();
 
-        $statement = $this->prepare("SELECT * FROM $table_name $joins WHERE $table_name.id = :id");
+        $sql = "SELECT * FROM $table_name $joins WHERE $table_name.id = :id";
+
+        $statement = $this->prepare($sql);
         $statement->bindValue('id', $id);
 
         $statement->execute();
@@ -117,7 +139,13 @@ abstract class DbModel extends Model
         return App::$app->db->prepare($sql);
     }
 
-
+    /**
+     * Retrieve and filter valid query parameters based.
+     *
+     * This function retrieves query parameters from the $_GET superglobal array and filters them based on the model's attributes.
+     *
+     * @return array An associative array containing the valid query parameters and their values.
+     */
     protected function getQueryParams(): array
     {
         $params = $_GET;
@@ -125,7 +153,7 @@ abstract class DbModel extends Model
 
         $valid_params = [];
         foreach ($params as $key => $value) {
-            if (in_array($key, $attributes)) {
+            if (in_array($key, $attributes) && $key !== 'id') {
                 $valid_params[$key] = $value;
             }
         }

@@ -227,15 +227,7 @@ class Mail extends Model
      */
     public static function log(string $message): bool
     {
-        try {
-            $statement = App::$app->db->prepare('INSERT INTO `mail_logs` (message) VALUES (:message)');
-            $statement->bindValue('message', $message);
-            $statement->execute();
-
-            return true;
-        } catch (Exception $exception) {
-            \app\core\exceptions\ErrorHandler::log($exception);
-            return false;
-        }
+        //TODO log to database
+        return false;
     }
 }

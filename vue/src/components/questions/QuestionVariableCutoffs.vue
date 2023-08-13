@@ -11,6 +11,7 @@ import { useGenerateId } from '@/composables';
 
 interface Props {
 	variableCutoffs: QuestionVariableCutoff[];
+	modelValue?: boolean;
 }
 
 interface DeleteModal {
@@ -18,11 +19,14 @@ interface DeleteModal {
 	cutoff?: QuestionVariableCutoff;
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits(['save']);
+const props = withDefaults(defineProps<Props>(), {
+	modelValue: false,
+});
+const emit = defineEmits(['save', 'update:modelValue']);
 
 // REFS
 
+const sexScores = ref(props.modelValue);
 const showModal = ref(false);
 const deleteModal = ref<DeleteModal>({ show: false });
 const cutoffs = ref<QuestionVariableCutoff[]>([...props.variableCutoffs]);
@@ -74,7 +78,26 @@ const handleSave = () => {
 		@close="showModal = false"
 	>
 		<template #content>
-			<h2>Gestisci i Cutoffs</h2>
+			<div class="flex justify-between items-center">
+				<h2>Gestisci i Cutoffs</h2>
+				<div>
+					<label class="container shrink">
+						<input
+							id="sex"
+							type="checkbox"
+							class="me-2 cursor-pointer"
+							v-model="sexScores"
+							@change="emit('update:modelValue', sexScores)"
+						/>
+						<span class="checkmark"></span>
+					</label>
+					<label
+						for="sex"
+						class="ms-7 cursor-pointer"
+						>Punteggi diversi per sesso</label
+					>
+				</div>
+			</div>
 			<hr class="mb-5" />
 			<form
 				id="cutoffs-form"
@@ -125,42 +148,84 @@ const handleSave = () => {
 									type="radio"
 									:name="`cutoff-${cutoff.id}-type`"
 									v-model="cutoff.type"
+									value="lesser-than"
+								/>
+								Minore di
+							</label>
+							<label class="cursor-pointer">
+								<input
+									class="cursor-pointer"
+									type="radio"
+									:name="`cutoff-${cutoff.id}-type`"
+									v-model="cutoff.type"
 									value="range"
 								/>
 								Range
 							</label>
 						</div>
 						<!-- RANGE CUTOFF -->
-						<div
-							v-if="cutoff.type === 'range'"
-							class="flex gap-3 items-center"
-						>
-							<span>Punteggio da</span>
-							<!-- FROM -->
-							<input
-								type="number"
-								v-model="cutoff.from"
-								required
-							/>
-							<span>a</span>
-							<input
-								type="number"
-								v-model="cutoff.to"
-								required
-							/>
+						<div v-if="cutoff.type === 'range'">
+							<div class="flex gap-3 items-center">
+								<span>Punteggio da</span>
+								<!-- FROM -->
+								<input
+									type="number"
+									v-model="cutoff.from"
+									required
+								/>
+								<span>a</span>
+								<input
+									type="number"
+									v-model="cutoff.to"
+									required
+								/>
+								<div v-if="sexScores">Per Uomo</div>
+							</div>
+							<!-- only if scores per sex is enabled -->
+							<div
+								v-if="sexScores"
+								class="flex gap-3 items-center my-2"
+							>
+								<span>Punteggio da</span>
+								<input
+									type="number"
+									v-model="cutoff.femFrom"
+									required
+								/>
+								<span>a</span>
+								<input
+									type="number"
+									v-model="cutoff.femTo"
+									required
+								/>
+								<div>Per Donna</div>
+							</div>
 							<!-- TO -->
 						</div>
 						<!-- GREATER THAN CUTOFF -->
-						<div
-							v-else
-							class="flex gap-3 items-center"
-						>
-							<span>Maggiore di</span>
-							<input
-								type="number"
-								v-model="cutoff.from"
-								required
-							/>
+						<div v-else>
+							<div class="flex gap-3 items-center">
+								<span> {{ cutoff.type === 'greater-than' ? 'Maggiore di' : 'Minore di' }}</span>
+								<input
+									type="number"
+									v-model="cutoff.from"
+									required
+								/>
+								<div v-if="sexScores">Per Uomo</div>
+							</div>
+							<!-- only if scores per sex is enabled -->
+							<div
+								v-if="sexScores"
+								class="flex gap-3 items-center my-2"
+							>
+								<span> {{ cutoff.type === 'greater-than' ? 'Maggiore di' : 'Minore di' }}</span>
+								<input
+									type="number"
+									v-model="cutoff.femFrom"
+									required
+								/>
+								<div>Per Donna</div>
+							</div>
 						</div>
 						<hr class="my-5" />
 					</li>
@@ -202,11 +267,17 @@ const handleSave = () => {
 	</AppModal>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/assets/scss/checkbox';
+
 input[type='number'] {
-	width: 50px;
+	width: 60px;
 	box-shadow: inset 0 0 3px gray;
 	padding: 0 5px;
 	border-radius: 5px;
+}
+
+label.container {
+	bottom: 10px;
 }
 </style>

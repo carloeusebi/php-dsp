@@ -72,7 +72,7 @@ class Patient extends DbModel
     /**
      * Fetch patients and updates their age 
      */
-    public function get(string $fields = '*'): array
+    public function get(array $columns = [], array $where = [], string $joins = ''): array
     {
         // calculates and updates the age of the patients
         return array_map(function ($patient) {
@@ -82,7 +82,8 @@ class Patient extends DbModel
                 parent::load($patient);
                 parent::update();
             }
-            $patient['files'] = App::$app->file->getByPatientId($patient['id']);
+            $file_where = ['patient_id' => $patient['id']];
+            $patient['files'] = App::$app->file->get([], $file_where);
             return $patient;
         }, parent::get());
     }

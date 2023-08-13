@@ -104,6 +104,7 @@ const updateVariable = <T>(newArray: T[], variableId: number, prop: 'items' | 'c
 					<!-- OPEN CUTOFFS BUTTON -->
 					<QuestionVariableCutoffs
 						:variable-cutoffs="variable.cutoffs"
+						v-model="variable.sexScores"
 						@save="updateVariable($event, variable.id, 'cutoffs')"
 					/>
 

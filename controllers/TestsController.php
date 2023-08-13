@@ -60,7 +60,6 @@ class TestsController extends Controller
     if (!$patient_id) {
       Response::response(400, ['Error' => 'No Patient ID']);
     }
-
     $patient = $this->fetchPatient($patient_id);
 
     Response::response(200, ['patient' => $patient]);

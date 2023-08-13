@@ -44,13 +44,8 @@ class Question extends DbModel
             ];
     }
 
-    protected static function joins(): string
-    {
-        return '';
-    }
 
-
-    public function get(string $fields = '*'): array
+    public function get(array $columns = [], array $where = [], string $joins = ''): array
     {
         $questions = parent::get();
 
@@ -62,7 +57,7 @@ class Question extends DbModel
     }
 
 
-    public function getById(int $id)
+    public function getById(int $id, string $joins = '')
     {
         $question = parent::getById($id);
         $question['tags'] = $this->getQuestionTags($question['id']);
@@ -115,13 +110,11 @@ class Question extends DbModel
      */
     protected function getQuestionTags(int $question_id): array
     {
-        $sql = "SELECT `tags`.*
-                FROM `tags`
-                JOIN `question_tag` AS QT ON QT.`tag_id` = `tags`.`id`
-                WHERE QT.`question_id` = $question_id";
-        $statement = $this->prepare($sql);
-        $statement->execute();
-        return $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $columns = ['`tags`.*'];
+        $joins = 'JOIN `question_tag` AS QT ON QT.`tag_id` = `tags`.`id`';
+        $where = ['question_id' => $question_id];
+
+        return App::$app->tag->get($columns, $where, $joins);
     }
 
 
@@ -148,11 +141,11 @@ class Question extends DbModel
      */
     protected function checkIfExists(): bool
     {
-        $questions = self::get();
-        foreach ($questions as $question) {
-            if ($this->question === $question['question'] && $this->id != $question['id']) return true;
-        }
-        return false;
+        $where = ['question' => $this->question];
+
+        $question = parent::get([], $where)[0] ?? [];
+
+        return count($question) > 0 && $question['id'] !== $this->id;
     }
 
 

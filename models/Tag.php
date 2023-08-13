@@ -28,11 +28,6 @@ class Tag extends DbModel
         return [];
     }
 
-    protected static function joins(): string
-    {
-        return '';
-    }
-
 
     public function save(): array
     {

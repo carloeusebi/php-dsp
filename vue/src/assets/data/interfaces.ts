@@ -50,9 +50,11 @@ export interface QuestionLegend {
 export interface QuestionVariableCutoff {
 	id: number;
 	name: string;
-	type: 'range' | 'greater-than';
+	type: 'range' | 'greater-than' | 'lesser-than';
 	from: number;
 	to: number;
+	femFrom?: number;
+	femTo?: number;
 }
 
 export interface QuestionVariableI {
@@ -60,6 +62,7 @@ export interface QuestionVariableI {
 	name: string;
 	items: number[]; //array of items ID
 	cutoffs: QuestionVariableCutoff[];
+	sexScores?: boolean;
 }
 
 export interface Question {
