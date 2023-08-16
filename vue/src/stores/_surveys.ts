@@ -1,5 +1,5 @@
 import { Survey } from '@/assets/data/interfaces';
-import { deleteMixin, formatDateToIta, saveMixin } from '@/mixins';
+import { deleteMixin, saveMixin } from '@/mixins';
 import { defineStore } from 'pinia';
 
 const endpoint = '/surveys';
@@ -30,14 +30,7 @@ export const useSurveysStore = defineStore('surveys', {
 
 		load(surveys: Survey[]) {
 			this.surveys = surveys.map(s => {
-				s.patient_name = `${s?.fname} ${s.lname}`;
-				if (s.created_at) {
-					s.created_at = formatDateToIta(s.created_at);
-				}
-				if (s.last_update) {
-					s.last_update = formatDateToIta(s.last_update);
-				}
-
+				s.patient_name = `${s.fname} ${s.lname}`;
 				return s;
 			});
 			localStorage.setItem('SURVEYS', JSON.stringify(surveys));

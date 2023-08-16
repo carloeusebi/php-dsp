@@ -38,6 +38,11 @@ class SurveysFactory extends BaseFactory
         $min = intval(substr($type, 0, 1));
         $max = intval(substr($type, -1));
 
+        if ($type === 'EDI') {
+            $min = 0;
+            $max = 5;
+        }
+
         return array_map(function ($item) use ($min, $max) {
             $random_answer = random_int($min, $max);
             return [

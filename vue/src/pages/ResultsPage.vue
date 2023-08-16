@@ -56,7 +56,7 @@ onMounted(async () => {
 
 const editMode = ref(false);
 
-const min = (question: Question): number => parseInt(question.type.at(0) as string);
+const min = (question: Question): number => (question.type === 'EDI' ? 0 : parseInt(question.type.at(0) as string));
 const itemValue = (question: Question, n: number): number => min(question) + n;
 
 const checkboxes = ref<Array<boolean[]>>([]);
@@ -207,7 +207,7 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 						<label
 							:for="`cb-${i}-${j}`"
 							class="ms-7 cursor-pointer"
-							>{{ j + min(question) }} = {{ legend.legend }}</label
+							>{{ question.type === 'EDI' ? (j < 2 ? 0 : j - 2) : j + min(question) }} = {{ legend.legend }}</label
 						>
 					</div>
 				</div>
@@ -235,7 +235,7 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 									:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
 									@click="changeAnswer(question.id, item.id, itemValue(question, n))"
 								>
-									{{ itemValue(question, n) }}
+									{{ question.type === 'EDI' ? (n < 2 ? 0 : n - 2) : itemValue(question, n) }}
 								</div>
 							</div>
 						</div>

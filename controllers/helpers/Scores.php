@@ -81,12 +81,19 @@ class Scores extends TestsController
         $min = intval(substr($question['type'], 0, 1));
         $max = intval(substr($question['type'], -1));
 
+        if ($question['type'] === 'EDI') {
+            $min = 0;
+            $max = 5;
+        }
+
         $items = $question['items'];
 
         foreach ($items as $item) {
             if ($item['id'] === $id) {
-                $answer = $item['answer'];
-                return $item['reversed'] ? self::reverseScore($min, $max, $answer) : $answer;
+                $item['answer'];
+                $answer =  $item['reversed'] ? self::reverseScore($min, $max, $item['answer']) : $item['answer'];
+                if ($question['type'] === 'EDI') $answer = $answer - 2 < 0 ? 0 : $answer - 2;
+                return $answer;
             }
         }
 

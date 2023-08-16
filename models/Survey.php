@@ -36,7 +36,7 @@ class Survey extends DbModel
 
     protected static function joins(): string
     {
-        return ' JOIN patients AS P ON surveys.patient_id = P.id ';
+        return 'JOIN patients AS P ON surveys.patient_id = P.id ';
     }
 
 
@@ -64,7 +64,9 @@ class Survey extends DbModel
     {
         $joins = $this->joins();
 
-        return parent::getById($id, $joins);
+        $result = parent::getById($id, $joins);
+        $result['id'] = $id;
+        return $result;
     }
 
 
@@ -75,7 +77,7 @@ class Survey extends DbModel
      */
     public function getByToken(string $token)
     {
-        $columns = ['`surveys`.*', '`P`.*'];
+        $columns = [...$this->columns(), '`surveys`.`questions`'];
         $where = ['token' => $token];
         return $this->get($columns, $where)[0];
     }

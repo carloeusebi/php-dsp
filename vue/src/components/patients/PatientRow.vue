@@ -141,7 +141,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([
 				</div>
 				<hr class="lg:hidden my-1" />
 				<!-- SURVEYS TABLE -->
-				<div class="survey-table col-span-1 overflow-auto">
+				<div class="survey-table col-span-1">
 					<AppTable
 						v-if="(patientSurveys as Survey[]).length > 0"
 						:cells="surveyCell"

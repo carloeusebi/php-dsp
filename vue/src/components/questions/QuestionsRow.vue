@@ -62,6 +62,8 @@ const saveQuestion = async () => {
 		 * @returns the total number of answers of the questionnaire
 		 */
 		const getNumberOfAnswers = (type: Question['type']): number => {
+			if (type === 'EDI') return 6;
+
 			const lowestAnswer = parseInt(type.at(0) as string);
 			const highestAnswer = parseInt(type.at(-1) as string);
 			return highestAnswer - lowestAnswer + 1;
@@ -89,9 +91,6 @@ const saveQuestion = async () => {
 
 const closeModal = () => {
 	showModal.value = false;
-	setTimeout(() => {
-		questionRef.value = { ...props.question };
-	}, 250);
 };
 
 // TAGS

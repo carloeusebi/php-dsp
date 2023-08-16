@@ -4,6 +4,7 @@ import { QuestionItemI } from '@/assets/data/interfaces';
 
 interface Props {
 	item: QuestionItemI;
+	index: number;
 }
 
 defineProps<Props>();
@@ -11,24 +12,23 @@ const emit = defineEmits(['delete-item']);
 </script>
 
 <template>
+	<!-- CHECKBOX -->
+	<label class="container">
+		<input
+			v-model="item.reversed"
+			type="checkbox"
+			class="me-2 cursor-pointer"
+		/>
+		<span class="checkmark"></span>
+	</label>
+	<!-- ITEM -->
 	<div class="flex items-end">
-		<div class="grow">
-			<!-- CHECKBOX -->
-			<label class="container shrink">
-				<input
-					v-model="item.reversed"
-					type="checkbox"
-					class="me-2 cursor-pointer"
-				/>
-				<span class="checkmark"></span>
-			</label>
-			<!-- ITEM -->
-			<AppInputElement
-				class="grow ms-8"
-				v-model="item.text"
-				:id="`answer-${item.id}`"
-			/>
-		</div>
+		<span class="ms-6 me-[2px] self-center min-w-[25px] text-center">{{ index + 1 }}.</span>
+		<AppInputElement
+			class="grow"
+			v-model="item.text"
+			:id="`answer-${item.id}`"
+		/>
 		<font-awesome-icon
 			@click="emit('delete-item', item.id)"
 			class="ms-3 cursor-pointer text-red-700 hover:text-red-800 mb-2 md:mb-0"

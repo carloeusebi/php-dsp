@@ -16,8 +16,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const min = computed(() => parseInt(props.question.type.at(0) as string));
-const max = computed(() => parseInt(props.question.type.at(-1) as string));
+const min = computed(() => (props.question.type === 'EDI' ? 0 : parseInt(props.question.type.at(0) as string)));
+const max = computed(() => (props.question.type === 'EDI' ? 5 : parseInt(props.question.type.at(-1) as string)));
 
 const firstNotAnsweredItemIndex = useGetIndexOfFirstItemWithoutProp(props.question.items, 'answer');
 const active = ref(firstNotAnsweredItemIndex);
@@ -157,7 +157,7 @@ const skipItem = () => {
 						:key="leg.id"
 						:class="{ active: clicked === n + min }"
 					>
-						<div class="score flex-shrink-0">{{ n + min }}</div>
+						<div class="score flex-shrink-0">{{ n + 1 }}</div>
 						<div class="px-2 flex-grow">
 							{{ leg.legend }}
 						</div>

@@ -27,13 +27,17 @@ const newItemReversed = ref(false);
 const itemsListRef = ref<HTMLDivElement | null>(null);
 
 // calculate number of answers
-const numberOfAnswers = computed(() => {
-	const low = parseInt(form.type.at(0) as string);
-	const high = parseInt(form.type.at(-1) as string);
-	const numOfAnswers = high - low + 1;
+const numberOfLegends = computed(() => {
+	const getNumOfLegends = (type: Question['type']) => {
+		const low = parseInt(type.at(0) as string);
+		const high = parseInt(type.at(-1) as string);
+		return high - low + 1;
+	};
+
+	const numOfLegends = form.type === 'EDI' ? 6 : getNumOfLegends(form.type);
 
 	// this cycle makes the legend array the same length of the legend inputs in the form, if the array were it shorter it would cause an error when v-modeling the input with an undefined
-	while (form.legend.length < numOfAnswers) {
+	while (form.legend.length < numOfLegends) {
 		// eslint-disable-next-line vue/no-side-effects-in-computed-properties
 		(form.legend as QuestionLegend[]).push({
 			id: form.legend.length + 1,
@@ -41,10 +45,15 @@ const numberOfAnswers = computed(() => {
 		});
 	}
 
-	return numOfAnswers;
+	return numOfLegends;
 });
 
-const getLegendLabel = (i: number): string => (parseInt(form.type.at(0) as string) + i).toString();
+const getLegendLabel = (i: number): string => {
+	if (form.type === 'EDI') {
+		return (i <= 2 ? 0 : i - 2).toString();
+	}
+	return (parseInt(form.type.at(0) as string) + i).toString();
+};
 
 const deleteItem = (id: number): void => {
 	form.items = form.items.filter(a => a.id !== id);
@@ -115,7 +124,7 @@ const emit = defineEmits(['answer-added', 'variable-added']);
 	<div class="grid md:grid-cols-2 md:gap-x-6 relative mb-8">
 		<!-- @vue-ignore -->
 		<div
-			v-for="(n, i) in numberOfAnswers"
+			v-for="(n, i) in numberOfLegends"
 			:key="i"
 			class="mb-3"
 		>
@@ -138,10 +147,11 @@ const emit = defineEmits(['answer-added', 'variable-added']);
 			:delay="250"
 			:delay-on-touch-only="true"
 		>
-			<template #item="{ element: item }">
+			<template #item="{ element: item, index }">
 				<li>
 					<QuestionItem
 						:item="item"
+						:index="index"
 						@delete-item="deleteItem(item.id)"
 					/>
 				</li>
@@ -162,6 +172,8 @@ const emit = defineEmits(['answer-added', 'variable-added']);
 			</label>
 			<AppInputElement
 				@keydown.enter.prevent="addItem"
+				@keyup.ctrl="addItem"
+				@keyup.ctrl.v="addItem"
 				class="grow ms-8"
 				v-model.trim="newItem"
 				id="new-answer"
