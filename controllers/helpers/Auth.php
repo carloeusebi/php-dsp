@@ -18,8 +18,20 @@ class Auth extends AuthController
     return $token;
   }
 
-  protected static function setCookie(string $token)
+
+  public static function resetCookieExpiration()
   {
-    setcookie('TOKEN', $token, time() + 3600, '/', '', true, true,);
+    $token = $_COOKIE['TOKEN'];
+    self::setCookie($token);
+  }
+
+
+  public static function setCookie(string $token)
+  {
+    /**
+     * @var int $ninety_minutes Cookie expiration.
+     */
+    $ninety_minutes = 5400;
+    setcookie('TOKEN', $token, time() + $ninety_minutes, '/', '', true, true,);
   }
 }

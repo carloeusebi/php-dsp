@@ -3,6 +3,7 @@
 namespace app\core\middlewares;
 
 use app\app\App;
+use app\controllers\helpers\Auth;
 use app\core\exceptions\ForbiddenException;
 
 class AdminMiddleware extends BaseMiddleware
@@ -23,6 +24,8 @@ class AdminMiddleware extends BaseMiddleware
 
       if (!self::validateToken()) {
         throw new ForbiddenException();
+      } else {
+        Auth::resetCookieExpiration();
       }
     }
   }

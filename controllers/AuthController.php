@@ -56,10 +56,9 @@ class AuthController extends Controller
     }
 
 
-    public function validate(): void
+    static function validate(): void
     {
         // this function just resets cookie expiration, it is protected by the middleware so it handles the authentication
-        $token = $_COOKIE['TOKEN'];
-        Auth::setCookie($token);
+        Auth::resetCookieExpiration();
     }
 }
