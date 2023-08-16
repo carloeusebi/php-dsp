@@ -41,6 +41,7 @@ $router->get('/api/tests', [TestsController::class, 'get']);
 $router->post('/api/tests', [TestsController::class, 'save']);
 $router->get('/api/tests/patient', [TestsController::class, 'getPatient']);
 $router->post('/api/tests/patient', [TestsController::class, 'updatePatientInfo']);
+$router->get('/api/tests/score', [TestsController::class, 'getScores']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);

@@ -28,7 +28,7 @@ abstract class Model
     {
         foreach ($this->fields_to_decode as $key) {
             if (isset($item[$key]) && $item[$key])
-                $item[$key] = json_decode($item[$key]);
+                $item[$key] = json_decode($item[$key], true);
         }
         return $item;
     }

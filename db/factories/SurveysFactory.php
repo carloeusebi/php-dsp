@@ -72,6 +72,7 @@ class SurveysFactory extends BaseFactory
                 $question['items'] = $this->answerItems($question['items'], $question['type']);
             }
             $question['legend'] = json_decode($question['legend'], true);
+            $question['variables'] = json_decode($question['variables'], true);
             return $question;
         }, $questions);
 

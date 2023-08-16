@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 
-import { Patient, Question, QuestionItem, Survey } from '@/assets/data/interfaces';
+import { Patient, Question, QuestionItemI, Survey } from '@/assets/data/interfaces';
 import { useLoaderStore, usePatientsStore, useSurveysStore } from '@/stores';
 import { useRoute } from 'vue-router';
 import axiosInstance from '@/assets/axios';
@@ -84,7 +84,7 @@ const changeAnswer = (questionId: number | undefined, itemId: number, answer: nu
 	// return if we are not in question mode
 	if (!editMode.value || !survey.value) return;
 	const questionToUpdate = survey.value.questions.find(({ id }) => id === questionId);
-	const itemToUpdate = questionToUpdate?.items.find(({ id }) => id === itemId) as QuestionItem;
+	const itemToUpdate = questionToUpdate?.items.find(({ id }) => id === itemId) as QuestionItemI;
 	itemToUpdate.answer = answer;
 };
 
@@ -111,7 +111,7 @@ const saveUpdates = async () => {
 const handleDeleteComment = (questionId: number, itemId: number) => {
 	if (!survey.value) return;
 	const question = survey.value.questions.find(({ id }) => questionId === id);
-	const item = question?.items.find(({ id }) => itemId === id) as QuestionItem;
+	const item = question?.items.find(({ id }) => itemId === id) as QuestionItemI;
 
 	const proceed = confirm(`Sicuro di voler cancellare il commento\n"${item.comment}"\ndella domanda\n"${item.text}"?`);
 

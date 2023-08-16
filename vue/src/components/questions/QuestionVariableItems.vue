@@ -21,7 +21,7 @@ const selectedItems = ref<number[]>(props.variableItems);
  */
 const selectAllItems = () => {
 	//@ts-ignore
-	selectedItems.value = props.items.map((item, i) => i);
+	selectedItems.value = props.items.map(item => item.id);
 };
 
 /**
@@ -86,7 +86,7 @@ const handleSaveBtnClick = () => {
 							:id="`item:${item.id}`"
 							type="checkbox"
 							class="cursor-pointer"
-							:value="i"
+							:value="item.id"
 							v-model="selectedItems"
 						/>
 						<span class="checkmark"></span>

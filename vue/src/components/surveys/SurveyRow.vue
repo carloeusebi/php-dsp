@@ -30,6 +30,7 @@ interface Alert {
 const emailAlert: Ref<Alert> = ref({ show: false });
 
 const props = defineProps<Props>();
+const loader = useLoaderStore();
 const showModal = ref(false);
 const token = props.survey.token;
 const link = `${import.meta.env.VITE_BASE_URL}/admin/test?token=${token}`;
@@ -39,18 +40,6 @@ const errorsStr = computed(() => {
 	const keys = Object.keys(errors.value);
 	return keys.reduce((str, key) => (str += `${errors.value[key]}<br>`), '');
 });
-
-const patientEmail = computed(() =>
-	props.survey?.email
-		? `<a href="mailto:${props.survey.email}" class="font-medium text-blue-600 hover:underline">${props.survey.email}</a>`
-		: 'Nessun indirizzo email inserito'
-);
-
-const patientPhone = computed(() =>
-	props.survey.phone
-		? `<a href="https://wa.me/${props.survey.phone}" target="_blank" class="font-medium text-blue-600 hover:underline">${props.survey.phone}</a>`
-		: 'Nessun numero di telefono inserito'
-);
 
 const completedIcon = computed(() => {
 	return props.survey.completed ? 'square-check' : 'square';
@@ -83,10 +72,7 @@ const showSuccessAlert = () => {
  */
 const sendEmail = async () => {
 	emailAlert.value.show = false;
-
-	const loader = useLoaderStore();
 	loader.setLoader();
-
 	const data = {
 		email_to: props.survey?.email,
 		subject: 'Questionario per la valutazione',
@@ -110,6 +96,20 @@ const sendEmail = async () => {
 const handleCloseModal = () => {
 	showModal.value = false;
 	emailAlert.value.show = false;
+};
+
+const getScores = async () => {
+	loader.setLoader();
+	const params = { token };
+	try {
+		const res = await axiosInstance.get('/tests/score', { params });
+		console.log(res.data);
+	} catch (err) {
+		if (isAxiosError(err)) console.error(err.response?.data);
+		else console.error(err);
+	} finally {
+		loader.unsetLoader();
+	}
 };
 </script>
 
@@ -175,8 +175,26 @@ const handleCloseModal = () => {
 				/>
 			</table>
 			<div class="border-b max-w-fit pb-3 mb-3">
-				<p><strong>Email: </strong><span v-html="patientEmail"></span></p>
-				<p><strong>Telefono: </strong><span v-html="patientPhone"></span></p>
+				<p>
+					<strong>Email: </strong>
+					<a
+						v-if="survey.email"
+						:href="`mailto:${survey.email}`"
+						class="font-medium text-blue-600 hover:underline"
+						>{{ survey.email }}</a
+					>
+					<span v-else>Nessun indirizzo email inserito</span>
+				</p>
+				<p>
+					<strong>Telefono: </strong>
+					<a
+						v-if="survey.phone"
+						:href="`https://wa.me/:${survey.phone}`"
+						class="font-medium text-blue-600 hover:underline"
+						>{{ survey.phone }}</a
+					>
+					<span v-else>Nessun numero di telefono inserito</span>
+				</p>
 			</div>
 			<div class="mt-3">
 				<p><strong>Creato il: </strong>{{ survey.created_at }}</p>
@@ -199,6 +217,15 @@ const handleCloseModal = () => {
 			</p>
 		</template>
 		<template #button>
+			<!-- SCORES BUTTON -->
+			<AppButton
+				class="ms-3"
+				:class="{ 'btn-disabled': !survey.completed }"
+				@click="getScores"
+				:disabled="!survey.completed"
+			>
+				Calcola punteggio
+			</AppButton>
 			<!-- RESULTS BUTTON -->
 			<router-link
 				target="_blank"

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\app\App;
+use app\controllers\helpers\Scores;
 use app\core\Controller;
 use app\core\middlewares\PatientMiddleware;
 use app\core\utils\Response;
@@ -29,6 +30,7 @@ class TestsController extends Controller
     if (isset($survey['completed']) && $survey['completed']) {
       Response::response(403, ['error' => 'Test is completed']);
     }
+
     Response::response(200, $survey);
   }
 
@@ -77,7 +79,6 @@ class TestsController extends Controller
 
     $patient_to_update = $this->fetchPatient($updated_patient_info['id']);
 
-
     // updates patient infos with the ones sent from the form
     foreach ($patient_to_update as $key => $value) {
       if ($updated_patient_info[$key])
@@ -88,6 +89,27 @@ class TestsController extends Controller
     $errors = $model->save();
 
     $errors ? Response::response(422, $errors) : Response::response(204);
+  }
+
+
+  public function getScores(): void
+  {
+    $token = Request::getBody()['token'] ?? '';
+    if (!$token) {
+      Response::response(400, ['Error' => 'No Token']);
+    }
+
+    $survey = App::$app->survey->getByToken($token);
+    if (!$survey) {
+      Response::response(404, ['Error' => 'No Test found']);
+    }
+    if (!$survey['completed']) {
+      Response::response(422, ['Error' => 'Test not completed yet']);
+    }
+
+    $scores = Scores::calculateScores($survey);
+
+    Response::response(200, ['survey' => $survey, 'scores' => $scores]);
   }
 
 
