@@ -106,10 +106,9 @@ const uploadFile = async () => {
 	<AppButtonBlank
 		@click="showModal = true"
 		color="yellow"
-	>
-		<font-awesome-icon :icon="['fas', 'file-pdf']" />
-		<span class="ms-3 hidden md:inline">Visualizza files del paziente</span>
-	</AppButtonBlank>
+		icon="file-pdf"
+		label="Visualizza filed del paziente"
+	/>
 
 	<AppModal
 		:open="showModal"

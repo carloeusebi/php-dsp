@@ -125,13 +125,9 @@ const filteredQuestionsIds = computed(() => {
 	<AppButtonBlank
 		color="green"
 		@click="showModal = true"
-	>
-		<font-awesome-icon
-			:icon="['fas', 'plus']"
-			size="xl"
-		/>
-		<span class="hidden md:inline ms-3">Aggiungi nuovo sondaggio</span>
-	</AppButtonBlank>
+		icon="plus"
+		label="Aggiungi un nuovo sondaggio"
+	/>
 
 	<AppModal
 		:id="'Create' + (patient?.id || -1)"

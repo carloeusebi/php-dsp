@@ -23,7 +23,7 @@ const emit = defineEmits(['delete-item']);
 	</label>
 	<!-- ITEM -->
 	<div class="flex items-end">
-		<span class="ms-6 me-[2px] self-center min-w-[25px] text-center">{{ index + 1 }}.</span>
+		<span class="ms-7 me-2 self-center min-w-[25px] text-center cursor-move select-none">{{ index + 1 }}.</span>
 		<AppInputElement
 			class="grow"
 			v-model="item.text"

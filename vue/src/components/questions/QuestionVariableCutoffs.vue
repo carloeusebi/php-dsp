@@ -119,16 +119,14 @@ const handleSave = () => {
 							/>
 							<!-- DELETE BUTTON -->
 							<!-- @click="deleteCutoff(cutoff.id, cutoff.name)" -->
-							<AppButtonBlank
+							<font-awesome-icon
 								@click="
 									deleteModal.show = true;
 									deleteModal.cutoff = cutoff;
 								"
-								color="red"
-								type="button"
-							>
-								<font-awesome-icon :icon="['fas', 'trash-can']" />
-							</AppButtonBlank>
+								:icon="['fas', 'trash-can']"
+								class="text-red-700 hover:text-red-800 cursor-pointer"
+							/>
 						</div>
 						<!-- RADIOS -->
 						<div class="flex gap-10 items-center my-1">
@@ -235,9 +233,9 @@ const handleSave = () => {
 			<AppButtonBlank
 				type="button"
 				@click="addCutoff"
-			>
-				Aggiungi Cutoff
-			</AppButtonBlank>
+				icon="plus"
+				label="Aggiungi Cutoff"
+			/>
 
 			<!-- DELETE MODAL -->
 			<AppModal

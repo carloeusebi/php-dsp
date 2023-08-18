@@ -26,7 +26,7 @@ const deleteTag = (id: number) => {
 	<div class="flex gap-3">
 		<label
 			:for="`tag-${tag.id}`"
-			class="grow cursor-pointer ms-7"
+			class="grow cursor-pointer ms-7 overflow-hidden"
 			:style="`color: ${tag.color}`"
 		>
 			{{ tag.tag }}

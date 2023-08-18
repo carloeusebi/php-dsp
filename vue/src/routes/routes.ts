@@ -1,5 +1,4 @@
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import HomePage from '@/pages/HomePage.vue';
 import LoginPage from '@/pages/LoginPage.vue';
 import PatientsPage from '@/pages/PatientsPage.vue';
 import SurveysPage from '@/pages/SurveysPage.vue';
@@ -13,16 +12,11 @@ export const routes = [
 		path: '/',
 		component: AdminLayout,
 		name: 'admin',
-		redirect: '/home',
+		redirect: '/pazienti',
 		meta: {
 			requiresAdmin: true,
 		},
 		children: [
-			{
-				path: '/home',
-				component: HomePage,
-				name: 'home',
-			},
 			{
 				path: '/pazienti',
 				component: PatientsPage,

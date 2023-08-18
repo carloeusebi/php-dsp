@@ -77,17 +77,17 @@ const handlePageClick = (newPage: number) => {
 		<div class="flex justify-between my-3 px-3">
 			<h1 class="text-3xl font-bold">Sondaggi</h1>
 			<!-- CREATE BUTTON -->
-			<div>
+			<div class="flex gap-2">
 				<SurveyCreate />
 				<!-- QUESTIONS BUTTON -->
-				<router-link to="/questionari">
-					<AppButtonBlank>
-						<font-awesome-icon
-							:icon="['fas', 'pen']"
-							size="lg"
-						/>
-						<span class="hidden md:inline ms-3">Modifica questionari</span>
-					</AppButtonBlank>
+				<router-link
+					to="/questionari"
+					class="flex"
+				>
+					<AppButtonBlank
+						icon="pen"
+						label="Modifica questionari"
+					/>
 				</router-link>
 			</div>
 		</div>

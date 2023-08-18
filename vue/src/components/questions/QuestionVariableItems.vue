@@ -63,17 +63,17 @@ const handleSaveBtnClick = () => {
 				v-else
 				class="flex justify-between gap-6"
 			>
-				<div>
+				<div class="flex gap-2 my-2">
 					<AppButtonBlank
 						type="button"
 						@click="selectAllItems"
-						>Seleziona tutte</AppButtonBlank
-					>
+						label="Seleziona tutte"
+					/>
 					<AppButtonBlank
 						type="button"
 						@click="deselectAllItems"
-						>Deseleziona tutte</AppButtonBlank
-					>
+						label="Deseleziona tutte"
+					/>
 				</div>
 			</div>
 			<ul class="text-sm max-h-[300px] overflow-y-auto overflow-x-hidden mb-5 shadow-inner p-4 rounded-lg">

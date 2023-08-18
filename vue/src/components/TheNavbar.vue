@@ -4,7 +4,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import TheLogoutButton from './TheLogoutButton.vue';
 
 const navigation = [
-	{ name: 'Home', to: 'home' },
 	{ name: 'Pazienti', to: 'patients' },
 	{ name: 'Sondaggi', to: 'surveys' },
 ];

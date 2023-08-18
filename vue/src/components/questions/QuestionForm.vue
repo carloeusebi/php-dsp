@@ -144,8 +144,7 @@ const emit = defineEmits(['answer-added', 'variable-added']);
 			tag="ul"
 			v-model="form.items"
 			:animation="150"
-			:delay="250"
-			:delay-on-touch-only="true"
+			:delay="750"
 		>
 			<template #item="{ element: item, index }">
 				<li>

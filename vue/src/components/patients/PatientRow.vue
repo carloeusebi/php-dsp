@@ -110,7 +110,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([
 	>
 		<template v-slot:content>
 			<!-- TOP BUTTONS -->
-			<div>
+			<div class="flex gap-2 justify-end">
 				<PatientFiles :patient="patient" />
 				<SurveyCreate :patient="patient" />
 				<PatientSave
@@ -121,7 +121,7 @@ const surveyCell: Ref<SurveyCell[]> = ref([
 				/>
 				<PatientDelete :to-delete-patient="{ ...patient }" />
 			</div>
-			<hr />
+			<hr class="my-5" />
 			<h1 class="text-4xl font-bold my-5">{{ patient.fname }} {{ patient.lname }}</h1>
 			<div class="grid lg:grid-cols-2 gap-6">
 				<div class="col-span-1">

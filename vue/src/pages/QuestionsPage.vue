@@ -53,7 +53,7 @@ const filteredQuestions = computed(() => {
 				@change-selection="handleChangeSelection($event)"
 			/>
 		</div>
-		<div class="flex justify-between items-center my-3">
+		<div class="flex justify-between my-3">
 			<!-- back button -->
 			<router-link to="/sondaggi">
 				<button class="text-gray-700 hover:text-gray-800 font-medium rounded-md">

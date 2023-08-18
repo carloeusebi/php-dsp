@@ -77,9 +77,15 @@ const handleCheckboxClick = (id: number) => {
 			</div>
 		</template>
 		<template #items>
-			<div class="flex justify-center">
-				<AppButtonBlank @click="select(true)">Tutti</AppButtonBlank>
-				<AppButtonBlank @click="select(false)">Nessuno</AppButtonBlank>
+			<div class="flex justify-center gap-2">
+				<AppButtonBlank
+					@click="select(true)"
+					label="Tutti"
+				/>
+				<AppButtonBlank
+					@click="select(false)"
+					label="Nessuno"
+				/>
 			</div>
 			<hr class="my-3" />
 			<ul>

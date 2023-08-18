@@ -7,7 +7,7 @@ class m0010_create_files_table
 
     public function up()
     {
-        $sql = "CREATE TABLE `files` (
+        $sql = "CREATE TABLE IF NOT EXISTS `files` (
             `id` int NOT NULL AUTO_INCREMENT,
             `patient_id` int NOT NULL,
             `name` varchar(80) COLLATE utf8mb4_general_ci NOT NULL,

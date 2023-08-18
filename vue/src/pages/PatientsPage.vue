@@ -76,7 +76,7 @@ const handlePageClick = (newPage: number) => {
 			<AppSearchbar @key-press="handleSearchbarKeypress" />
 			<!-- CREATE PATIENTS -->
 		</div>
-		<div class="flex justify-between items-center my-3 px-3">
+		<div class="flex justify-between my-3 px-3">
 			<h1 class="text-3xl font-bold">Pazienti</h1>
 			<PatientSave
 				icon="plus"

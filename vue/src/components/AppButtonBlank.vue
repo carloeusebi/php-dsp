@@ -4,21 +4,31 @@ defineProps({
 		type: String,
 		default: 'blue',
 	},
-	label: {
+	label: String,
+	icon: {
 		type: String,
-		default: 'Aggiungi',
 	},
-	icon: String,
 });
 </script>
 
 <template>
 	<button
 		type="button"
-		:class="`text-${color}-700 hover:text-${color}-800 focus:text-${color}-900 outline-${color}-900`"
-		class="font-medium rounded-md px-5 py-2.5 outline-0 lg:focus:outline-2"
+		class="flex group items-center text-white shadow-border text-sm font-sans font-bold rounded overflow-hidden"
 	>
-		<slot></slot>
+		<div
+			v-if="icon"
+			:class="`bg-${color}-500 group-hover:bg-${color}-600`"
+			class="py-3 md:py-1 lg:py-2 px-3 h-full"
+		>
+			<font-awesome-icon :icon="['fas', icon]" />
+		</div>
+		<div
+			class="py-3 md:py-1 lg:py-2 px-4 hidden md:inline"
+			:class="`bg-${color}-600 group-hover:bg-${color}-700`"
+		>
+			{{ label }}
+		</div>
 	</button>
 </template>
 

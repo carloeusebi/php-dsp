@@ -29,9 +29,9 @@ class Auth extends AuthController
   public static function setCookie(string $token)
   {
     /**
-     * @var int $ninety_minutes Cookie expiration.
+     * @var int $twelve_hours Cookie expiration time.
      */
-    $ninety_minutes = 5400;
-    setcookie('TOKEN', $token, time() + $ninety_minutes, '/', '', true, true,);
+    $twelve_hours = 43200;
+    setcookie('TOKEN', $token, time() + $twelve_hours, '/', '', true, true,);
   }
 }

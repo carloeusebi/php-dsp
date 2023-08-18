@@ -76,9 +76,8 @@ const updateVariable = <T>(newArray: T[], variableId: number, prop: 'items' | 'c
 	<AppButtonBlank
 		v-if="modelValue.length > 5"
 		@click="addNewVariable"
-	>
-		Aggiungi una nuova variabile
-	</AppButtonBlank>
+		label="Aggiungi una nuova variabile"
+	/>
 	<ul>
 		<li v-for="variable in modelValue">
 			<div class="grid grid-cols-3 gap-5 justify-center items-center mb-3">
@@ -122,7 +121,11 @@ const updateVariable = <T>(newArray: T[], variableId: number, prop: 'items' | 'c
 			<hr class="my-5" />
 		</li>
 	</ul>
-	<AppButtonBlank @click="addNewVariable"> Aggiungi una nuova variabile </AppButtonBlank>
+	<AppButtonBlank
+		@click="addNewVariable"
+		icon="plus"
+		label="Aggiungi una nuova variabile"
+	/>
 
 	<!-- DELETE MODAL -->
 	<AppModal

@@ -29,10 +29,9 @@ const handleDeletePatient = async () => {
 	<AppButtonBlank
 		@click="showDeleteModal = true"
 		color="red"
-	>
-		<font-awesome-icon :icon="['fas', 'trash-can']" />
-		<span class="hidden md:inline ms-3">Elimina Paziente</span>
-	</AppButtonBlank>
+		icon="trash-can"
+		label="Elimina Paziente"
+	/>
 
 	<AppModal
 		:open="showDeleteModal"
