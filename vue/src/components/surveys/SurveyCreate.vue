@@ -196,63 +196,63 @@ const filteredQuestionsIds = computed(() => {
 					<QuestionTags @change-selection="handleChangeSelection($event)" />
 				</div>
 
-				<div
-					v-if="filteredQuestionsIds.length"
-					class="min-h-[80px]"
-				>
-					<draggable
-						item-key="id"
-						tag="ul"
-						v-model="questions"
-						:animation="150"
-						:delay="250"
-						:delay-on-touch-only="true"
-					>
-						<template #item="{ element: question }">
-							<li
-								v-if="filteredQuestionsIds.includes(question.id)"
-								class="select-none my-1"
-							>
-								<!-- CHECKBOX -->
-								<label class="container shrink">
-									<input
-										:id="question.id"
-										:value="question.id"
-										v-model="question.selected"
-										type="checkbox"
-										class="me-2 cursor-pointer"
-									/>
-									<span class="checkmark"></span>
-								</label>
-								<!-- question name -->
-								<label
-									:for="question.id"
-									class="flex items-end gap-2 ms-7 pn-1 cursor-pointer text-gray-700 hover:text-black transition-colors"
+				<!-- QUESTIONS CONTAINER -->
+				<div class="questions-container min-h-[300px]">
+					<div v-if="filteredQuestionsIds.length">
+						<draggable
+							item-key="id"
+							tag="ul"
+							v-model="questions"
+							:animation="150"
+							:delay="250"
+							:delay-on-touch-only="true"
+						>
+							<template #item="{ element: question }">
+								<li
+									v-if="filteredQuestionsIds.includes(question.id)"
+									class="select-none my-1"
 								>
-									{{ question.question }}
-									<!-- question tags -->
-									<ul class="md:flex gap-1 hidden">
-										<li
-											v-for="tag in question.tags"
-											:key="tag.id"
-											:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
-											class="inline-flex items-center rounded-md px-1 h-5 text-[9px] font-medium"
-										>
-											{{ tag.tag }}
-										</li>
-									</ul>
-								</label>
-							</li>
-						</template>
-					</draggable>
-				</div>
-				<div v-else>
-					<AppAlert
-						:show="true"
-						title="Oops!"
-					>
-						Nessun questionario trovato!
-					</AppAlert>
+									<!-- CHECKBOX -->
+									<label class="container shrink">
+										<input
+											:id="question.id"
+											:value="question.id"
+											v-model="question.selected"
+											type="checkbox"
+											class="me-2 cursor-pointer"
+										/>
+										<span class="checkmark"></span>
+									</label>
+									<!-- question name -->
+									<label
+										:for="question.id"
+										class="flex items-end gap-2 ms-7 pn-1 cursor-pointer text-gray-700 hover:text-black transition-colors"
+									>
+										{{ question.question }}
+										<!-- question tags -->
+										<ul class="md:flex gap-1 hidden">
+											<li
+												v-for="tag in question.tags"
+												:key="tag.id"
+												:style="`background-color: ${tag.color}10; color: ${tag.color}; border: 1px solid ${tag.color}50`"
+												class="inline-flex items-center rounded-md px-1 h-5 text-[9px] font-medium"
+											>
+												{{ tag.tag }}
+											</li>
+										</ul>
+									</label>
+								</li>
+							</template>
+						</draggable>
+					</div>
+					<div v-else>
+						<AppAlert
+							:show="true"
+							title="Oops!"
+						>
+							Nessun questionario trovato!
+						</AppAlert>
+					</div>
 				</div>
 			</form>
 		</template>

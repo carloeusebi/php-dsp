@@ -12,6 +12,14 @@ const props = defineProps({
 		type: String,
 		default: 'sm:max-w-4xl',
 	},
+	/**
+	 * Disables history mode, should only be set to True when the modal can't open other modals from inside.
+	 * History Mode is used to close the modals with the back button.
+	 */
+	disableHistoryMode: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const emit = defineEmits(['close']);
@@ -29,6 +37,7 @@ let assignedIdWhenOpened: number;
 watch(
 	() => props.open,
 	newValue => {
+		if (props.disableHistoryMode) return;
 		// If modal is being opened
 		if (newValue === true) {
 			router.push({ query: { modal_id: modal_id.value } });
@@ -51,6 +60,7 @@ watch(
 watch(
 	() => route.query.modal_id,
 	newValue => {
+		if (props.disableHistoryMode) return;
 		if (!route.query.modal_id || parseInt(newValue as string) < assignedIdWhenOpened) {
 			emit('close');
 		}

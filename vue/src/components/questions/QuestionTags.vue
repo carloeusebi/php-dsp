@@ -3,7 +3,6 @@ import { ref, watch } from 'vue';
 
 import AppButton from '@/components/AppButton.vue';
 import AppDropdown from '@/components/AppDropdown.vue';
-import AppButtonBlank from '../AppButtonBlank.vue';
 import QuestionTag from './QuestionTag.vue';
 import QuestionTagSave from './QuestionTagSave.vue';
 
@@ -77,51 +76,57 @@ const handleCheckboxClick = (id: number) => {
 			</div>
 		</template>
 		<template #items>
-			<div class="flex justify-center gap-2">
-				<AppButtonBlank
-					@click="select(true)"
-					label="Tutti"
-				/>
-				<AppButtonBlank
-					@click="select(false)"
-					label="Nessuno"
-				/>
-			</div>
-			<hr class="my-3" />
-			<ul>
-				<li
-					v-for="tag in tags"
-					:key="tag.id"
-				>
-					<!-- CHECKBOX -->
-					<label class="container shrink w-5">
-						<input
-							:id="`tag-${tag.id}`"
-							type="checkbox"
-							class="me-2 cursor-pointer"
-							:checked="selectedTagsIds.includes(tag.id)"
-							@change="handleCheckboxClick(tag.id)"
+			<div class="overflow-auto">
+				<div class="flex justify-center gap-3">
+					<div
+						class="cursor-pointer p-1 text-blue-500 hover:text-blue-700"
+						@click="select(true)"
+					>
+						Tutti
+					</div>
+					<div
+						class="cursor-pointer p-1 text-blue-500 hover:text-blue-700"
+						@click="select(false)"
+					>
+						Nessuno
+					</div>
+				</div>
+				<hr class="my-3" />
+				<ul class="max-h-[250px] overflow-auto">
+					<li
+						v-for="tag in tags"
+						:key="tag.id"
+					>
+						<!-- CHECKBOX -->
+						<label class="container shrink w-5">
+							<input
+								:id="`tag-${tag.id}`"
+								type="checkbox"
+								class="me-2 cursor-pointer"
+								:checked="selectedTagsIds.includes(tag.id)"
+								@change="handleCheckboxClick(tag.id)"
+							/>
+							<span class="checkmark"></span>
+						</label>
+						<QuestionTag
+							:tag="tag"
+							:editable="editable"
+							@delete="deleteTag($event)"
 						/>
-						<span class="checkmark"></span>
-					</label>
-					<QuestionTag
-						:tag="tag"
-						:editable="editable"
-						@delete="deleteTag($event)"
-					/>
-				</li>
-			</ul>
-			<hr
-				v-if="editable"
-				class="my-3"
-			/>
-			<div class="flex justify-center">
-				<AppButton
+					</li>
+				</ul>
+				<hr
 					v-if="editable"
-					@click="showSaveModal = true"
-				>
-					Crea nuovo tag
-				</AppButton>
+					class="my-3"
+				/>
+				<div class="flex justify-center">
+					<AppButton
+						v-if="editable"
+						@click="showSaveModal = true"
+					>
+						Crea nuovo tag
+					</AppButton>
+				</div>
 			</div>
 		</template>
 	</AppDropdown>

@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import AppModal from '../AppModal.vue';
 import AppButton from '../AppButton.vue';
-import AppButtonBlank from '../AppButtonBlank.vue';
 import { QuestionItemI } from '@/assets/data/interfaces';
 
 interface Props {
@@ -64,16 +63,18 @@ const handleSaveBtnClick = () => {
 				class="flex justify-between gap-6"
 			>
 				<div class="flex gap-2 my-2">
-					<AppButtonBlank
-						type="button"
+					<div
+						class="cursor-pointer p-1 text-blue-500 hover:text-blue-700"
 						@click="selectAllItems"
-						label="Seleziona tutte"
-					/>
-					<AppButtonBlank
-						type="button"
+					>
+						Seleziona Tutte
+					</div>
+					<div
+						class="cursor-pointer p-1 text-blue-500 hover:text-blue-700"
 						@click="deselectAllItems"
-						label="Deseleziona tutte"
-					/>
+					>
+						Deseleziona Tutte
+					</div>
 				</div>
 			</div>
 			<ul class="text-sm max-h-[300px] overflow-y-auto overflow-x-hidden mb-5 shadow-inner p-4 rounded-lg">

@@ -113,7 +113,7 @@ const skipItem = () => {
 			class="relative z-10 pt-6 bg-gray-50"
 		>
 			<h2 class="text-center font-extrabold">{{ question.question }}</h2>
-			<p>{{ question.description }}</p>
+			<p class="text-justify">{{ question.description }}</p>
 			<div class="flex justify-center mx-auto my-5">
 				<AppButton
 					color="green"
@@ -185,12 +185,13 @@ const skipItem = () => {
 	<AppModal
 		:open="showModal"
 		@close="showModal = false"
+		:disable-history-mode="true"
 	>
 		<template #content>
 			<AppAlert
 				:show="showCommentAlert"
 				title="Errore"
-				message="Se vuoi saltare la domanda devi scrivere un commento"
+				message="Se vuoi saltare la domanda devi scrivere un commento."
 				type="warning"
 			/>
 
@@ -206,7 +207,7 @@ const skipItem = () => {
 			</form>
 		</template>
 		<template #button>
-			<AppButton> Aggiungi commento</AppButton>
+			<AppButton form="comment-form"> Aggiungi commento</AppButton>
 			<AppButton
 				class="me-3"
 				color="green"

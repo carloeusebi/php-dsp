@@ -9,6 +9,7 @@ import { Errors, Patient } from '@/assets/data/interfaces';
 import axiosInstance from '@/assets/axios';
 import { useLoaderStore } from '@/stores';
 import { isAxiosError } from 'axios';
+import { useScrollTo } from '@/composables';
 
 const endpoint = 'tests/patient';
 
@@ -32,6 +33,8 @@ const fetchPatient = async (token: string) => {
 };
 
 const handleFormSubmit = async () => {
+	//@ts-ignore
+	useScrollTo(window, 0);
 	loader.setLoader();
 	errors.value = {};
 	if (patient.value === null) return;

@@ -3,7 +3,6 @@ import { Ref, computed, ref } from 'vue';
 
 import AppModal from '@/components/AppModal.vue';
 import AppButton from '@/components/AppButton.vue';
-import AppButtonBlank from '@/components/AppButtonBlank.vue';
 import AppAlert from '@/components/AppAlert.vue';
 import SurveyDelete from './SurveyDelete.vue';
 
@@ -204,16 +203,16 @@ const getScores = async () => {
 			<!-- link -->
 			<p>
 				<strong>Link al sondaggio per il paziente: </strong>
-				<AppButtonBlank
+				<button
+					class="text-gray-700 ms-2"
 					@click="copyUrl"
-					color="gray"
 				>
 					<font-awesome-icon
 						:icon="['fas', 'copy']"
 						size="lg"
 					/>
 					Copia
-				</AppButtonBlank>
+				</button>
 			</p>
 		</template>
 		<template #button>

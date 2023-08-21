@@ -97,7 +97,7 @@ class Scores extends TestsController
             }
         }
 
-        throw new Exception("Le risposte del questionario {$question['question']} non sono sincronizzate con il questionario");
+        // throw new Exception("Le risposte del questionario {$question['question']} non sono sincronizzate con il questionario");
     }
 
 
