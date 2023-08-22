@@ -29,10 +29,9 @@ const handleDeleteSurvey = async () => {
 	<AppButtonBlank
 		@click="showDeleteModal = true"
 		color="red"
-	>
-		<font-awesome-icon :icon="['fas', 'trash-can']" />
-		<span class="hidden md:inline ms-3">Elimina Sondaggio</span>
-	</AppButtonBlank>
+		icon="trash-can"
+		label="Elimina Sondaggio"
+	/>
 
 	<AppModal
 		:open="showDeleteModal"

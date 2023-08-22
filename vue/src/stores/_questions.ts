@@ -20,7 +20,9 @@ export const useQuestionsStore = defineStore('questions', {
 	//actions
 	actions: {
 		fetch() {
-			this.axios.get(endpoint).then(res => {
+			const params = { order_by: 'question' };
+
+			this.axios.get(endpoint, { params }).then(res => {
 				this.load(res.data);
 			});
 		},

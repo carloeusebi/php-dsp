@@ -21,7 +21,7 @@ interface Props {
 
 // if no toEditPatient, patient default to an empty one
 const props = withDefaults(defineProps<Props>(), {
-	toEditPatient: () => ({ ...emptyPatient }),
+	toEditPatient: () => ({ ...(emptyPatient as Patient) }),
 });
 
 const showModal = ref(false);

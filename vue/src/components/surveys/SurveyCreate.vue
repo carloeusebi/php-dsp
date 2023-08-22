@@ -30,7 +30,7 @@ if (props.patient) emptySurvey.patient_id = props.patient.id as number;
 const showModal = ref(false);
 const patients = useSort(usePatientsStore().getPatients, 'lname', 'down');
 
-const newSurvey: Ref<Survey> = ref({ ...emptySurvey });
+const newSurvey: Ref<Survey> = ref({ ...(emptySurvey as Survey) });
 
 const errors: Ref<Errors> = ref({});
 const errorsStr = computed(() => {
@@ -73,7 +73,7 @@ const saveSurvey = async () => {
 
 	if (!errorsStr.value) {
 		showModal.value = false;
-		newSurvey.value = { ...emptySurvey };
+		newSurvey.value = { ...(emptySurvey as Survey) };
 		questions.value = questions.value.map(q => {
 			q.selected = false;
 			return q;

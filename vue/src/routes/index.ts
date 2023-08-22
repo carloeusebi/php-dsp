@@ -25,7 +25,7 @@ router.beforeEach((to, _from, next) => {
 
 	// GUEST;
 	else if (to.meta.requiresGuest) {
-		if (user.isAdmin) next({ name: 'home' });
+		if (user.isAdmin) next({ name: 'admin' });
 		else next();
 	}
 

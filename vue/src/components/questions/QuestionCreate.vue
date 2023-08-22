@@ -10,7 +10,7 @@ import AppAlert from '@/components/AppAlert.vue';
 
 import { useLoaderStore, useQuestionsStore } from '@/stores';
 import { emptyQuestion, questionTypes } from '@/assets/data/data';
-import { Errors } from '@/assets/data/interfaces';
+import { Errors, Question } from '@/assets/data/interfaces';
 
 const questionStore = useQuestionsStore();
 const labels = questionStore.getLabels;
@@ -36,7 +36,7 @@ const create = async () => {
 	newQuestion.value.variables = [];
 
 	try {
-		await questionStore.save({ ...newQuestion.value });
+		await questionStore.save({ ...(newQuestion.value as Question) });
 		showModal.value = false;
 		newQuestion.value = { ...emptyQuestion };
 	} catch (err) {

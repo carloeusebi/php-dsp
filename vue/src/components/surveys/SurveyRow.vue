@@ -216,31 +216,30 @@ const getScores = async () => {
 			</p>
 		</template>
 		<template #button>
-			<!-- SCORES BUTTON -->
-			<AppButton
-				class="ms-3"
-				:class="{ 'btn-disabled': !survey.completed }"
-				@click="getScores"
-				:disabled="!survey.completed"
-			>
-				Calcola punteggio
-			</AppButton>
-			<!-- RESULTS BUTTON -->
-			<router-link
-				target="_blank"
-				:to="{ name: 'results', params: { id: survey.id } }"
-			>
-				<AppButton>Visualizza Risposte</AppButton>
-			</router-link>
-
-			<!-- EMAIL BUTTON -->
-			<AppButton
-				:disabled="survey.completed || !props.survey?.email"
-				:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
-				@click="sendEmail"
-				class="me-3"
-				>Invia un'email<span class="hidden md:block"> con il link</span></AppButton
-			>
+			<div class="flex flex-col md:flex-row gap-1 md:gap-2">
+				<!-- SCORES BUTTON -->
+				<AppButton
+					:class="{ 'btn-disabled': !survey.completed }"
+					@click="getScores"
+					:disabled="!survey.completed"
+				>
+					Calcola punteggio
+				</AppButton>
+				<!-- RESULTS BUTTON -->
+				<router-link
+					target="_blank"
+					:to="{ name: 'results', params: { id: survey.id } }"
+				>
+					<AppButton>Visualizza Risposte</AppButton>
+				</router-link>
+				<!-- EMAIL BUTTON -->
+				<AppButton
+					:disabled="survey.completed || !props.survey?.email"
+					:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
+					@click="sendEmail"
+					>Invia un'email<span class="hidden md:block"> con il link</span></AppButton
+				>
+			</div>
 		</template>
 	</AppModal>
 </template>

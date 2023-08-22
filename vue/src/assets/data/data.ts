@@ -2,29 +2,25 @@ import { Patient, Question, Survey } from './interfaces';
 
 //TODO to update
 
-export const emptyQuestion: Question = {
+export const emptyQuestion: Omit<Question, 'id'> = {
 	question: '',
 	description: '',
 	type: '',
-	answers: [],
 	legend: [],
+	items: [],
+	variables: [],
 };
 
-export const emptyPatient: Patient = {
+export const emptyPatient: Partial<Patient> = {
 	fname: '',
 	lname: '',
-	age: '',
 	birthday: '',
 	begin: '',
-	username: '',
 };
 
-export const emptySurvey: Survey = {
-	patient_id: '',
+export const emptySurvey: Partial<Survey> = {
 	title: '',
-	survey: [],
-	answers: [],
 	completed: false,
 };
 
-export const questionTypes = ['1-4', '1-6', '0-5', '0-3', '1-7', '0-4', '1-5', 'EDI'];
+export const questionTypes = ['1-4', '1-6', '0-5', '0-3', '1-7', '0-4', '1-5', 'EDI', 'Risposta multipla'];
