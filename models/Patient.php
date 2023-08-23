@@ -79,9 +79,14 @@ class Patient extends DbModel
             $age = calculateAge($patient['birthday']);
             if ($age !== $patient['age']) {
                 $patient['age'] = $age;
-                parent::load($patient);
-                parent::update();
+
+                // updates patient's age in the db
+                $updated_patient = new Patient();
+                $updated_patient->load($patient);
+                $updated_patient->update();
             }
+
+            // file_patient relations
             $file_where = ['patient_id' => $patient['id']];
             $patient['files'] = App::$app->file->get([], $file_where);
             return $patient;

@@ -34,12 +34,20 @@ export interface Patient {
 	cohabitants?: string;
 }
 
+export interface QuestionItemCustomAnswer {
+	id: number;
+	customAnswer: string;
+	points: number;
+}
+
 export interface QuestionItemI {
 	id: number;
 	text: string;
 	answer?: number;
 	comment?: string;
 	reversed?: boolean;
+	hasMultipleAnswers?: boolean;
+	multipleAnswers?: QuestionItemCustomAnswer[];
 }
 
 export interface QuestionLegend {
@@ -69,7 +77,7 @@ export interface Question {
 	id: number;
 	question: string;
 	description: string;
-	type: '' | '1-4' | '1-6' | '0-5' | '0-3' | '1-7' | '0-4' | '1-4' | '1-5' | 'EDI' | 'Risposta multipla';
+	type: '' | '1-4' | '1-6' | '0-5' | '0-3' | '1-7' | '0-4' | '1-4' | '1-5' | 'EDI' | 'MUL';
 	legend: QuestionLegend[];
 	items: QuestionItemI[];
 	variables: QuestionVariableI[];

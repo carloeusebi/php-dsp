@@ -8,6 +8,7 @@ import AppAlert from '@/components/AppAlert.vue';
 
 import { Question } from '@/assets/data/interfaces';
 import { useGetIndexOfFirstItemWithoutProp } from '@/composables';
+import TestAnswer from './TestAnswer.vue';
 
 interface Props {
 	question: Question;
@@ -29,17 +30,45 @@ const clicked = ref(-1);
 
 const scroll = ref(false);
 const showQuestionDescription = ref(true);
-const showModal = ref(false);
+const showCommentModal = ref(false);
 const comment = ref('');
 
 const segments = computed(() => props.question.items.length);
 const emit = defineEmits(['answered', 'question-complete']);
 
-// keyboard click of valid num key triggers handleClick
+// keyboard click of valid num key triggers handleAnswer
 window.addEventListener('keydown', e => {
+	// ignores keydown event if comment modal is open
+	if (showCommentModal.value) return;
+
 	const keyPress = parseInt(e.key);
-	if (!isNaN(keyPress) && keyPress >= min.value && keyPress <= max.value) handleClick(keyPress);
-	11;
+	if (isNaN(keyPress)) return;
+
+	const { type, items } = props.question;
+	const activeItemIndex = active.value;
+
+	if (type === 'MUL') {
+		// for MUL type Questionnaires
+		const item = items[activeItemIndex];
+
+		// Check if the active item allows multiple answers
+		if (!item.multipleAnswers) return;
+
+		// Check if the pressed key corresponds to a valid answer option
+		if (keyPress - 1 < item.multipleAnswers.length && keyPress - 1 > item.multipleAnswers.length) return;
+
+		// Retrieve the points associated with the selected multiple answer
+		const answer = item.multipleAnswers[keyPress - 1].points;
+
+		handleAnswer(answer);
+	} else {
+		//for other Questionnaire types
+		const answer = keyPress - 1 + min.value;
+
+		if (answer >= min.value && answer <= max.value) {
+			handleAnswer(answer);
+		}
+	}
 });
 
 const activeItemId = computed(() => props.question.items[active.value].id);
@@ -75,7 +104,7 @@ const goToNextQuestion = () => {
  * Handle the submission of an answer by the patient
  * @param answer The value of the selected answer
  */
-const handleClick = (answer: number): void => {
+const handleAnswer = (answer: number): void => {
 	if (scroll.value) return;
 	clicked.value = answer;
 
@@ -85,7 +114,7 @@ const handleClick = (answer: number): void => {
 
 const addComment = () => {
 	props.question.items[active.value].comment = comment.value;
-	showModal.value = false;
+	showCommentModal.value = false;
 };
 
 const showCommentAlert = ref(false);
@@ -150,26 +179,43 @@ const skipItem = () => {
 				<p class="item-description text-center text-lg font-semibold">
 					{{ question.items[active].text }}
 				</p>
-				<ul class="my-5 w-full">
+				<!-- ! MUL -->
+				<ul v-if="question.type === 'MUL'">
 					<li
-						@click="handleClick(n + min)"
+						v-for="(ans, n) in question.items[active].multipleAnswers"
+						:key="ans.id"
+						@click="handleAnswer(ans.points)"
+						:class="{ active: clicked === ans.points }"
+					>
+						<TestAnswer
+							:index="n + 1"
+							:answer="ans.customAnswer"
+							:active="clicked === n + min"
+						/>
+					</li>
+				</ul>
+				<!-- ! OTHER -->
+				<ul
+					v-else
+					class="my-5 w-full"
+				>
+					<li
+						@click="handleAnswer(n + min)"
 						v-for="(leg, n) in question.legend"
 						:key="leg.id"
 						:class="{ active: clicked === n + min }"
 					>
-						<div class="score flex-shrink-0">{{ n + 1 }}</div>
-						<div class="px-2 flex-grow">
-							{{ leg.legend }}
-						</div>
-						<div class="absolute flex items-center bg-[#ecf5ef] top-1 bottom-1 right-1">
-							<font-awesome-icon :icon="['fas', 'check']" />
-						</div>
+						<TestAnswer
+							:index="n + 1"
+							:answer="leg.legend"
+							:active="clicked === n + min"
+						/>
 					</li>
 				</ul>
 				<!-- ADD COMMENT BUTTON -->
 				<div class="flex justify-end">
 					<button
-						@click="showModal = true"
+						@click="showCommentModal = true"
 						class="bg-primary hover:bg-secondary text-white w-full h-10 rounded-md font-bold"
 					>
 						<font-awesome-icon :icon="['far', 'comment-dots']" />
@@ -183,8 +229,8 @@ const skipItem = () => {
 	<!-- ADD COMMENT MODAL -->
 
 	<AppModal
-		:open="showModal"
-		@close="showModal = false"
+		:open="showCommentModal"
+		@close="showCommentModal = false"
 		:disable-history-mode="true"
 	>
 		<template #content>
@@ -222,7 +268,6 @@ const skipItem = () => {
 <style lang="scss" scoped>
 $primary-color: #6ecc84;
 $secondary-color: #254d32;
-
 .item-description {
 	min-height: 75px;
 }
@@ -244,34 +289,12 @@ li {
 	cursor: pointer;
 }
 
-.score {
-	width: 24px;
-	height: 24px;
-	margin: 4px 8px;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	border-radius: 2px;
-	border: 1px solid $secondary-color;
-	background-color: rgba(255, 255, 255, 0.8);
-	color: $secondary-color;
-
-	font-family: sans-serif;
-}
-
-.fa-check {
-	display: none;
-	padding: 8px;
-}
-
 .active {
 	animation: at-click 0.25s ease 0s 2 normal none running;
 
 	box-shadow: $secondary-color 0 0 0 2px inset;
 
-	.score {
+	:deep(.score) {
 		border-color: $secondary-color;
 		background-color: $secondary-color;
 		color: white;
@@ -279,6 +302,12 @@ li {
 
 	.fa-check {
 		display: inline-block;
+	}
+}
+
+@keyframes at-click {
+	50% {
+		opacity: 0.3;
 	}
 }
 
@@ -298,12 +327,6 @@ li {
 	66% {
 		transform: translate(0);
 		opacity: 1;
-	}
-}
-
-@keyframes at-click {
-	50% {
-		opacity: 0.3;
 	}
 }
 </style>

@@ -23,4 +23,4 @@ export const emptySurvey: Partial<Survey> = {
 	completed: false,
 };
 
-export const questionTypes = ['1-4', '1-6', '0-5', '0-3', '1-7', '0-4', '1-5', 'EDI', 'Risposta multipla'];
+export const questionTypes = ['1-4', '1-6', '0-5', '0-3', '1-7', '0-4', '1-5', 'EDI', 'MUL'];

@@ -185,9 +185,12 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 						class="text-gray-400"
 					/>
 				</div>
-				<p>{{ question.description }}</p>
+				<p class="mb-5">{{ question.description }}</p>
 				<!-- LEGEND -->
-				<div class="border border-black my-5 p-2 grid md:grid-cols-2">
+				<div
+					v-if="question.type !== 'MUL'"
+					class="border border-black my-5 p-2 grid md:grid-cols-2"
+				>
 					<div
 						v-for="(legend, j) in question.legend"
 						:key="j"
@@ -214,28 +217,57 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 				<!-- ITEMS -->
 				<div>
 					<div
-						v-for="item in question.items"
+						v-for="(item, itemNumber) in question.items"
 						:key="item.id"
 						class="grid grid-cols-6 relative"
 					>
-						<div class="col-span-4 p-2 border border-black flex justify-between">
-							{{ item.text }}
+						<!-- question -->
+						<div
+							:class="[item.text ? 'col-span-4' : 'col-span-1']"
+							class="p-2 border border-black flex justify-between"
+						>
+							{{ itemNumber + 1 }}. {{ item.text }}
 						</div>
 						<!-- ANSWERS -->
-						<div class="col-span-2 flex">
-							<!-- @vue-ignore -->
+						<div :class="[item.text ? 'col-span-2' : 'col-span-5']">
+							<!-- ! IF MUL -->
 							<div
-								v-for="(legend, n) in question.legend"
-								:key="n"
-								class="flex-grow h-full"
-								:class="{ hidden: !checkboxes[i][n] && !checkboxes[i].every(cb => !cb) }"
+								v-if="item.multipleAnswers"
+								class="flex h-full"
 							>
 								<div
-									class="answer-cell border border-black flex-grow flex justify-center items-center h-full"
-									:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
-									@click="changeAnswer(question.id, item.id, itemValue(question, n))"
+									v-for="ans in item.multipleAnswers"
+									:key="ans.id"
+									class="flex-grow h-full"
 								>
-									{{ question.type === 'EDI' ? (n < 2 ? 0 : n - 2) : itemValue(question, n) }}
+									<div
+										class="answer-cell border border-black flex-grow flex justify-center items-center h-full p-2"
+										:class="{ 'bg-green-500': ans.points === item.answer }"
+										@click="changeAnswer(question.id, item.id, ans.points)"
+									>
+										{{ ans.customAnswer }}
+									</div>
+								</div>
+							</div>
+							<!-- ! IF OTHER TYPE -->
+							<div
+								v-else
+								class="flex h-full"
+							>
+								<!-- @vue-ignore -->
+								<div
+									v-for="(legend, n) in question.legend"
+									:key="n"
+									class="flex-grow h-full"
+									:class="{ hidden: !checkboxes[i][n] && !checkboxes[i].every(cb => !cb) }"
+								>
+									<div
+										class="answer-cell border border-black flex-grow flex justify-center items-center h-full"
+										:class="{ 'bg-green-500': itemValue(question, n) === item.answer }"
+										@click="changeAnswer(question.id, item.id, itemValue(question, n))"
+									>
+										{{ question.type === 'EDI' ? (n < 2 ? 0 : n - 2) : itemValue(question, n) }}
+									</div>
 								</div>
 							</div>
 						</div>
@@ -343,12 +375,12 @@ img {
 	align-items: center;
 	display: none;
 	background-color: #fff;
-	padding: 2rem;
+	padding: 1rem 2rem;
 	box-shadow: 0 0 10px 2px black;
 	z-index: 10;
 	border-radius: 20px;
 	right: 5px;
-	min-width: fit-content;
+	min-width: max-content;
 	max-width: 75vw;
 }
 

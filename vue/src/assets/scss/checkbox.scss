@@ -25,14 +25,20 @@ label.container input {
 	background-color: #eee;
 }
 
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
+/* On mouse-over or focus, add a grey background color */
+.container:hover input ~ .checkmark,
+.container input:focus ~ .checkmark {
 	background-color: #ccc;
 }
 
 /* When the checkbox is checked, add a blue background */
 .container input:checked ~ .checkmark {
 	background-color: #2196f3;
+}
+
+// When the checkbox is checked and focused, add a darker background
+.container input:checked:focus ~ .checkmark {
+	background-color: #186cb1;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */

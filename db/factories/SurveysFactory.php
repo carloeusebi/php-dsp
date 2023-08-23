@@ -35,6 +35,8 @@ class SurveysFactory extends BaseFactory
      */
     private function answerItems(array $items, string $type): array
     {
+        if ($type === 'MUL') return $items;
+
         $min = intval(substr($type, 0, 1));
         $max = intval(substr($type, -1));
 
@@ -64,8 +66,8 @@ class SurveysFactory extends BaseFactory
         $created_at = $this->randomDate(strtotime('-5 years'), strtotime('-5 days'));
         $last_update = $this->randomDate(strtotime($created_at), strtotime('now'));
 
-        // removes empty Questionnaires, if any
-        $questions = array_values(array_filter($questions, fn ($quest) => $quest['items'] !== 'null'));
+        // removes empty Questionnaires, if any, and MUL types Questionnaires
+        $questions = array_values(array_filter($questions, fn ($quest) => $quest['items'] !== 'null' && $quest['type'] !== 'MUL'));
 
         // generates a 75% chance that the survey is completed
         $completed = rand(1, 100) <= 75 ? 1 : null;

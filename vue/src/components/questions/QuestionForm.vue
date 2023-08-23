@@ -3,13 +3,15 @@ import draggable from 'vuedraggable';
 import { Ref, computed, reactive, ref } from 'vue';
 
 import AppInputElement from '@/components/AppInputElement.vue';
+import QuestionVariables from './QuestionVariables.vue';
+import QuestionItem from './QuestionItem.vue';
+import QuestionItemMUL from './QuestionItemMUL.vue';
 
 import { useGenerateId } from '@/composables';
 import { questionTypes } from '@/assets/data/data';
 import { Question, QuestionLegend } from '@/assets/data/interfaces';
 import { useQuestionsStore } from '@/stores';
-import QuestionVariables from './QuestionVariables.vue';
-import QuestionItem from './QuestionItem.vue';
+import AppButtonBlank from '../AppButtonBlank.vue';
 
 interface Props {
 	question: Question;
@@ -18,6 +20,7 @@ interface Props {
 const labels = useQuestionsStore().getLabels;
 
 const props = defineProps<Props>();
+const emit = defineEmits(['answer-added', 'variable-added']);
 
 const form = reactive(props.question);
 const types = ref(questionTypes);
@@ -28,6 +31,8 @@ const itemsListRef = ref<HTMLDivElement | null>(null);
 
 // calculate number of answers
 const numberOfLegends = computed(() => {
+	if (form.type === 'MUL') return;
+
 	const getNumOfLegends = (type: Question['type']) => {
 		const low = parseInt(type.at(0) as string);
 		const high = parseInt(type.at(-1) as string);
@@ -78,7 +83,21 @@ const addItem = () => {
 	newItemReversed.value = false;
 };
 
-const emit = defineEmits(['answer-added', 'variable-added']);
+/**
+ * Adds a new MUL item to the list of the Questionnaire's items
+ */
+const addMULItem = () => {
+	const id = useGenerateId(form.items);
+	const newMULItem = {
+		id,
+		text: '',
+		hasMultipleAnswers: true,
+		multipleAnswers: [],
+	};
+
+	form.items.push(newMULItem);
+	emit('answer-added', itemsListRef.value?.scrollHeight);
+};
 </script>
 
 <template>
@@ -118,71 +137,103 @@ const emit = defineEmits(['answer-added', 'variable-added']);
 		/>
 	</div>
 	<hr class="my-5" />
-	<p class="text-gray-500 mb-3">{{ labels.legend }}</p>
-
-	<!-- LEGEND -->
-	<div class="grid md:grid-cols-2 md:gap-x-6 relative mb-8">
-		<!-- @vue-ignore -->
-		<div
-			v-for="(n, i) in numberOfLegends"
-			:key="i"
-			class="mb-3"
-		>
-			<AppInputElement
-				:label="getLegendLabel(i)"
-				v-model="form.legend[i].legend"
-			/>
+	<!-- ! IF MULTI ANSWERS MUL -->
+	<div v-if="form.type === 'MUL'">
+		<div ref="itemsListRef">
+			<draggable
+				item-key="id"
+				tag="ul"
+				v-model="form.items"
+				:animation="450"
+				:delay="750"
+			>
+				<template #item="{ element: item, index }">
+					<li>
+						<QuestionItemMUL
+							:index="index + 1"
+							:item="item"
+							@delete-item="deleteItem(item.id)"
+						/>
+					</li>
+				</template>
+			</draggable>
 		</div>
-	</div>
-	<hr class="my-5" />
-	<p class="text-gray-500 mb-3">{{ labels.items }} - Spuntare quelle a punteggio invertito</p>
-
-	<div ref="itemsListRef">
-		<!-- ITEMS -->
-		<draggable
-			item-key="id"
-			tag="ul"
-			v-model="form.items"
-			:animation="150"
-			:delay="750"
-		>
-			<template #item="{ element: item, index }">
-				<li>
-					<QuestionItem
-						:item="item"
-						:index="index"
-						@delete-item="deleteItem(item.id)"
-					/>
-				</li>
-			</template>
-		</draggable>
-	</div>
-
-	<!-- ADD NEW ITEM -->
-	<div class="flex items-end bg-white">
-		<div class="grow">
-			<label class="container shrink">
-				<input
-					v-model="newItemReversed"
-					type="checkbox"
-					class="me-2 cursor-pointer"
-				/>
-				<span class="checkmark"></span>
-			</label>
-			<AppInputElement
-				@keydown.enter.prevent="addItem"
-				@keyup.ctrl="addItem"
-				@keyup.ctrl.v="addItem"
-				class="grow ms-8"
-				v-model.trim="newItem"
-				id="new-answer"
-			/>
-		</div>
-		<font-awesome-icon
-			@click="addItem"
-			class="ms-3 cursor-pointer text-blue-700 hover:text-blue-800"
-			:icon="['fas', 'plus']"
+		<AppButtonBlank
+			@click="addMULItem"
+			icon="plus"
+			label="Aggiungi domanda"
 		/>
+	</div>
+	<!-- * ELSE -->
+	<div v-else>
+		<p class="text-gray-500 mb-3">
+			{{ labels.legend }}
+		</p>
+
+		<!-- LEGEND -->
+		<div class="grid md:grid-cols-2 md:gap-x-6 relative mb-8">
+			<!-- @vue-ignore -->
+			<div
+				v-for="(n, i) in numberOfLegends"
+				:key="i"
+				class="mb-3"
+			>
+				<AppInputElement
+					:label="getLegendLabel(i)"
+					v-model="form.legend[i].legend"
+				/>
+			</div>
+		</div>
+		<hr class="my-5" />
+		<p class="text-gray-500 mb-3">{{ labels.items }} - Spuntare quelle a punteggio invertito</p>
+
+		<div ref="itemsListRef">
+			<!-- ITEMS -->
+			<draggable
+				item-key="id"
+				tag="ul"
+				v-model="form.items"
+				:animation="150"
+				:delay="750"
+			>
+				<template #item="{ element: item, index }">
+					<li>
+						<QuestionItem
+							:item="item"
+							:index="index"
+							@delete-item="deleteItem(item.id)"
+						/>
+					</li>
+				</template>
+			</draggable>
+		</div>
+
+		<!-- ADD NEW ITEM -->
+		<div class="flex items-end bg-white">
+			<div class="grow">
+				<label class="container shrink">
+					<input
+						v-model="newItemReversed"
+						type="checkbox"
+						class="me-2 cursor-pointer"
+					/>
+					<span class="checkmark"></span>
+				</label>
+				<AppInputElement
+					@keydown.enter.prevent="addItem"
+					@keyup.ctrl="addItem"
+					@keyup.ctrl.v="addItem"
+					class="grow ms-8"
+					v-model.trim="newItem"
+					id="new-answer"
+				/>
+			</div>
+			<font-awesome-icon
+				@click="addItem"
+				class="ms-3 cursor-pointer text-blue-700 hover:text-blue-800"
+				:icon="['fas', 'plus']"
+			/>
+		</div>
 	</div>
 
 	<hr class="my-8" />
