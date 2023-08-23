@@ -118,15 +118,20 @@ class Database
     {
         $tables = $this->getTables();
 
-        // prepare sql
-        $sql = 'DROP TABLES ';
-        foreach ($tables as $table) {
-            $sql .= $table[0] . ", ";
-        }
-        $sql = substr($sql, 0, -2);  // removes last ', '
-        $this->pdo->exec($sql);
+        if (count($tables) > 0) {
 
-        $this->log(count($tables) . " tables dropped.");
+            // prepare sql
+            $sql = 'DROP TABLES ';
+            foreach ($tables as $table) {
+                $sql .= $table[0] . ", ";
+            }
+            $sql = substr($sql, 0, -2);  // removes last ', '
+            $this->pdo->exec($sql);
+
+            $this->log(count($tables) . " tables dropped.");
+        } else {
+            $this->log('No tables to drop');
+        }
     }
 
 
@@ -165,12 +170,7 @@ class Database
         $statement = $this->pdo->prepare('SHOW TABLES');
         $statement->execute();
 
-        $tables = $statement->fetchAll(PDO::FETCH_NUM);
-        if (count($tables) === 0) {
-            $this->log('No tables to drop');
-            exit;
-        }
-        return $tables;
+        return $statement->fetchAll(PDO::FETCH_NUM);
     }
 
 

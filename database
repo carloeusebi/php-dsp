@@ -8,7 +8,7 @@ set_exception_handler('app\core\exceptions\ErrorHandler::handleCliException');
 
 $app = new App();
 
-$commands = ['migrate' => 'Migrate the database', 'seed' => 'Seed the database using factories', 'drop' => 'Drop all database tables'];
+$commands = ['migrate' => 'Migrate the database', 'seed' => 'Seed the database using factories', 'drop' => 'Drop all database tables', 'refresh' => 'Drops, migrates and then seeds the database'];
 
 
 function help(array $commands): void
@@ -26,17 +26,42 @@ function help(array $commands): void
     echo "\n";
 }
 
+function migrate()
+{
+    App::$app->db->applyMigrations();
+}
+
+function seed()
+{
+    App::$app->db->applyFactories();
+}
+
+function drop()
+{
+    App::$app->db->dropTables();
+}
+
+function refresh()
+{
+    drop();
+    migrate();
+    seed();
+}
+
 $command = $argv[1] ?? 'help';
 
 switch ($command) {
     case 'migrate':
-        App::$app->db->applyMigrations();
+        migrate();
         break;
     case 'seed':
-        App::$app->db->applyFactories();
+        seed();
         break;
     case 'drop':
-        App::$app->db->dropTables();
+        drop();
+        break;
+    case 'refresh' || '-r':
+        refresh();
         break;
     case 'help';
         help($commands);
