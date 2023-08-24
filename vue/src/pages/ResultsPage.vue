@@ -6,6 +6,8 @@ import { useLoaderStore, usePatientsStore, useSurveysStore } from '@/stores';
 import { useRoute } from 'vue-router';
 import axiosInstance from '@/assets/axios';
 import { isAxiosError } from 'axios';
+import ResultsHeader from '@/components/ResultsHeader.vue';
+import ResultsPatient from '@/components/ResultsPatient.vue';
 
 interface PrintableQuestion extends Question {
 	printable: boolean;
@@ -42,7 +44,8 @@ onMounted(async () => {
 			survey.questions = makeQuestionsPrintable(survey.questions);
 			return survey;
 		} catch (err) {
-			alert(err);
+			if (isAxiosError(err)) alert(err.response?.data);
+			else alert(err);
 		} finally {
 			loader.unsetLoader();
 		}
@@ -127,42 +130,13 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 	<div class="bg-white min-h-screen">
 		<div class="container max-w-6xl mx-auto p-6">
 			<!-- HEADER -->
-			<header class="mb-8">
-				<figure class="flex justify-end">
-					<img
-						src="/Logo.webp"
-						alt="Logo"
-					/>
-				</figure>
-				<h1 class="md:text-3xl font-bold my-10">{{ survey?.title }}</h1>
-			</header>
+			<ResultsHeader :title="survey?.title" />
 
 			<!-- PATIENT -->
-			<section
-				id="patient"
-				class="border-b pb-2 mb-5"
-			>
-				<div>
-					<h2 class="mb-3">Paziente:</h2>
-					<strong>Nome e cognome: </strong>{{ survey?.fname }}
-					{{ survey?.lname }}
-				</div>
-				<div>
-					<span><strong>Età: </strong>{{ survey?.age }}</span>
-					<span
-						class="ms-3"
-						v-if="survey?.weight"
-						>| <strong>Peso: </strong>{{ survey?.weight }}kg</span
-					>
-					<span
-						class="ms-3"
-						v-if="survey?.height"
-						>| <strong>Altezza: </strong>{{ survey?.height }}cm</span
-					>
-				</div>
-				<div v-if="survey?.job"><strong>Professione: </strong>{{ survey?.job }}</div>
-				<div v-if="survey?.cohabitants"><strong>Vive con: </strong>{{ survey?.cohabitants }}</div>
-			</section>
+			<ResultsPatient
+				v-if="survey"
+				:survey="survey"
+			/>
 
 			<!-- QUESTIONNAIRE -->
 			<section
@@ -350,11 +324,6 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 * {
 	-webkit-print-color-adjust: exact;
 	print-color-adjust: exact;
-}
-
-img {
-	max-width: 50%;
-	width: 350px;
 }
 
 .comment-container {
