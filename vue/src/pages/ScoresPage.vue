@@ -30,7 +30,8 @@ onMounted(async () => {
 		survey.value = res.data.survey;
 		scores.value = res.data.scores;
 	} catch (err) {
-		if (isAxiosError(err)) alert(err.response?.data);
+		if (isAxiosError(err) && err.response?.status === 403)
+			alert("Devi aver effettuato l'accesso per vedere questa pagina");
 		else alert(err);
 	} finally {
 		loader.unsetLoader();

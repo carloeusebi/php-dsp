@@ -100,7 +100,8 @@ const saveUpdates = async () => {
 	try {
 		await useSurveysStore().save({ ...survey.value });
 	} catch (err) {
-		if (isAxiosError(err)) console.warn(err.response?.data);
+		if (isAxiosError(err) && err.response?.status === 403)
+			alert("Devi aver effettuato l'accesso per vedere questa pagina");
 		else console.error(err);
 	} finally {
 		loader.unsetLoader();
