@@ -204,7 +204,10 @@ const handleCloseModal = () => {
 		<template #button>
 			<div class="flex flex-col md:flex-row gap-1 md:gap-2">
 				<!-- SCORES BUTTON -->
-				<router-link :to="{ name: 'scores', params: { id: survey.id } }">
+				<router-link
+					target="_blank"
+					:to="{ name: 'scores', params: { id: survey.id } }"
+				>
 					<AppButton
 						:disabled="!survey.completed"
 						:class="{ 'btn-disabled': !survey.completed }"
@@ -223,7 +226,9 @@ const handleCloseModal = () => {
 					:disabled="survey.completed || !props.survey?.email"
 					:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
 					@click="sendEmail"
-					>Invia un'email<span class="hidden md:block"> con il link</span></AppButton
+				>
+					Invia un'email
+					<span class="hidden md:block"> con il link</span></AppButton
 				>
 			</div>
 		</template>
