@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\app\App;
 use app\controllers\helpers\Scores;
 use app\core\Controller;
+use app\core\middlewares\AdminMiddleware;
 use app\core\middlewares\PatientMiddleware;
 use app\core\utils\Response;
 use app\core\utils\Request;
@@ -89,27 +90,6 @@ class TestsController extends Controller
     $errors = $model->save();
 
     $errors ? Response::response(422, $errors) : Response::response(204);
-  }
-
-
-  public function getScores(): void
-  {
-    $token = Request::getBody()['token'] ?? '';
-    if (!$token) {
-      Response::response(400, ['Error' => 'No Token']);
-    }
-
-    $survey = App::$app->survey->getByToken($token);
-    if (!$survey) {
-      Response::response(404, ['Error' => 'No Test found']);
-    }
-    if (!$survey['completed']) {
-      Response::response(422, ['Error' => 'Test not completed yet']);
-    }
-
-    $scores = Scores::calculateScores($survey);
-
-    Response::response(200, ['survey' => $survey, 'scores' => $scores]);
   }
 
 

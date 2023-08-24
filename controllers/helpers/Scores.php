@@ -3,10 +3,9 @@
 namespace app\controllers\helpers;
 
 use app\app\App;
-use app\controllers\TestsController;
 use Exception;
 
-class Scores extends TestsController
+class Scores
 {
 
     /**

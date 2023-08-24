@@ -29,6 +29,8 @@ $router->get('/api/surveys', [SurveysController::class, 'get']);
 $router->post('/api/surveys', [SurveysController::class, 'save']);
 $router->delete('/api/surveys', [SurveysController::class, 'delete']);
 
+$router->get('/api/surveys/score', [SurveysController::class, 'getScores']);
+
 $router->get('/api/questions', [QuestionsController::class, 'get']);
 $router->post('/api/questions', [QuestionsController::class, 'save']);
 $router->delete('/api/questions', [QuestionsController::class, 'delete']);
@@ -41,7 +43,6 @@ $router->get('/api/tests', [TestsController::class, 'get']);
 $router->post('/api/tests', [TestsController::class, 'save']);
 $router->get('/api/tests/patient', [TestsController::class, 'getPatient']);
 $router->post('/api/tests/patient', [TestsController::class, 'updatePatientInfo']);
-$router->get('/api/tests/score', [TestsController::class, 'getScores']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);
