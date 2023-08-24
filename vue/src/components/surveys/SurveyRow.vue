@@ -96,20 +96,6 @@ const handleCloseModal = () => {
 	showModal.value = false;
 	emailAlert.value.show = false;
 };
-
-const getScores = async () => {
-	loader.setLoader();
-	const params = { token };
-	try {
-		const res = await axiosInstance.get('/tests/score', { params });
-		console.log(res.data);
-	} catch (err) {
-		if (isAxiosError(err)) console.error(err.response?.data);
-		else console.error(err);
-	} finally {
-		loader.unsetLoader();
-	}
-};
 </script>
 
 <template>
@@ -218,13 +204,13 @@ const getScores = async () => {
 		<template #button>
 			<div class="flex flex-col md:flex-row gap-1 md:gap-2">
 				<!-- SCORES BUTTON -->
-				<AppButton
-					:class="{ 'btn-disabled': !survey.completed }"
-					@click="getScores"
-					:disabled="!survey.completed"
-				>
-					Calcola punteggio
-				</AppButton>
+				<router-link :to="{ name: 'scores', params: { id: survey.id } }">
+					<AppButton
+						:disabled="!survey.completed"
+						:class="{ 'btn-disabled': !survey.completed }"
+						>Calcola punteggio</AppButton
+					>
+				</router-link>
 				<!-- RESULTS BUTTON -->
 				<router-link
 					target="_blank"
