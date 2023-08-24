@@ -190,7 +190,6 @@ const skipItem = () => {
 						<TestAnswer
 							:index="n + 1"
 							:answer="ans.customAnswer"
-							:active="clicked === n + min"
 						/>
 					</li>
 				</ul>
@@ -208,7 +207,6 @@ const skipItem = () => {
 						<TestAnswer
 							:index="n + 1"
 							:answer="leg.legend"
-							:active="clicked === n + min"
 						/>
 					</li>
 				</ul>

@@ -39,7 +39,10 @@ const disableBackButton = () => {
 const resetAnswers = (index: number) => {
 	const items = test.value.questions[index].items;
 	if (items[0].answer === undefined) return; // if the questionnaire doesn't contain any answer the rest of the code doesn't need to be executed
-	const resettedItems = items.map(({ id, text, reversed }) => ({ id, text, reversed }));
+	const resettedItems = items.map(item => {
+		delete item.answer;
+		return item;
+	});
 	test.value.questions[index].items = [...resettedItems];
 	testsStore.save(test.value);
 	alert(

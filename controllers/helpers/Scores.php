@@ -78,26 +78,27 @@ class Scores extends TestsController
      */
     private static function getItemAnswer(array $question, int $id): int
     {
-        $min = intval(substr($question['type'], 0, 1));
-        $max = intval(substr($question['type'], -1));
-
         if ($question['type'] === 'EDI') {
             $min = 0;
             $max = 5;
+        } elseif ($question['type'] !== 'MUL') {
+            $min = intval(substr($question['type'], 0, 1));
+            $max = intval(substr($question['type'], -1));
         }
 
-        $items = $question['items'];
-
-        foreach ($items as $item) {
+        foreach ($question['items'] as $item) {
             if ($item['id'] === $id) {
                 $item['answer'];
-                $answer =  $item['reversed'] ? self::reverseScore($min, $max, $item['answer']) : $item['answer'];
+                $answer =  array_key_exists('reversed', $item) && $item['reversed'] ? self::reverseScore($min, $max, $item['answer']) : $item['answer'];
                 if ($question['type'] === 'EDI') $answer = $answer - 2 < 0 ? 0 : $answer - 2;
+                elseif ($question['type'] === 'MUL') {
+                    $answer = $item['multipleAnswers'][$answer]['points'];
+                }
                 return $answer;
             }
         }
 
-        // throw new Exception("Le risposte del questionario {$question['question']} non sono sincronizzate con il questionario");
+        throw new Exception("Le risposte del questionario {$question['question']} non sono sincronizzate con il questionario");
     }
 
 

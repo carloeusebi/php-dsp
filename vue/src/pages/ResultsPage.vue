@@ -237,8 +237,8 @@ const handleDeleteComment = (questionId: number, itemId: number) => {
 							>
 								<div
 									v-for="ans in item.multipleAnswers"
+									:style="`flex-basis: calc(100% / ${item.multipleAnswers.length})`"
 									:key="ans.id"
-									class="flex-grow h-full"
 								>
 									<div
 										class="answer-cell border border-black flex-grow flex justify-center items-center h-full p-2"
