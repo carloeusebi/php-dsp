@@ -6,6 +6,7 @@ import QuestionsPage from '@/pages/QuestionsPage.vue';
 import TestPage from '@/pages/TestPage.vue';
 import ResultsPage from '@/pages/ResultsPage.vue';
 import PageNotFound from '@/pages/PageNotFound.vue';
+import ScoresPage from '@/pages/ScoresPage.vue';
 
 export const routes = [
 	{
@@ -51,9 +52,17 @@ export const routes = [
 		},
 	},
 	{
-		path: '/results/:id',
+		path: '/risposte/:id',
 		component: ResultsPage,
 		name: 'results',
+		meta: {
+			title: 'Risposte Test',
+		},
+	},
+	{
+		path: '/punteggi/:id',
+		component: ScoresPage,
+		name: 'scores',
 		meta: {
 			title: 'Risultati Test',
 		},

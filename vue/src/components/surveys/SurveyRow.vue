@@ -96,20 +96,6 @@ const handleCloseModal = () => {
 	showModal.value = false;
 	emailAlert.value.show = false;
 };
-
-const getScores = async () => {
-	loader.setLoader();
-	const params = { token };
-	try {
-		const res = await axiosInstance.get('/tests/score', { params });
-		console.log(res.data);
-	} catch (err) {
-		if (isAxiosError(err)) console.error(err.response?.data);
-		else console.error(err);
-	} finally {
-		loader.unsetLoader();
-	}
-};
 </script>
 
 <template>
@@ -218,13 +204,16 @@ const getScores = async () => {
 		<template #button>
 			<div class="flex flex-col md:flex-row gap-1 md:gap-2">
 				<!-- SCORES BUTTON -->
-				<AppButton
-					:class="{ 'btn-disabled': !survey.completed }"
-					@click="getScores"
-					:disabled="!survey.completed"
+				<router-link
+					target="_blank"
+					:to="{ name: 'scores', params: { id: survey.id } }"
 				>
-					Calcola punteggio
-				</AppButton>
+					<AppButton
+						:disabled="!survey.completed"
+						:class="{ 'btn-disabled': !survey.completed }"
+						>Calcola punteggio</AppButton
+					>
+				</router-link>
 				<!-- RESULTS BUTTON -->
 				<router-link
 					target="_blank"
@@ -237,7 +226,9 @@ const getScores = async () => {
 					:disabled="survey.completed || !props.survey?.email"
 					:class="{ 'btn-disabled': survey.completed || !props.survey?.email }"
 					@click="sendEmail"
-					>Invia un'email<span class="hidden md:block"> con il link</span></AppButton
+				>
+					Invia un'email
+					<span class="hidden md:block"> con il link</span></AppButton
 				>
 			</div>
 		</template>
