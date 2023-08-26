@@ -13,7 +13,7 @@ class Session
         # For CORS
         header("Access-Control-Allow-Origin: http://localhost:3000");
         header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Allow-Headers: Content-type, Authorization");
+        header("Access-Control-Allow-Headers: Content-type, Authorization, x-xsrf-token");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE, PUT");
 
         // marks every flash message already existing so that they will be removed when Session dies
