@@ -8,6 +8,7 @@ use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
+use app\core\exceptions\ErrorHandler;
 use app\core\exceptions\ForbiddenException;
 use app\core\exceptions\RouteNotFoundException;
 use app\core\utils\Request;
@@ -78,6 +79,20 @@ class App
             Response::statusCode($code);
             if ($e instanceof RouteNotFoundException && !Request::isApi())
                 $this->router->renderView('404');
+        }
+    }
+
+
+    static function logToDb(string $message)
+    {
+        $statement = self::$app->db->prepare('INSERT INTO `logs` (message) VALUES (:message)');
+
+        $statement->bindValue(':message', $message);
+
+        try {
+            $statement->execute();
+        } catch (\Exception $e) {
+            ErrorHandler::log($e);
         }
     }
 }

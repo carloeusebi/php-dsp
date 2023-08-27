@@ -60,7 +60,8 @@ switch ($command) {
     case 'drop':
         drop();
         break;
-    case 'refresh' || '-r':
+    case 'refresh':
+    case '-r':
         refresh();
         break;
     case 'help';

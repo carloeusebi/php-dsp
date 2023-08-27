@@ -159,7 +159,7 @@ class Mail extends Model
 
                 // if the email passed the Verifalia test is considered valid and deliverable 
                 if ($entry->classification === 'Undeliverable') {
-                    if ($should_log_invalid) self::log(self::MAIL_INVALID);
+                    if ($should_log_invalid) self::log(self::MAIL_INVALID . ": $email");
                     return true;
                 }
 
@@ -225,9 +225,8 @@ class Mail extends Model
     /**
      * Log in the database a failed attempt to validate an email address
      */
-    public static function log(string $message): bool
+    public static function log(string $message): void
     {
-        //TODO log to database
-        return false;
+        App::logToDb($message);
     }
 }
