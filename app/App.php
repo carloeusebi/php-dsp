@@ -85,14 +85,6 @@ class App
 
     static function logToDb(string $message)
     {
-        $statement = self::$app->db->prepare('INSERT INTO `logs` (message) VALUES (:message)');
-
-        $statement->bindValue(':message', $message);
-
-        try {
-            $statement->execute();
-        } catch (\Exception $e) {
-            ErrorHandler::log($e);
-        }
+        Database::table('logs')->insert(['message' => $message]);
     }
 }

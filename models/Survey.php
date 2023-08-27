@@ -2,8 +2,8 @@
 
 namespace app\models;
 
+use app\app\App;
 use app\db\DbModel;
-use PDO;
 
 class Survey extends DbModel
 {
@@ -12,6 +12,8 @@ class Survey extends DbModel
     public $title;
     public $questions;
     public $completed;
+    public $created_at;
+    public $updated_at;
     public $token;
 
     protected array $fields_to_decode = ['questions'];
@@ -25,7 +27,7 @@ class Survey extends DbModel
     static function attributes(): array
     {
         return [
-            'patient_id', 'title', 'questions', 'completed', 'id', 'token'
+            'patient_id', 'title', 'questions', 'completed', 'id', 'token', 'created_at', 'updated_at',
         ];
     }
 
@@ -39,24 +41,26 @@ class Survey extends DbModel
         return 'JOIN patients AS P ON surveys.patient_id = P.id ';
     }
 
-
     /**
      * @return array An array of default columns, contains all Surveys columns but the `questions` column, and `id`, `fname`, `lname`, `phone` and `email` from the Patients table.
      */
     protected static function columns(): array
     {
-        $table_name = self::tableName();
-        return ["$table_name.`id`", "$table_name.`patient_id`", "$table_name.`title`", "$table_name.`created_at`", "$table_name.`last_update`", "$table_name.`completed`", "$table_name.`token`", 'P.id AS patient_id', 'P.fname', 'P.lname', 'P.phone', 'P.email'];
+        return ['id', 'patient_id', 'title', 'created_at', 'updated_at', 'completed', 'token'];
     }
 
 
-    public function get(array $columns = [], array $where = [], string $joins = '')
+    public function get(array $columns = [], array $where = [], string $joins = '', string $order = 'ORDER BY `id` ASC')
     {
-        // if columns are passed as param, sets column to the param, otherwise sets column to return value of the function columns
-        $columns = count($columns) ? $columns : $this->columns();
-        $joins = $this->joins();
+        $columns = $this->columns();
+        $surveys = parent::get(columns: $columns);
 
-        return parent::get($columns, $where, $joins);
+        //map array with patient's info
+        return array_map(function ($survey) {
+            $patient_id = $survey['patient_id'];
+            $survey['patient'] = App::$app->patient->getById($patient_id);
+            return $survey;
+        }, $surveys);
     }
 
 

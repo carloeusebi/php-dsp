@@ -1,12 +1,12 @@
 <?php
 
-namespace app\controllers;
+namespace app\controllers\admin;
 
 use app\app\App;
 use app\core\utils\Request;
 use app\core\utils\Response;
 use app\db\DbModel;
-use Exception;
+use app\controllers\AdminController;
 
 class FilesController extends AdminController
 {

@@ -1,7 +1,7 @@
 <?php
 
 use app\app\App;
-use app\core\utils\Utils;
+use app\db\Database;
 use app\db\factories\BaseFactory;
 
 class PatientsFactory extends BaseFactory
@@ -23,25 +23,26 @@ class PatientsFactory extends BaseFactory
         $number_of_patients = (int) readline("How many patients do you want to generate? ");
 
         for ($i = 1; $i <= $number_of_patients; $i++) {
+
             $fname = $this->randomItem($this->first_names);
             $lname = $this->randomItem($this->last_names);
-            $sex = $this->randomItem($this->sexes);
-            $birthday = $this->randomDate(strtotime('-90 years'), strtotime('-18 years'));
-            $age = calculateAge($birthday);
-            $birthplace = $this->randomItem($this->birthplaces);
-            $address = $this->randomItem($this->addresses);
-            $begin = $this->randomDate(strtotime('-5 years'), strtotime('now'));
-            $email = strtolower($fname) . strtolower($lname) . "@example.com";
-            $phone = $this->randomItem($this->phones);
-            $codice_fiscale = 'CF' . str_pad($i, 14, '0', STR_PAD_LEFT); // Generating a unique code for demonstration
-            $weight = mt_rand(50, 100);
-            $height = mt_rand(150, 190);
-            $job = $this->randomItem($this->jobs);
-            $cohabitants = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, error praesentium corporis, fuga earum nisi dolor porro cumque accusamus nesciunt voluptatibus, eos commodi pariatur recusandae suscipit? Maxime aliquid earum voluptatum.';
 
-            $sql = "INSERT INTO " . self::TABLE_NAME . " (`fname`, `lname`, `age`, `sex`, `birthday`, `birthplace`, `address`, `codice_fiscale`, `begin`, `email`, `phone`,  `weight`, `height`, `job`, `cohabitants`) VALUES ('$fname', '$lname', '$age', '$sex', '$birthday', '$birthplace', '$address', '$codice_fiscale', '$begin', '$email', '$phone',  '$weight', '$height', '$job', '$cohabitants')";
-
-            App::$app->db->execute($sql);
+            Database::table(self::TABLE_NAME)->insert([
+                'fname' =>  $fname,
+                'lname' => $lname,
+                'sex' =>  $this->randomItem($this->sexes),
+                'birthday' =>  $this->randomDate(strtotime('-90 years'), strtotime('-18 years')),
+                'birthplace' =>  $this->randomItem($this->birthplaces),
+                'address' => $this->randomItem($this->addresses),
+                'begin' => $this->randomDate(strtotime('-5 years'), strtotime('now')),
+                'email' => strtolower($fname) . strtolower($lname) . "@example.com",
+                'phone' => $this->randomItem($this->phones),
+                'codice_fiscale' => 'CF' . str_pad($i, 14, '0', STR_PAD_LEFT), // Generating a unique code for demonstration
+                'weight' => mt_rand(50, 100),
+                'height' => mt_rand(150, 190),
+                'job' => $this->randomItem($this->jobs),
+                'cohabitants' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim, error praesentium corporis, fuga earum nisi dolor porro cumque accusamus nesciunt voluptatibus, eos commodi pariatur recusandae suscipit? Maxime aliquid earum voluptatum.',
+            ]);
 
             $this->printProgressBar($i, $number_of_patients);
         }

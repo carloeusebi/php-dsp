@@ -2,25 +2,35 @@
 
 use app\app\App;
 use app\db\factories\BaseFactory;
+use app\models\Question;
 
 class QuestionsFactory extends BaseFactory
 {
     public const TABLE_NAME = 'questions';
-
-    private const FILE_PATH = __DIR__ . '/sql/questions.sql';
-    private const GITHUB_URL = 'https://github.com/carloeusebi/php-vue-dsp';
+    private const FILE_PATH = '/db/seeds/questions.csv';
 
     public function generateAndInsert(): void
     {
-        $file = file_exists(self::FILE_PATH);
+        $csv_file = fopen(App::$ROOT_DIR . self::FILE_PATH, 'r');
+        $number_of_inserts = 0;
+        $first_line = true;
 
-        if (!$file) {
-            echo "File questions.sql not found, download it form github " . self::GITHUB_URL . PHP_EOL;
-            return;
+        while (($data = fgetcsv($csv_file, separator: ',')) !== false) {
+            if (!$first_line) {
+                $new_question = new Question();
+
+                $new_question->question = $data[1];
+                $new_question->description = $data[2];
+                $new_question->type = $data[3];
+                $new_question->items = $data[4];
+                $new_question->legend = $data[5];
+                $new_question->variables = $data[6];
+
+                $new_question->save();
+                $number_of_inserts++;
+            }
+            $first_line = false;
         }
-
-        $sql = file_get_contents(self::FILE_PATH);
-        $number_of_inserts = App::$app->db->execute($sql);
 
         if ($number_of_inserts)
             echo "$number_of_inserts Questions inserted successfully!\n";

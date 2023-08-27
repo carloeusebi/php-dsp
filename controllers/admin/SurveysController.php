@@ -1,12 +1,14 @@
 <?php
 
-namespace app\controllers;
+namespace app\controllers\admin;
 
 use app\app\App;
 use app\db\DbModel;
 use app\core\utils\Request;
 use app\core\utils\Response;
 use app\controllers\helpers\Scores;
+use app\controllers\AdminController;
+
 
 class SurveysController extends AdminController
 {

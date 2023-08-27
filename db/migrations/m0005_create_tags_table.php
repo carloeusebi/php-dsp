@@ -9,19 +9,13 @@ class m0005_create_tags_table
         $db = App::$app->db;
 
         $SQL = "CREATE TABLE IF NOT EXISTS `tags` (
-                `id` int NOT NULL AUTO_INCREMENT,
-                `tag` varchar(80)  NOT NULL,
-                `color` varchar(7) NOT NULL, 
-                PRIMARY KEY (`id`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-                CREATE TABLE IF NOT EXISTS `question_tag` (
-                `question_id` int NOT NULL,
-                `tag_id` int NOT NULL,
-                PRIMARY KEY (`question_id`,`tag_id`),
-                KEY `tag_id` (`tag_id`),
-                CONSTRAINT `question_tag_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-                CONSTRAINT `question_tag_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+            `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+            `tag` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+            `color` char(7) COLLATE utf8mb4_unicode_ci NOT NULL,
+            `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
         $db->execute($SQL);
     }

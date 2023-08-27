@@ -11,8 +11,6 @@ use app\core\utils\Response;
 
 class AuthController extends Controller
 {
-    protected const ADMIN = 'ADMIN';
-
     public function __construct()
     {
         $this->registerMiddleware(new AdminMiddleware(['validate']));
@@ -23,25 +21,24 @@ class AuthController extends Controller
     {
         $data = Request::getBody();
 
-        extract($data);
+        $username = $data['username'] ?? '';
+        $password = $data['password'] ?? '';
 
         if (!isset($username) || !isset($password)) {
             Response::response(400, ['Error' => 'Missing username or password']);
         }
 
-        $is_auth = App::$app->admin->attemptLogin($username, $password);
+        $admin = Auth::attemptLogin($username, $password);
 
-        if (!$is_auth) {
+        if (!$admin) {
             Response::response(401, ['message' => 'invalid-credentials']);
         }
 
-        $token = Auth::generateToken(self::ADMIN);
-        Auth::setCookie($token);
-        $_SESSION['TOKEN'] = $token;
+        $token = Auth::generateToken($admin);
 
         $message = [
-            'user' => self::ADMIN,
-            'session_id' => session_id()
+            'user' => $admin,
+            'token' => $token,
         ];
         Response::response(200, $message);
     }
@@ -49,16 +46,16 @@ class AuthController extends Controller
 
     public function logout(): void
     {
-        unset($_COOKIE['TOKEN']);
-        unset($_SESSION['TOKEN']);
-        session_destroy();
+        Auth::logout();
         Response::statusCode(204);
     }
 
 
-    static function validate(): void
+    /**
+     * Mocks Laravel Sanctum, to allow the frontend Vue app to work with both this vanilla PHP app and Laravel.
+     */
+    public function mockSanctum(): void
     {
-        // this function just resets cookie expiration, it is protected by the middleware so it handles the authentication
-        Auth::resetCookieExpiration();
+        Response::statusCode(200);
     }
 }

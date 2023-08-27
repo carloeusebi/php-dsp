@@ -45,9 +45,9 @@ class Question extends DbModel
     }
 
 
-    public function get(array $columns = [], array $where = [], string $joins = ''): array
+    public function get(array $columns = [], array $where = [], string $joins = '', string $order = 'ORDER BY `id` ASC'): array
     {
-        $questions = parent::get();
+        $questions = parent::get(order: 'ORDER BY `question`');
 
         // Map each question with its associated tags
         return array_map(function ($question) {
@@ -75,7 +75,7 @@ class Question extends DbModel
         if (!$this->description) $errors['description'] = "La descrizione è obbligatoria";
         if (!$this->type) $errors['type'] = "Il tipo della domanda è obbligatorio";
 
-        if ($this->variables) {
+        if ($this->variables && is_array($this->variables)) {
             $i = 1;
             foreach ($this->variables as $variable) {
                 if (!isset($variable['name']) || strlen($variable['name']) === 0) {
@@ -89,9 +89,9 @@ class Question extends DbModel
 
         if (empty($errors)) {
 
-            $this->legend = json_encode($this->legend);
-            $this->items = json_encode($this->items);
-            $this->variables = json_encode($this->variables);
+            if (is_array($this->legend)) $this->legend = json_encode($this->legend);
+            if (is_array($this->items)) $this->items = json_encode($this->items);
+            if (is_array($this->variables)) $this->variables = json_encode($this->variables);
 
             if ($this->id) {
                 $this->updateTags();

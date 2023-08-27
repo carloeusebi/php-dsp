@@ -25,10 +25,11 @@ abstract class DbModel extends Model
      * @param array $columns An array of column names to be retrieved from the table. Default is an empty array.
      * @param array $where An array of conditions to filter the query results. Default is an empty array.
      * @param string $joins A string containing the table joins;
+     * @param string $order A string containing the order, default is `ORDER BY id ASC`;
      *
      * @return array|null An array containing the retrieved data as associative arrays or null if no data found.
      */
-    public function get(array $columns = [], array $where = [], string $joins = '')
+    public function get(array $columns = [], array $where = [], string $joins = '', string $order = 'ORDER BY `id` ASC')
     {
         $table_name = $this->tableName();
 
@@ -37,9 +38,8 @@ abstract class DbModel extends Model
 
         $columns = empty($columns) ? '*' : implode(', ', $columns);
         $where = $where_params ? "WHERE " . implode('AND', array_map(fn ($param) => "$param = :$param", $where_params_keys)) : '';
-        $order = $this->getOrder();
 
-        $sql = "SELECT $columns FROM $table_name $joins $where ORDER BY $table_name.{$order}";
+        $sql = "SELECT $columns FROM $table_name $joins $where $order";
 
         $statement = $this->prepare($sql);
 

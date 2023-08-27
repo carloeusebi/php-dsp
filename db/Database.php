@@ -4,11 +4,15 @@ namespace app\db;
 
 use Exception;
 use PDO;
+use PDOStatement;
 
 class Database
 {
-    public PDO $pdo;
+    private PDO $pdo;
     public static Database $db;
+
+    protected static string $table;
+    protected static array $clauses = [];
 
     public function __construct()
     {
@@ -32,22 +36,128 @@ class Database
         }
     }
 
+    static function table(string $table)
+    {
+        self::$table = $table;
+        return self::$db;
+    }
+
+    /**
+     * Insert new records in the database.
+     */
+    public function insert(array $values)
+    {
+        $table = self::$table;
+        $attributes = implode(', ', array_keys($values));
+        $params = implode(',', array_map(fn ($attr) => ":$attr", array_keys($values)));
+
+        $sql = "INSERT INTO `$table` ($attributes) VALUES ($params)";
+        $stmt = $this->prepare($sql);
+
+        foreach ($values as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        $stmt->execute();
+    }
+
+
+    /**
+     * Updates a record in the database based on the ID.
+     */
+    public function update(int $id, array $values)
+    {
+        $table = self::$table;
+        $set = implode(',', array_map(fn ($attr) => "`$attr` = :$attr", array_keys($values)));
+
+        $sql = "UPDATE $table SET $set WHERE id = :id";
+        $stmt = $this->prepare($sql);
+
+        $stmt->bindValue(":id", $id);
+        foreach ($values as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        $stmt->execute();
+    }
+
+    /**
+     * Adds a basic where clause to the query.
+     */
+    public function where(string $column, string $operator, string $value, $boolean = 'and')
+    {
+        self::$clauses[] = [
+            'column' => $column,
+            'operator' => $operator,
+            'value' => $value,
+            'boolean' => $boolean,
+        ];
+        return self::$db;
+    }
+
+
+    public function whereRaw(string $sql, $boolean = 'AND')
+    {
+        self::$clauses[] = [
+            'raw_sql' => $sql,
+            'boolean' => $boolean,
+        ];
+        return self::$db;
+    }
+
+
+    /**
+     * Retrieves data from the database.
+     */
+    public function get(string $columns = '*')
+    {
+        $table = self::$table;
+        $clauses = self::$clauses ?? [];
+
+        $sql = "SELECT $columns FROM $table ";
+
+        if (!empty($clauses)) {
+            $sql .= " WHERE ";
+            foreach ($clauses as $clause) {
+                if (isset($clause['raw_sql'])) {
+                    $sql .= ' ' . $clause['raw_sql'] . ' ' . $clause['boolean'];
+                } else {
+                    extract($clause);
+                    $sql .= " $column $operator :$column $boolean ";
+                }
+            }
+        }
+
+        $stmt = self::prepare($sql);
+
+        foreach ($clauses as $clause) {
+            if (!isset($clause['raw_sql']))
+                $stmt->bindValue(":$column", $value);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     /**
      *  Prepares a statement for execution and returns a statement object
      * @return PDOStatement|false If the database server successfully prepares the statement, PDO::prepare returns a PDOStatement object. If the database server cannot successfully prepare the statement, PDO::prepare returns FALSE or emits PDOException (depending on error handling).
      */
-    public function prepare(string $query)
+    static function prepare(string $query): PDOStatement
     {
-        return $this->pdo->prepare($query);
+        return self::$db->pdo->prepare($query);
     }
 
     /**
      * Execute an SQL statement and return the number of affected rows
      * @return int|false PDO::exec returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, PDO::exec returns 0.
      */
-    public function execute(string $query)
+    static function execute(string $query)
     {
-        return $this->pdo->exec($query);
+        try {
+            return self::$db->pdo->exec($query);
+        } catch (\Exception $e) {
+            \app\core\exceptions\ErrorHandler::log($e);
+        }
     }
 
     /**

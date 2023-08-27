@@ -24,6 +24,7 @@ class ErrorHandler
 
     static function handleCliException(Throwable $exception): never
     {
+        self::log($exception);
         // echo "\033[2J\033[;H";
         echo "PHP Fatal error:\n";
         echo "Code: {$exception->getCode()}\n";

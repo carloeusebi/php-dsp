@@ -20,11 +20,9 @@ class Response
             header('Content-Type: application/json');
         }
         self::statusCode($http_code);
-        if (!empty($messages)) {
-            $json =  json_encode($messages, JSON_INVALID_UTF8_IGNORE);
-            if ($json) echo $json;
-            else self::statusCode(500);
-        }
+        $json =  json_encode($messages, JSON_INVALID_UTF8_IGNORE);
+        if ($json) echo $json;
+        else self::statusCode(500);
         exit;
     }
 }

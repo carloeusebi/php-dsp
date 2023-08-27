@@ -2,21 +2,20 @@
 
 use app\app\App;
 
-class m0013_create_logs_table
+class m0009_create_emails_table
 {
+
     public function up()
     {
-        $db = App::$app->db;
-
-        $sql = "CREATE TABLE IF NOT EXISTS `logs` (
+        $sql = "CREATE TABLE IF NOT EXISTS `emails`(
             `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-            `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
-            `read_at` date DEFAULT NULL,
+            `email` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
             `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
             `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `emails_email_unique` (`email`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-        $db->execute($sql);
+        App::$app->db->execute($sql);
     }
 }

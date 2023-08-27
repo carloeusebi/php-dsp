@@ -2,36 +2,86 @@
 
 namespace app\controllers\helpers;
 
+use app\app\App;
 use app\controllers\AuthController;
+use app\core\Model;
+use app\db\Database;
 
-class Auth extends AuthController
+class Auth
 {
-  private const ADMIN_TOKEN = "ADM_";
-  private const USER_TOKEN = "USR_";
 
-  protected static function generateToken(string $type, int $id = 0): string
+  private const TABLE = 'personal_access_tokens';
+
+  /**
+   * Attempts login provided with an username and a password.
+   * 
+   * @return array|false Returns the logged in Admin if login is successful, false otherwise.
+   */
+  static function attemptLogin(string $username, string $password): array|false
   {
-    $prefix = ($type === self::ADMIN) ? self::ADMIN_TOKEN : self::USER_TOKEN;
+    $admins = App::$app->admin->get();
+
+    foreach ($admins as $admin) {
+      if ($username === $admin['username']) {
+        if (password_verify($password, $admin['password'])) {
+          return $admin;
+        }
+      }
+    }
+
+    return false;
+  }
+
+
+  static function logout()
+  {
+    session_destroy();
+    Database::execute('TRUNCATE TABLE ' . self::TABLE);
+  }
+
+  static function generateToken(array $model): string
+  {
     $randomBytes = random_bytes(32);
-    $token = $prefix . $id . hash_hmac('sha256', $prefix, bin2hex($randomBytes));
+    $token = hash_hmac('sha256', $randomBytes, bin2hex($randomBytes));
+
+    Database::table(self::TABLE)->insert([
+      'tokenable_type' => 'Admin',
+      'tokenable_id' => $model['id'],
+      'name' => 'authToken',
+      'token' => $token,
+      'expires_at' => date('Y-m-d H:i:s', time() + 7200),
+    ]);
 
     return $token;
   }
 
 
-  public static function resetCookieExpiration()
+  static function validate(): array|false
   {
-    $token = $_COOKIE['TOKEN'];
-    self::setCookie($token);
+    $token = self::getAuthToken();
+
+    if (!$token) return false;
+
+    return Database::table(self::TABLE)
+      ->where('token', '=', $token, 'AND')
+      ->whereRaw('expires_at > NOW()', '')
+      ->get()[0];
   }
 
 
-  public static function setCookie(string $token)
+  static function refresh(array $token)
   {
-    /**
-     * @var int $twelve_hours Cookie expiration time.
-     */
-    $twelve_hours = 43200;
-    setcookie('TOKEN', $token, time() + $twelve_hours, '/', '', true, true,);
+    $now = date('Y-m-d H:i:s', time());
+    $new_expiration = date('Y-m-d H:i:s', time() + 7200);
+
+    $id = $token['id'];
+
+    Database::table(self::TABLE)->update($id, ['last_used_at' => $now, 'expires_at' => $new_expiration]);
+  }
+
+
+  protected static function getAuthToken(): string
+  {
+    return str_replace('Bearer ', '', apache_request_headers()['Authorization']) ?? '';
   }
 }

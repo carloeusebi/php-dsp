@@ -11,7 +11,6 @@ class Patient extends DbModel
     public $id;
     public $fname;
     public $lname;
-    public $age;
     public $birthday;
     public $birthplace;
     public $address;
@@ -24,6 +23,7 @@ class Patient extends DbModel
     public $job;
     public $qualification;
     public $sex;
+    public $drugs;
     public $cohabitants;
 
     protected array $fields_to_decode = [];
@@ -36,7 +36,7 @@ class Patient extends DbModel
     static function attributes(): array
     {
         return [
-            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'qualification', 'sex', 'cohabitants', 'id'
+            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'qualification', 'sex', 'cohabitants', 'drugs', 'id'
         ];
     }
 
@@ -60,6 +60,7 @@ class Patient extends DbModel
             'job' => 'Occupazione',
             'sex' => 'Sesso',
             'cohabitants' => 'Conviventi',
+            'drugs' => 'Farmaci'
         ];
     }
 
@@ -70,25 +71,14 @@ class Patient extends DbModel
     }
 
     /**
-     * Fetch patients and updates their age 
+     * Fetches patient and file relation
      */
-    public function get(array $columns = [], array $where = [], string $joins = ''): array
+    public function get(array $columns = [], array $where = [], string $joins = '', string $order = 'ORDER BY `id` ASC'): array
     {
-        // calculates and updates the age of the patients
         return array_map(function ($patient) {
-            $age = calculateAge($patient['birthday']);
-            if ($age !== $patient['age']) {
-                $patient['age'] = $age;
-
-                // updates patient's age in the db
-                $updated_patient = new Patient();
-                $updated_patient->load($patient);
-                $updated_patient->update();
-            }
-
             // file_patient relations
             $file_where = ['patient_id' => $patient['id']];
-            $patient['files'] = App::$app->file->get([], $file_where);
+            $patient['files'] = App::$app->file->get(where: $file_where);
             return $patient;
         }, parent::get());
     }
@@ -112,7 +102,6 @@ class Patient extends DbModel
 
         //birthday
         if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
-        $this->age = calculateAge($this->birthday);
 
         // date of therapy start
         $this->begin = $this->begin  ? $this->begin : date("Y-m-d", time()); // if no previous date was submitted start of therapy is considered now
@@ -146,13 +135,5 @@ class Patient extends DbModel
         list($year, $month, $day) = explode('-', $date);
 
         return checkdate($month, $day, $year);
-    }
-
-    /**
-     * Checks if the age is valid
-     */
-    protected function isAgeInvalid()
-    {
-        return $this->age <= 0 || $this->age > 120;
     }
 }

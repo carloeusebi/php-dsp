@@ -5,6 +5,7 @@ namespace app\core\middlewares;
 use app\app\App;
 use app\controllers\helpers\Auth;
 use app\core\exceptions\ForbiddenException;
+use app\db\Database;
 
 class AdminMiddleware extends BaseMiddleware
 {
@@ -22,17 +23,13 @@ class AdminMiddleware extends BaseMiddleware
     // if the controller's method is inside the actions array it executes the validation. An empty actions array means that all controller's methods are protected by the middleware
     if (empty($this->actions) || in_array(App::$app->controller->action, $this->actions)) {
 
-      if (!self::validateToken()) {
+      $aut_token = Auth::validate();
+      if (!$aut_token) {
         throw new ForbiddenException();
       } else {
-        Auth::resetCookieExpiration();
+        // refresh token
+        Auth::refresh($aut_token);
       }
     }
-  }
-
-
-  protected static function validateToken(): bool
-  {
-    return isset($_COOKIE['TOKEN']) && isset($_SESSION['TOKEN']) && $_COOKIE['TOKEN'] === $_SESSION['TOKEN'];
   }
 }

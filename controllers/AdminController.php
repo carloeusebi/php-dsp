@@ -15,12 +15,27 @@ abstract class AdminController extends Controller
 
     public function __construct()
     {
-        $this->registerMiddleware(new AdminMiddleware());
+        $this->registerMiddleware(new AdminMiddleware([]));
         $this->model = $this->getModel();
     }
 
 
     abstract protected function getModel(): DbModel;
+
+
+    public function index(): void
+    {
+        $resources = $this->model->get();
+        $labels = $this->model->labels();
+
+        if (empty($labels)) {
+            $response = $resources;
+        } else {
+            $response = ['labels' => $labels, 'list' => $resources];
+        }
+
+        Response::response(200, $response);
+    }
 
 
     public function get(): void

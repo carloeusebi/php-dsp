@@ -2,6 +2,7 @@
 
 use app\app\App;
 use app\db\factories\BaseFactory;
+use app\models\Survey;
 
 class SurveysFactory extends BaseFactory
 {
@@ -64,7 +65,7 @@ class SurveysFactory extends BaseFactory
     {
         // generates random dates
         $created_at = $this->randomDate(strtotime('-5 years'), strtotime('-5 days'));
-        $last_update = $this->randomDate(strtotime($created_at), strtotime('now'));
+        $updated_at = $this->randomDate(strtotime($created_at), strtotime('now'));
 
         // removes empty Questionnaires, if any, and MUL types Questionnaires
         $questions = array_values(array_filter($questions, fn ($quest) => $quest['items'] !== 'null' && $quest['type'] !== 'MUL'));
@@ -89,32 +90,10 @@ class SurveysFactory extends BaseFactory
             'title' => $this->randomItem($this->titles),
             'questions' => json_encode($questions),
             'created_at' => $created_at,
-            'last_update' => $last_update,
+            'updated_at' => $completed ? $updated_at : null,
             'completed' => $completed,
             'token' => App::$app->survey->generateToken()
         ];
-    }
-
-    /**
-     * Store the randomly generated Survey in the database
-     * @param array $survey The Survey to be stored in the database
-     */
-    private function insertSurvey(array $survey): void
-    {
-        extract($survey);
-
-        $sql = "INSERT INTO " . self::TABLE_NAME . "(patient_id, title, questions, created_at, last_update, completed, token) VALUES (:patient_id, :title, :questions, :created_at, :last_update, :completed, :token)";
-
-        $statement = App::$app->db->prepare($sql);
-        $statement->bindValue(':patient_id', $patient_id);
-        $statement->bindValue(':title', $title);
-        $statement->bindValue(':questions', $questions);
-        $statement->bindValue(':created_at', $created_at);
-        $statement->bindValue(':last_update', $last_update);
-        $statement->bindValue(':completed', $completed);
-        $statement->bindValue(':token', $token);
-
-        $statement->execute();
     }
 
     /**
@@ -134,7 +113,10 @@ class SurveysFactory extends BaseFactory
         for ($i = 1; $i <= $total_num_of_surveys; $i++) {
             $patient = $this->randomItem($patients);
             $survey = $this->generateSurvey($patient['id'], $questions);
-            $this->insertSurvey($survey);
+
+            $new_survey = new Survey();
+            $new_survey->load($survey);
+            $new_survey->save();
 
             $this->printProgressBar($i, (int) $total_num_of_surveys);
         }
