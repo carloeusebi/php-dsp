@@ -18,9 +18,8 @@ class SurveysController extends AdminController
   }
 
 
-  public function getScores(): void
+  public function getScores(int $id): void
   {
-    $id = Request::getBody()['id'] ?? '';
     if (!$id) {
       Response::response(400, ['Error' => 'No ID']);
     }

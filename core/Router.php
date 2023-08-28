@@ -15,7 +15,7 @@ class Router
     /**
      * @var array Contains regular expression patterns for route parameters
      */
-    private array $param_patterns = ['{id}' => '(\d+)'];
+    private array $param_patterns = ['{id}' => '(\d+)', '{token}' => '([0-9a-fA-F]+)'];
 
 
     public function get(string $url, array $callback): void
@@ -75,7 +75,6 @@ class Router
         }
 
         [$callback, $params] = $this->findMatchingRoute($method, $path);
-
 
         if (!$callback) {
             throw new RouteNotFoundException();

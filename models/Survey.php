@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\app\App;
+use app\db\Database;
 use app\db\DbModel;
 
 class Survey extends DbModel
@@ -52,8 +53,8 @@ class Survey extends DbModel
 
     public function get(array $columns = [], array $where = [], string $joins = '', string $order = 'ORDER BY `id` ASC')
     {
-        $columns = $this->columns();
-        $surveys = parent::get(columns: $columns);
+        $columns = [...$columns, ...$this->columns()];
+        $surveys = parent::get($columns);
 
         //map array with patient's info
         return array_map(function ($survey) {
@@ -66,7 +67,7 @@ class Survey extends DbModel
 
     public function getById(int $id, string $joins = '')
     {
-        $survey = parent::getById($id, $joins);
+        $survey = parent::getById($id);
         $survey['patient'] = App::$app->patient->getById($id);
         return $survey;
     }
@@ -79,9 +80,12 @@ class Survey extends DbModel
      */
     public function getByToken(string $token)
     {
-        $columns = [...$this->columns(), '`surveys`.`questions`'];
+        $columns = ['questions'];
         $where = ['token' => $token];
-        return $this->get($columns, $where)[0];
+
+        $survey = $this->get($columns, $where)[0];
+        $survey['patient'] = App::$app->patient->getById($survey['patient_id']);
+        return $survey;
     }
 
 

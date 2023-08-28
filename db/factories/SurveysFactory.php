@@ -1,6 +1,7 @@
 <?php
 
 use app\app\App;
+use app\db\Database;
 use app\db\factories\BaseFactory;
 use app\models\Survey;
 
@@ -114,9 +115,7 @@ class SurveysFactory extends BaseFactory
             $patient = $this->randomItem($patients);
             $survey = $this->generateSurvey($patient['id'], $questions);
 
-            $new_survey = new Survey();
-            $new_survey->load($survey);
-            $new_survey->save();
+            Database::table(self::TABLE_NAME)->insert($survey);
 
             $this->printProgressBar($i, (int) $total_num_of_surveys);
         }

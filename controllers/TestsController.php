@@ -15,14 +15,12 @@ class TestsController extends Controller
 
   public function __construct()
   {
-    $this->registerMiddleware(new PatientMiddleware([]));
+    // $this->registerMiddleware(new PatientMiddleware([]));
   }
 
 
-  public function get()
+  public function get(string $token)
   {
-    $token = Request::getBody()['token'] ?? '';
-
     $survey = App::$app->survey->getByToken($token);
     if (!$survey) {
       Response::response(404, ['error' => 'No Test found']);
