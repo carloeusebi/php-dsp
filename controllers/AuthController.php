@@ -21,26 +21,18 @@ class AuthController extends Controller
     {
         $data = Request::getBody();
 
-        $username = $data['username'] ?? '';
+        $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
-
-        if (!isset($username) || !isset($password)) {
-            Response::response(400, ['Error' => 'Missing username or password']);
+        if (!isset($email) || !isset($password)) {
+            Response::response(400, ['Error' => 'Missing email or password']);
         }
-
-        $admin = Auth::attemptLogin($username, $password);
-
+        $admin = Auth::attemptLogin($email, $password);
         if (!$admin) {
             Response::response(401, ['message' => 'invalid-credentials']);
         }
-
         $token = Auth::generateToken($admin);
 
-        $message = [
-            'user' => $admin,
-            'token' => $token,
-        ];
-        Response::response(200, $message);
+        Response::response(200, ['user' => $admin]);
     }
 
 

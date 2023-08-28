@@ -4,10 +4,10 @@ namespace app\models;
 
 use app\db\DbModel;
 
-class Admin extends DbModel
+class User extends DbModel
 {
     public $id;
-    public $username;
+    public $email;
     public $password;
 
     public function save(): array
@@ -18,12 +18,12 @@ class Admin extends DbModel
 
     public static function tableName(): string
     {
-        return 'admins';
+        return 'users';
     }
 
     static function attributes(): array
     {
-        return ['id', 'username', 'password'];
+        return ['id', 'email', 'password'];
     }
 
     static function labels(): array

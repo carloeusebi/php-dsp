@@ -8,12 +8,11 @@ use app\db\Database;
 use app\core\Router;
 use app\core\Session;
 use app\core\Controller;
-use app\core\exceptions\ErrorHandler;
 use app\core\exceptions\ForbiddenException;
 use app\core\exceptions\RouteNotFoundException;
 use app\core\utils\Request;
 use app\core\utils\Response;
-use app\models\Admin;
+use app\models\User;
 use app\models\Patient;
 use app\models\Survey;
 use app\models\Question;
@@ -28,7 +27,7 @@ class App
     public Router $router;
     public Session $session;
     public Database $db;
-    public Admin $admin;
+    public User $user;
     public Patient $patient;
     public Survey $survey;
     public Question $question;
@@ -57,7 +56,7 @@ class App
         $this->session = new Session();
 
         // models
-        $this->admin = new Admin();
+        $this->user = new User();
         $this->patient = new Patient();
         $this->question = new Question();
         $this->survey = new Survey();
