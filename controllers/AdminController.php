@@ -7,6 +7,7 @@ use app\core\Controller;
 use app\core\middlewares\AdminMiddleware;
 use app\core\utils\Request;
 use app\core\utils\Response;
+use app\db\Database;
 use app\db\DbModel;
 
 abstract class AdminController extends Controller
@@ -15,10 +16,9 @@ abstract class AdminController extends Controller
 
     public function __construct()
     {
-        $this->registerMiddleware(new AdminMiddleware([]));
+        // $this->registerMiddleware(new AdminMiddleware([]));
         $this->model = $this->getModel();
     }
-
 
     abstract protected function getModel(): DbModel;
 
@@ -33,63 +33,60 @@ abstract class AdminController extends Controller
         } else {
             $response = ['labels' => $labels, 'list' => $resources];
         }
-
         Response::response(200, $response);
     }
 
 
-    public function get(): void
+    public function show(int $id): void
     {
-        $data = Request::getBody();
-
-        $id = isset($data['id']) ? intval($data['id']) : null;
-        $labels = $this->model->labels();
-
-        if ($id) {
-            $items = $this->model->getById($id);
-            if (!$items) {
-                Response::response(404, 'The given patient ID does not exists');
-            }
-        } else {
-            $items = $this->model->get();
-        }
-
-        $message = [
-            'labels' => $labels,
-            'list' => $items
-        ];
-
-        Response::response(200, $message);
+        $resource = $this->model->getById($id);
+        Response::response(200, $resource);
     }
 
 
-    public function save(): void
+    public function store(): void
     {
         $errors = [];
         $data = Request::getBody();
-
         if (!$data) {
-            Response::response(400, ['Error' => 'No Body']);
+            Response::response(400, ['error' => 'No Body']);
         }
 
         $this->model->load($data);
         $errors = $this->model->save();
-
         if ($errors) {
-            Response::response(422, $errors);
+            Response::response(422, ['errors' => $errors]);
         }
 
-        // recover saved entry, and sends it back
-        $id = $data['id'] ?? intval(App::$app->db->getLastInsertId());
-        $last_insert_item = $this->model->getById($id);
-        Response::response(201, ["last_insert" => $last_insert_item]);
+        $inserted_id = Database::getLastInsertId();
+        $just_inserted_item = $this->model->getById($inserted_id);
+
+        Response::response(201, $just_inserted_item);
     }
 
 
-    public function delete(): void
+    public function update(int $id): void
     {
-        $id = Request::getBody()['id'] ?? NULL;
+        $errors = [];
+        $data = Request::getBody();
+        if (!$data) {
+            Response::response(400, ['errors' => 'No Body']);
+        }
 
+        $this->model->load($data);
+        $errors = $this->model->save();
+        if ($errors) {
+            Response::response(422, ['errors' => $errors]);
+        }
+
+        $updated_item = $this->model->getById($id);
+
+        Response::response(201, $updated_item);
+    }
+
+
+    public function destroy(int $id): void
+    {
         if (!$id) {
             Response::response(400, ['Error' => 'No ID provided']);
         }

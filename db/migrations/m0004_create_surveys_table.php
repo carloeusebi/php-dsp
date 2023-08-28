@@ -21,7 +21,7 @@ class m0004_create_surveys_table
           PRIMARY KEY (`id`),
           UNIQUE KEY `surveys_token_unique` (`token`),
           KEY `surveys_patient_id_foreign` (`patient_id`),
-          CONSTRAINT `surveys_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`)
+          CONSTRAINT `surveys_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
     $db->execute($SQL);

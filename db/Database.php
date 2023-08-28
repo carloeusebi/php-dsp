@@ -82,7 +82,7 @@ class Database
     /**
      * Adds a basic where clause to the query.
      */
-    public function where(string $column, string $operator, string $value, $boolean = 'and')
+    public function where(string $column, string $operator, string $value, $boolean = 'AND')
     {
         self::$clauses[] = [
             'column' => $column,
@@ -93,7 +93,9 @@ class Database
         return self::$db;
     }
 
-
+    /**
+     * Adds a basic where clause to the query.
+     */
     public function whereRaw(string $sql, $boolean = 'AND')
     {
         self::$clauses[] = [
@@ -111,9 +113,7 @@ class Database
     {
         $table = self::$table;
         $clauses = self::$clauses ?? [];
-
         $sql = "SELECT $columns FROM $table ";
-
         if (!empty($clauses)) {
             $sql .= " WHERE ";
             foreach ($clauses as $clause) {
@@ -125,14 +125,11 @@ class Database
                 }
             }
         }
-
         $stmt = self::prepare($sql);
-
         foreach ($clauses as $clause) {
             if (!isset($clause['raw_sql']))
                 $stmt->bindValue(":$column", $value);
         }
-
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -164,9 +161,9 @@ class Database
      * Returns the ID of the last inserted row or sequence value
      * @return string|false If a sequence name was not specified for the name parameter, PDO::lastInsertId returns a string representing the row ID of the last row that was inserted into the database
      */
-    public function getLastInsertId()
+    static function getLastInsertId()
     {
-        return $this->pdo->lastInsertId();
+        return self::$db->pdo->lastInsertId();
     }
 
 

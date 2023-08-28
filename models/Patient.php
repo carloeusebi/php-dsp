@@ -36,7 +36,7 @@ class Patient extends DbModel
     static function attributes(): array
     {
         return [
-            'fname', 'lname', 'age', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'qualification', 'sex', 'cohabitants', 'drugs', 'id'
+            'fname', 'lname', 'birthday', 'birthplace', 'address', 'codice_fiscale', 'begin', 'email', 'phone', 'weight', 'height', 'job', 'qualification', 'sex', 'cohabitants', 'drugs', 'id'
         ];
     }
 
@@ -101,12 +101,13 @@ class Patient extends DbModel
             $this->sex = strtoupper(substr($this->sex, 0, 1));
 
         //birthday
-        if (!$this->isRealDate($this->birthday)) $errors['birthday'] = "Data di nascita non valida";
+        if ($this->birthday && ($this->isNotRealDate($this->birthday) || $this->ageIsInvalid($this->birthday))) $errors['birthday'] = "Data di nascita non valida.";
 
         // date of therapy start
         $this->begin = $this->begin  ? $this->begin : date("Y-m-d", time()); // if no previous date was submitted start of therapy is considered now
         if (!$this->begin) $errors['begin'] = "La data di inizio terapia è obbligatoria.";
-        if (!$this->isRealDate($this->begin)) $errors['begin'] = "Data di inizio terapia non è valida";
+        if ($this->isNotRealDate($this->begin)) $errors['begin'] = "Data di inizio terapia non è valida.";
+        if ($this->isDateInFuture($this->begin)) $errors['begin'] = 'La data di inizio terapia non può essere nel futuro.';
 
         // email
         if ($this->email && Mail::isUndeliverable($this->email, false, true)) $errors['email'] = Mail::UNDELIVERABLE_ERROR_MESSAGE;
@@ -128,12 +129,26 @@ class Patient extends DbModel
     /**
      * Checks if the given date is an actual real date that won't break the database
      */
-    protected function isRealDate(string $date): bool
+    protected function isNotRealDate(string $date): bool
     {
         if (!strtotime($date))
             return false;
         list($year, $month, $day) = explode('-', $date);
 
-        return checkdate($month, $day, $year);
+        return !checkdate($month, $day, $year);
+    }
+
+    protected function isDateInFuture(string $date)
+    {
+        $now = time();
+        $date_to_check = strtotime($date);
+
+        return $date_to_check > $now;
+    }
+
+    protected function ageIsInvalid(string $birthday)
+    {
+        $age = calculateAge($birthday);
+        return $age <= 0 || $age > 120;
     }
 }

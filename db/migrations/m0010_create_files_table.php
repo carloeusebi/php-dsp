@@ -17,7 +17,7 @@ class m0010_create_files_table
             `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             KEY `files_patient_id_foreign` (`patient_id`),
-            CONSTRAINT `files_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`)
+            CONSTRAINT `files_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
         App::$app->db->execute($sql);

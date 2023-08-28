@@ -12,21 +12,42 @@ class Router
     private array $routes = [];
     private string $layout = 'main';
 
+    /**
+     * @var array Contains regular expression patterns for route parameters
+     */
+    private array $param_patterns = ['{id}' => '(\d+)'];
+
+
     public function get(string $url, array $callback): void
     {
-        $this->routes['get'][$url] = $callback;
+        $this->addRoute('get', $url, $callback);
     }
 
 
     public function post(string $url, array $callback): void
     {
-        $this->routes['post'][$url] = $callback;
+        $this->addRoute('post', $url, $callback);
+    }
+
+
+    public function put(string $url, array $callback): void
+    {
+        $this->addRoute('put', $url, $callback);
     }
 
 
     public function delete(string $url, array $callback): void
     {
-        $this->routes['delete'][$url] = $callback;
+        $this->addRoute('delete', $url, $callback);
+    }
+
+
+    private function addRoute(string $method, string $url, array $callback)
+    {
+        foreach ($this->param_patterns as $param => $pattern) {
+            $url = str_replace($param, $pattern, $url);
+        }
+        $this->routes[$method][$url] = $callback;
     }
 
 
@@ -47,12 +68,13 @@ class Router
         $path = Request::getPath();
         $method = Request::getMethod();
 
-        $callback = $this->routes[$method][$path] ?? false;
-
         // todo remove for production; to allow cors to pass through during testing
         if (Request::isOption()) {
             Response::response(200);
         }
+
+        [$callback, $params] = $this->findMatchingRoute($method, $path);
+
 
         if (!$callback) {
             throw new RouteNotFoundException();
@@ -72,8 +94,23 @@ class Router
         }
 
         // call the controller function
-        return $controller->{$controller->action}();
+        return $controller->{$controller->action}(...$params);
     }
+
+
+    private function findMatchingRoute(string $method, string $path): array|false
+    {
+        foreach ($this->routes[$method] as $route => $callback) {
+            $pattern = str_replace('/', '\/', $route);
+            if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
+                array_shift($matches);
+                return [$callback, $matches];
+            }
+        }
+
+        return false;
+    }
+
 
     public function renderView(string $page, array $params = []): void
     {
