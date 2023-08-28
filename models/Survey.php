@@ -13,8 +13,6 @@ class Survey extends DbModel
     public $title;
     public $questions;
     public $completed;
-    public $created_at;
-    public $updated_at;
     public $token;
 
     protected array $fields_to_decode = ['questions'];
@@ -28,7 +26,7 @@ class Survey extends DbModel
     static function attributes(): array
     {
         return [
-            'patient_id', 'title', 'questions', 'completed', 'id', 'token', 'created_at', 'updated_at',
+            'patient_id', 'title', 'questions', 'completed', 'id', 'token'
         ];
     }
 
@@ -68,7 +66,9 @@ class Survey extends DbModel
     public function getById(int $id, string $joins = '')
     {
         $survey = parent::getById($id);
-        $survey['patient'] = App::$app->patient->getById($id);
+        if ($survey)
+            $survey['patient'] = App::$app->patient->getById($id);
+
         return $survey;
     }
 
@@ -83,8 +83,11 @@ class Survey extends DbModel
         $columns = ['questions'];
         $where = ['token' => $token];
 
-        $survey = $this->get($columns, $where)[0];
-        $survey['patient'] = App::$app->patient->getById($survey['patient_id']);
+        $surveys = $this->get($columns, $where);
+        $survey = is_array($surveys) ? $surveys[0] : false;
+        if ($survey)
+            $survey['patient'] = App::$app->patient->getById($survey['patient_id']);
+
         return $survey;
     }
 

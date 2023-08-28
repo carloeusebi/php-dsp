@@ -46,8 +46,8 @@ $router->post('/api/tags', [TagsController::class, 'store']);
 $router->put('/api/tags/{id}', [TagsController::class, 'update']);
 $router->delete('/api/tags/{id}', [TagsController::class, 'destroy']);
 
-$router->get('/api/tests/{token}', [TestsController::class, 'get']);
-$router->put('/api/tests/{token}', [TestsController::class, 'update']);
+$router->get('/api/tests/{token}', [TestsController::class, 'show']);
+$router->put('/api/tests', [TestsController::class, 'update']);
 $router->post('/api/tests/patient/{id}', [TestsController::class, 'updatePatientInfo']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);

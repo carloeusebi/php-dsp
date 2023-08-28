@@ -26,7 +26,7 @@ class SurveysController extends AdminController
 
     $survey = App::$app->survey->getById($id);
     if (!$survey) {
-      Response::response(404, ['Error' => 'No Test found']);
+      Response::response(404, ['Error' => "No Test found with id $id"]);
     }
     if (!$survey['completed']) {
       Response::response(422, ['Error' => 'Test not completed yet']);
