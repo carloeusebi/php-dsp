@@ -8,6 +8,7 @@ use Verifalia\VerifaliaRestClient;
 
 use app\app\App;
 use app\core\Model;
+use app\db\Database;
 
 class Mail extends Model
 {
@@ -183,42 +184,19 @@ class Mail extends Model
      */
     private static function emailWasAlreadyValidated(string $email_to_validate): bool
     {
-        $valid_emails = self::getValidEmails();
-        if (!$valid_emails) return false;
-
-        return in_array($email_to_validate, $valid_emails);
-    }
-
-    /**
-     * Fetches from the db the emails and returns a list of valid emails
-     * @return string[]
-     */
-    private static function getValidEmails(): array
-    {
-        $statement = App::$app->db->prepare('SELECT * FROM `emails`');
-        $statement->execute();
-        $data = $statement->fetchAll(\PDO::FETCH_ASSOC);
-
-        return array_map(fn ($d) => $d['email'], $data);
+        $matches = Database::table('emails')
+            ->where('email', '=', $email_to_validate, '')
+            ->get();
+        return count($matches);
     }
 
 
     /**
      * Saves in the database the newly validate email address
      */
-    private static function saveValidEmail(string $email): bool
+    private static function saveValidEmail(string $email)
     {
-        try {
-
-            $statement = App::$app->db->prepare('INSERT INTO `emails` (email) VALUES (:email)');
-            $statement->bindValue('email', $email);
-            $statement->execute();
-
-            return true;
-        } catch (Exception $exception) {
-            \app\core\exceptions\ErrorHandler::log($exception);
-            return false;
-        }
+        Database::table('emails')->insert(['email' => $email]);
     }
 
 

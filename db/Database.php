@@ -39,6 +39,7 @@ class Database
     static function table(string $table)
     {
         self::$table = $table;
+        self::$clauses = []; //empties the clauses
         return self::$db;
     }
 
@@ -57,7 +58,12 @@ class Database
         foreach ($values as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
-        $stmt->execute();
+
+        try {
+            $stmt->execute();
+        } catch (\Exception $e) {
+            \app\core\exceptions\ErrorHandler::log($e);
+        }
     }
 
 
@@ -130,6 +136,9 @@ class Database
             if (!isset($clause['raw_sql']))
                 $stmt->bindValue(":$column", $value);
         }
+
+        self::$clauses = []; // empties the clauses for the next query;
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
