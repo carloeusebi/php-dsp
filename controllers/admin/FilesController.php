@@ -16,28 +16,6 @@ class FilesController extends AdminController
         return App::$app->file;
     }
 
-
-    public function download(): void
-    {
-        $data = Request::getBody();
-
-        if (!isset($data['file_name'])) {
-            Response::response(400, ['Error' => 'No file name']);
-        }
-
-        $file_path = App::$ROOT_DIR . '/storage/uploads/' . $data['file_name'];
-
-        if (file_exists($file_path)) {
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: inline; filename="' . $data['file_name'] . '"');
-
-            readfile($file_path);
-        } else {
-            Response::response(404, ['Error' => 'File not found']);
-        }
-    }
-
-
     public function upload(): void
     {
         $file_to_upload = $_FILES['file'];
@@ -50,7 +28,8 @@ class FilesController extends AdminController
             Response::response(400, ['Error' => 'Missing patient ID']);
         }
 
-        $data['name'] = $this->uploadFile($file_to_upload);
+        $data['name'] = $file_to_upload['name'];
+        $data['path'] = $this->uploadFile($file_to_upload);
         $data['type'] = pathinfo($file_to_upload['name'], PATHINFO_EXTENSION);
 
         $this->model->load($data);
@@ -63,24 +42,48 @@ class FilesController extends AdminController
         $last_insert_id = intval(App::$app->db->getLastInsertId());
         $last_insert_item = $this->model->getById($last_insert_id);
 
-        Response::response(201, ['last_insert' => $last_insert_item]);
+        Response::response(201, $last_insert_item);
+    }
+
+    public function download(int $id): void
+    {
+        if (!$id) {
+            Response::response(404);
+        }
+        $file = App::$app->file->getById($id);
+        if (!$file) {
+            Response::response(404, ['error' => "No file found with id $id"]);
+        }
+
+        $file_path = $file['path'];
+
+        if (file_exists($file_path)) {
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="' . $file['name'] . '"');
+
+            readfile($file_path);
+        } else {
+            Response::response(404, ['Error' => 'File not found']);
+        }
     }
 
 
-    public function delete(): void
-    {
-        $data = Request::getBody();
 
-        $file_name = App::$ROOT_DIR . '/storage/uploads/' . $data['name'];
+
+    public function delete(int $id): void
+    {
+        $file = App::$app->file->getById($id);
+        if (!$file) {
+            Response::response(404, ['error' => "No file found with id $id"]);
+        }
+        $file_path = $file['path'];
 
         try {
-            unlink($file_name);
+            unlink($file_path);
         } catch (\Exception $exception) {
             \app\core\exceptions\ErrorHandler::log($exception);
         }
-
-
-        parent::delete();
+        parent::destroy($id);
     }
 
 
@@ -110,6 +113,6 @@ class FilesController extends AdminController
             throw new \RuntimeException('Failed to upload the file. Please try again.');
         }
 
-        return $filename;
+        return $filepath;
     }
 }

@@ -10,6 +10,7 @@ class File extends DbModel
     public int $id;
     public int $patient_id;
     public string $name;
+    public string $path;
     public string $type;
 
     protected array $fields_to_decode = [];
@@ -21,7 +22,7 @@ class File extends DbModel
 
     static function attributes(): array
     {
-        return ['patient_id', 'name', 'type'];
+        return ['patient_id', 'name', 'path', 'type'];
     }
 
     static function labels(): array

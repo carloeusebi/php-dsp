@@ -39,21 +39,20 @@ $router->post('/api/surveys', [SurveysController::class, 'store']);
 $router->put('/api/surveys/{id}', [SurveysController::class, 'update']);
 $router->delete('/api/surveys/{id}', [SurveysController::class, 'destroy']);
 
-$router->get('/api/surveys/score', [SurveysController::class, 'getScores']);
+$router->get('/api/surveys/score/{id}', [SurveysController::class, 'getScores']);
 
 $router->get('/api/tags', [TagsController::class, 'index']);
 $router->post('/api/tags', [TagsController::class, 'store']);
 $router->put('/api/tags/{id}', [TagsController::class, 'update']);
 $router->delete('/api/tags/{id}', [TagsController::class, 'destroy']);
 
-$router->get('/api/tests', [TestsController::class, 'index']);
-$router->post('/api/tests', [TestsController::class, 'store']);
-$router->get('/api/tests/patient', [TestsController::class, 'getPatient']);
-$router->post('/api/tests/patient', [TestsController::class, 'updatePatientInfo']);
+$router->get('/api/tests/{token}', [TestsController::class, 'index']);
+$router->put('/api/tests/{token}', [TestsController::class, 'update']);
+$router->post('/api/tests/patient/{id}', [TestsController::class, 'updatePatientInfo']);
 
 $router->post('/api/email', [MailController::class, 'sendFromAdmin']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);
 
-$router->get('/api/file', [FilesController::class, 'download']);
+$router->get('/api/file/{id}', [FilesController::class, 'download']);
 $router->post('/api/file', [FilesController::class, 'upload']);
-$router->delete('/api/file', [FilesController::class, 'destroy']);
+$router->delete('/api/file/{id}', [FilesController::class, 'delete']);
