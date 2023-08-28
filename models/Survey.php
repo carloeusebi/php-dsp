@@ -66,11 +66,9 @@ class Survey extends DbModel
 
     public function getById(int $id, string $joins = '')
     {
-        $joins = $this->joins();
-
-        $result = parent::getById($id, $joins);
-        $result['id'] = $id;
-        return $result;
+        $survey = parent::getById($id, $joins);
+        $survey['patient'] = App::$app->patient->getById($id);
+        return $survey;
     }
 
 

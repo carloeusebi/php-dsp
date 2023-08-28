@@ -44,6 +44,7 @@ class Router
 
     private function addRoute(string $method, string $url, array $callback)
     {
+        // Replace parameter placeholders with regex patterns
         foreach ($this->param_patterns as $param => $pattern) {
             $url = str_replace($param, $pattern, $url);
         }
@@ -97,12 +98,23 @@ class Router
         return $controller->{$controller->action}(...$params);
     }
 
-
+    /**
+     * Finds a matching route for the given method and path.
+     *
+     * This method searches the registered routes for a match against the provided HTTP method and request path.
+     * It compares the route patterns using regular expressions and returns the associated callback along with any extracted parameter values.
+     * 
+     * @return array|false The callback and parameter values or false if no match
+     */
     private function findMatchingRoute(string $method, string $path): array|false
     {
         foreach ($this->routes[$method] as $route => $callback) {
+            // Convert the route pattern into a regular expression
             $pattern = str_replace('/', '\/', $route);
+
+            // Check if the path matches the regular expression pattern
             if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
+                // Remove the full match from the $matches array
                 array_shift($matches);
                 return [$callback, $matches];
             }

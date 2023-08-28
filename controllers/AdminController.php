@@ -40,6 +40,9 @@ abstract class AdminController extends Controller
     public function show(int $id): void
     {
         $resource = $this->model->getById($id);
+        if (!$resource) {
+            Response::response(404, ['error' => "No resource found with id $id"]);
+        }
         Response::response(200, $resource);
     }
 
