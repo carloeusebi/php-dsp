@@ -83,11 +83,22 @@ class Scores
         } elseif ($question['type'] !== 'MUL') {
             $min = intval(substr($question['type'], 0, 1));
             $max = intval(substr($question['type'], -1));
+        } else {
+            //Questionnaire's type is MUL
+            $item_answers = $question['items'][0]['multipleAnswers'];
+            $min = $item_answers[0]['points'];
+            $max = $item_answers[array_key_last($item_answers)]['points'];
         }
 
         foreach ($question['items'] as $item) {
             if ($item['id'] === $id) {
-                $item['answer'];
+                $answer = $item['answer'];
+
+                //answer validation
+                if ($answer < $min || $answer > $max)
+                    throw new Exception("Le risposta all'item \"{$item['id']}.{$item['text']}\" del questionario {$question['question']} contiene un punteggio non valido: {$answer}");
+
+                // if item has a reversed score, it reverts the score
                 $answer =  array_key_exists('reversed', $item) && $item['reversed'] ? self::reverseScore($min, $max, $item['answer']) : $item['answer'];
                 if ($question['type'] === 'EDI') $answer = $answer - 2 < 0 ? 0 : $answer - 2;
                 elseif ($question['type'] === 'MUL') {

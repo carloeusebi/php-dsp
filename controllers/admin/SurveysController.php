@@ -32,7 +32,11 @@ class SurveysController extends AdminController
       Response::response(422, ['Error' => 'Test not completed yet']);
     }
 
-    $scores = Scores::calculateScores($survey);
+    try {
+      $scores = Scores::calculateScores($survey);
+    } catch (\Exception $e) {
+      Response::response(422, ['message' => $e->getMessage()]);
+    }
 
     Response::response(200, ['survey' => $survey, 'scores' => $scores]);
   }
