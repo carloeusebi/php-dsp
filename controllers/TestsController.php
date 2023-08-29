@@ -16,7 +16,7 @@ class TestsController extends Controller
 
   public function __construct()
   {
-    // $this->registerMiddleware(new PatientMiddleware([]));
+    $this->registerMiddleware(new PatientMiddleware([]));
   }
 
 
@@ -48,7 +48,7 @@ class TestsController extends Controller
     App::$app->survey->load($data);
     $errors = App::$app->survey->save();
 
-    if (isset($data['justCompleted'])) {
+    if (isset($data['justCompleted']) && $data['justCompleted']) {
       $this->sendCompletionEmail($data);
     }
 

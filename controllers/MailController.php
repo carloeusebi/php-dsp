@@ -16,7 +16,7 @@ class MailController extends Controller
     public function __construct()
     {
         $this->mail = new Mail();
-        $this->registerMiddleware(new AdminMiddleware(['sendFromAdmin']));
+        $this->registerMiddleware(new AdminMiddleware(['sendEmailWithTestLink']));
     }
 
 
