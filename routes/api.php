@@ -50,7 +50,7 @@ $router->get('/api/tests/{token}', [TestsController::class, 'show']);
 $router->put('/api/tests', [TestsController::class, 'update']);
 $router->post('/api/tests/patient/{id}', [TestsController::class, 'updatePatientInfo']);
 
-$router->post('/api/email', [MailController::class, 'sendFromAdmin']);
+$router->post('/api/email/test-link', [MailController::class, 'sendEmailWithTestLink']);
 $router->post('/api/email/support', [MailController::class, 'contactSupport']);
 
 $router->get('/api/file/{id}', [FilesController::class, 'download']);

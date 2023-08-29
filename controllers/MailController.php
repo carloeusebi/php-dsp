@@ -71,17 +71,21 @@ class MailController extends Controller
     /**
      * When admin, using Vue3.js admin panel, is sending email to its patients
      */
-    public function sendFromAdmin()
+    public function sendEmailWithTestLink()
     {
         $errors = [];
         $data = Request::getBody();
+        $template_file = App::$ROOT_DIR . '/resources/views/mails/link-to-test.html';
 
         extract($data);
 
         // checks if inputs are valid
         if (!isset($email_to) || !$email_to) $errors['no-email'] = "Nessuna email inserita";
         if (!isset($subject) || !$subject) $errors['no-subject'] = "Nessun soggetto inserito";
-        if (!isset($body) || !$body) $errors['no-body'] = "Nessun corpo della mail inserito";
+        if (!isset($link) || !$link) $errors['no-link'] = "Nessun corpo della mail inserito";
+
+        $html_template = file_get_contents($template_file);
+        $data['body'] = str_replace('{{link}}', $link, $html_template);
 
         // if there errors sends response 400 with errors as body
         if (!empty($errors)) {

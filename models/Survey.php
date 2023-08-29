@@ -147,7 +147,7 @@ class Survey extends DbModel
                 // If not all items are answered, unset completed status for the question
                 // Mark the survey as not completed
                 unset($question['completed']);
-                $this->completed = 0;
+                $this->completed = null;
                 $mark_survey_as_completed = false;
             }
 
