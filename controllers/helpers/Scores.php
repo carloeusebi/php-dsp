@@ -94,6 +94,8 @@ class Scores
             if ($item['id'] === $id) {
                 $answer = $item['answer'];
 
+                if ($answer === -1) return 0;
+
                 //answer validation
                 if ($answer < $min || $answer > $max)
                     throw new Exception("Le risposta all'item \"{$item['id']}.{$item['text']}\" del questionario {$question['question']} contiene un punteggio non valido: {$answer}");
