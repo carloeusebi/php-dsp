@@ -46,6 +46,7 @@ class Patient extends DbModel
             'id' => 'id',
             'fname' => 'Nome',
             'lname' => 'Cognome',
+            'sex' => 'Sesso',
             'age' => 'Età',
             'birthday' => 'Data di nascita',
             'birthplace' => 'Luogo di nascita',
@@ -58,7 +59,6 @@ class Patient extends DbModel
             'height' => 'Altezza',
             'qualification' => 'Titolo di Studio',
             'job' => 'Occupazione',
-            'sex' => 'Sesso',
             'cohabitants' => 'Conviventi',
             'drugs' => 'Farmaci'
         ];
@@ -95,10 +95,14 @@ class Patient extends DbModel
         // name
         if (!$this->fname) $errors['fname'] = "Il nome è obbligatorio.";
         if (!$this->lname) $errors['lname'] = "Il cognome è obbligatorio.";
+        if (strlen($this->fname) > 80) $errors['fname'] = "Nome troppo lungo, massimo 80 caratteri.";
+        if (strlen($this->lname) > 80) $errors['lname'] = "Cognome troppo lungo, massimo 80 caratteri.";
 
         //if sex should arrive with more than one characters, it takes only first char to uppercase
-        if ($this->sex)
+        if ($this->sex) {
             $this->sex = strtoupper(substr($this->sex, 0, 1));
+            if (!in_array($this->sex, ['M', 'F', 'O']))  $this->sex = 'M';
+        }
 
         //birthday
         if ($this->birthday && ($this->isNotRealDate($this->birthday) || $this->ageIsInvalid($this->birthday))) $errors['birthday'] = "Data di nascita non valida.";
@@ -109,7 +113,16 @@ class Patient extends DbModel
         if ($this->isNotRealDate($this->begin)) $errors['begin'] = "Data di inizio terapia non è valida.";
         if ($this->isDateInFuture($this->begin)) $errors['begin'] = 'La data di inizio terapia non può essere nel futuro.';
 
+        if ($this->birthplace && strlen($this->birthplace) > 80) $errors['birthplace'] = "Luogo di nascita troppo lungo, massimo 80 caratteri.";
+        if ($this->address && strlen($this->address) > 80) $errors['address'] = "Indirizzo troppo lungo, massimo 150 caratteri";
+
+        if ($this->phone && strlen($this->phone) > 20) $errors['phone'] = "Numero di telefono troppo lungo, massimo 20 caratteri";
+        if ($this->qualification && strlen($this->qualification) > 80) $errors['qualification'] = "Qualifica troppo lunga, massimo 80 caratteri";
+        if ($this->job && strlen($this->job) > 50) $errors['job'] = "Lavoro troppo lungo, massimo 50 caratteri";
+
+
         // email
+        if ($this->email && strlen($this->email) > 80) $errors['email'] = "Mail troppo lunga, massimo 80 caratteri";
         if ($this->email && Mail::isUndeliverable($this->email, false, true)) $errors['email'] = Mail::UNDELIVERABLE_ERROR_MESSAGE;
 
         // validates the codice fiscale
@@ -117,6 +130,14 @@ class Patient extends DbModel
         if ($this->codice_fiscale)
             $is_invalid_cf = CodiceFiscale::validate($this->codice_fiscale);
         if ($is_invalid_cf) $errors['codice_fiscale'] = $is_invalid_cf;
+
+        //height and weight
+        if ($this->height) {
+            if ($this->height < 10 || $this->height > 255) $errors['height'] = "Altezza {$this->height}cm non valida, deve essere compresa tra 10cm e 255cm.";
+        }
+        if ($this->weight) {
+            if ($this->weight < 10 || $this->weight > 350) $errors['weight'] = "Peso {$this->weight}kg non valido, deve essere compreso tra 10kg e 350kg";
+        }
 
         if (empty($errors)) {
             if ($this->id) self::update();
