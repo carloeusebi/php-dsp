@@ -67,7 +67,7 @@ class Survey extends DbModel
     {
         $survey = parent::getById($id);
         if ($survey)
-            $survey['patient'] = App::$app->patient->getById($id);
+            $survey['patient'] = App::$app->patient->getById($survey['patient_id']);
 
         return $survey;
     }
