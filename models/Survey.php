@@ -102,6 +102,8 @@ class Survey extends DbModel
         if (!$this->patient_id) $errors['patient_id'] = 'Nessun Paziente selezionato, il Paziente è obbligatorio';
         if (!$this->questions) $errors['questions'] = 'Nessun questionario selezionato, selezionarne almeno uno';
 
+        $this->checkForModifications();
+
         $this->questions = json_encode($this->questions);
 
         if (empty($errors)) {
@@ -118,5 +120,41 @@ class Survey extends DbModel
     public function generateToken(): string
     {
         return bin2hex(random_bytes(16));
+    }
+
+
+    /**
+     * Checks for modifications in the Questionnaires answers, and updates its completed state accordingly.
+     */
+    private function checkForModifications(): void
+    {
+        $mark_survey_as_completed = true;
+        foreach ($this->questions as &$question) {
+            $all_items_answered = true;
+
+            // check each item in the current question
+            foreach ($question['items'] as $item) {
+                if (!array_key_exists('answer', $item)) {
+                    $all_items_answered = false;
+                    break;
+                }
+            }
+
+            // Update the question's completed status based on whether all items are answered or not
+            if ($all_items_answered) {
+                $question['completed'] = true;
+            } else {
+                // If not all items are answered, unset completed status for the question
+                // Mark the survey as not completed
+                unset($question['completed']);
+                $this->completed = 0;
+                $mark_survey_as_completed = false;
+            }
+
+            // If all questions and their items are answered, mark the entire survey as completed
+            if ($mark_survey_as_completed) {
+                $this->completed = 1;
+            }
+        }
     }
 }
