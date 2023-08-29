@@ -8,7 +8,7 @@ use app\core\utils\Request; ?>
 <?php include_once __DIR__ . '/../partials/head.php' ?>
 
 <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PPT73ZG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PPT73ZG" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript> -->
 <!-- End Google Tag Manager (noscript) -->
 
 <?php include __DIR__ . '/../partials/header.php' ?>
