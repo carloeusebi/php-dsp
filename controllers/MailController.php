@@ -136,7 +136,7 @@ class MailController extends Controller
             Ha contattato il supporto per il seguente motivo:<br> $issue";
 
         // send email both to admin's panel user and the support team
-        $data['email_to'] = Mail::$EMAIL_FROM;
+        $data['email_to'] = Mail::$EMAIL_MAIN;
         $this->mail->load($data);
         $this->mail->send();
 

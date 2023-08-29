@@ -29,20 +29,15 @@
             padding: 0 2rem;
         }
         
-        .link-container {
-            position: relative;
+        .link{
+            display: block;
             background-color: #6ecc84;
-            padding: .5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding-top: .5rem;
+            padding-bottom: .5rem;
+            text-align: center;
         }
 
-        .link{
-            position: absolute;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        .link
 
         p{
             text-align: justify;
@@ -67,9 +62,7 @@
             Salve, cliccando su questo link potrà iniziare la compilazione dei questionari necessari per portare avanti la Sua valutazione psicologica. Per qualsiasi dubbio inerente le singole domande può lasciare un commento toccando/cliccando sull'apposito pulsante, riguarderemo le domande assieme in seduta. Buon lavoro.
         </p>
 
-        <div class="link-container">
-            <a class="link" href="{{link}}">LINK</a>
-        </div>
+            <a class="link" href="{{link}}"><div>LINK</div></a>
 
 
 </body>
