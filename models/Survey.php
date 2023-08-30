@@ -102,7 +102,8 @@ class Survey extends DbModel
         if (!$this->patient_id) $errors['patient_id'] = 'Nessun Paziente selezionato, il Paziente è obbligatorio';
         if (!$this->questions) $errors['questions'] = 'Nessun questionario selezionato, selezionarne almeno uno';
 
-        $this->checkForModifications();
+        if ($this->id)
+            $this->checkForModifications();
 
         $this->questions = json_encode($this->questions);
 
