@@ -35,8 +35,13 @@ class Auth
 
   static function logout()
   {
+    $token = self::getAuthToken();
     session_destroy();
-    Database::execute('TRUNCATE TABLE ' . self::TABLE);
+
+    $now = date('Y-m-d H:i:s', time());
+    Database::table(self::TABLE)
+      ->where('token', '=', $token, '')
+      ->update(-1, ['expires_at' => $now]);
   }
 
   static function generateToken(array $user): string
@@ -58,7 +63,8 @@ class Auth
     if (!$token) return false;
 
     return Database::table(self::TABLE)
-      ->where('token', '=', $token, '')
+      ->where('token', '=', $token)
+      ->whereRaw('`expires_at` > NOW()', '')
       ->get();
   }
 
@@ -67,6 +73,17 @@ class Auth
   {
     $token = self::getAuthToken();
     self::setCookie($token);
+
+    $now = date('Y-m-d H:i:s', time());
+    Database::table(self::TABLE)
+      ->where('token', '=', $token, '')
+      ->update(
+        -1,
+        values: [
+          'expires_at' => self::expiration(),
+          'last_used_at' => $now
+        ]
+      );
   }
 
 
@@ -90,6 +107,13 @@ class Auth
       'tokenable_id' => $user['id'],
       'name' => 'authToken',
       'token' => $token,
+      'expires_at' => self::expiration()
     ]);
+  }
+
+
+  protected static function expiration()
+  {
+    return date('Y-m-d H:i:s', time() + 7200);
   }
 }

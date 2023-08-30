@@ -28,6 +28,7 @@ class Database
             $this->pdo = new PDO($dsn, $user, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
             self::$db = $this;
         } catch (Exception $e) {
@@ -75,13 +76,28 @@ class Database
         $table = self::$table;
         $set = implode(',', array_map(fn ($attr) => "`$attr` = :$attr", array_keys($values)));
 
-        $sql = "UPDATE $table SET $set WHERE id = :id";
+        $where = empty(self::$clauses) ? 'id = :id' : $this->buildWhereClause(self::$clauses);
+
+        $sql = "UPDATE $table SET $set WHERE $where";
         $stmt = $this->prepare($sql);
 
-        $stmt->bindValue(":id", $id);
+        // bind values
         foreach ($values as $key => $value) {
             $stmt->bindValue(":$key", $value);
         }
+
+        //bind clauses
+        if (empty(self::$clauses))
+            $stmt->bindValue(":id", $id);
+        else {
+            foreach (self::$clauses as $clause) {
+                if (!isset($clause['raw_sql'])) {
+                    extract($clause);
+                    $stmt->bindValue(":$column", $value);
+                }
+            }
+        }
+
         $stmt->execute();
     }
 
@@ -121,26 +137,35 @@ class Database
         $clauses = self::$clauses ?? [];
         $sql = "SELECT $columns FROM $table ";
         if (!empty($clauses)) {
-            $sql .= " WHERE ";
-            foreach ($clauses as $clause) {
-                if (isset($clause['raw_sql'])) {
-                    $sql .= ' ' . $clause['raw_sql'] . ' ' . $clause['boolean'];
-                } else {
-                    extract($clause);
-                    $sql .= " $column $operator :$column $boolean ";
-                }
-            }
+            $sql .= " WHERE " . $this->buildWhereClause($clauses);
         }
         $stmt = self::prepare($sql);
         foreach ($clauses as $clause) {
-            if (!isset($clause['raw_sql']))
+            if (!isset($clause['raw_sql'])) {
+                extract($clause);
                 $stmt->bindValue(":$column", $value);
+            }
         }
 
         self::$clauses = []; // empties the clauses for the next query;
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    private function buildWhereClause(array $clauses): string
+    {
+        $whereClause = "";
+        foreach ($clauses as $clause) {
+            if (isset($clause['raw_sql'])) {
+                $whereClause .= ' ' . $clause['raw_sql'] . ' ' . $clause['boolean'];
+            } else {
+                extract($clause);
+                $whereClause .= " $column $operator :$column $boolean ";
+            }
+        }
+        return $whereClause;
     }
 
 
