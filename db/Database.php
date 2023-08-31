@@ -28,7 +28,7 @@ class Database
             $this->pdo = new PDO($dsn, $user, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            // $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
             self::$db = $this;
         } catch (Exception $e) {
