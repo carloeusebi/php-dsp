@@ -10,6 +10,9 @@ class User extends DbModel
     public $email;
     public $password;
 
+    protected array $fields_to_decode = [];
+
+
     public function save(): array
     {
         parent::create();

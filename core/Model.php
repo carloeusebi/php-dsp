@@ -8,7 +8,6 @@ abstract class Model
 {
     protected array $fields_to_decode;
 
-
     public function load(array $data): void
     {
         foreach ($data as $key => $value) {
@@ -43,6 +42,7 @@ abstract class Model
     protected function decodeMany(array $data): array
     {
         // if model has no field to decode, just return the original data
+        if (empty($data)) return $data;
         return array_map(function ($item) {
             return $this->decodeOne($item);
         }, $data);

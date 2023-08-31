@@ -15,7 +15,6 @@ abstract class DbModel extends Model
     abstract static function labels(): array;
     abstract public function save(): array;
 
-
     /**
      * Retrieve data from the database based on specified columns and conditions.
      *
