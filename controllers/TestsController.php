@@ -20,7 +20,7 @@ class TestsController extends Controller
   }
 
 
-  public function show(Request $request, string $token)
+  public function show(string $token)
   {
     $survey = App::$app->survey->getByToken($token);
     if (!$survey) {
@@ -59,7 +59,7 @@ class TestsController extends Controller
   }
 
 
-  public function updatePatientInfo(Request $request, int $id)
+  public function updatePatientInfo(int $id, Request $request)
   {
     $model = App::$app->patient;
     $updated_patient_info = $request->getBody();

@@ -43,7 +43,6 @@ abstract class Model
     protected function decodeMany(array $data): array
     {
         // if model has no field to decode, just return the original data
-        if (empty($data) || empty($this->fields_to_decode)) return $data;
         return array_map(function ($item) {
             return $this->decodeOne($item);
         }, $data);
