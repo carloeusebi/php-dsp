@@ -23,14 +23,14 @@ class MailController extends Controller
     /**
      * Handles website contact form's submission
      */
-    public function sendFromForm()
+    public function sendFromForm(Request $request)
     {
-        $view = Request::getPath();
-        $form_data = Request::getBody();
+        $view = $request->getPath();
+        $form_data = $request->getBody();
 
         // if somehow this code is being executed without the form submission return invalid requests
         if (!isset($form_data['submit'])) {
-            Response::response(400);
+            return Response::statusCode(400);
         }
 
         // load the mail with data from the form, and collects errors
@@ -47,7 +47,7 @@ class MailController extends Controller
             App::$app->session->setFlash('form', $form_data);
         }
 
-        Response::redirect($view);
+        return Response::redirect($view);
     }
 
 
@@ -71,10 +71,10 @@ class MailController extends Controller
     /**
      * When admin, using Vue3.js admin panel, is sending email to its patients
      */
-    public function sendEmailWithTestLink()
+    public function sendEmailWithTestLink(Request $request)
     {
         $errors = [];
-        $data = Request::getBody();
+        $data = $request->getBody();
         $template_file = App::$ROOT_DIR . '/resources/views/mails/link-to-test.html';
 
         extract($data);
@@ -89,7 +89,7 @@ class MailController extends Controller
 
         // if there errors sends response 400 with errors as body
         if (!empty($errors)) {
-            Response::response(400, $errors);
+            return Response::json(400, $errors);
         }
 
         // loads and sends the email
@@ -98,21 +98,21 @@ class MailController extends Controller
 
         // if there are errors sending the email it returns those error in the response
         if ($error) {
-            Response::response(500, ['error' => $error]);
+            return Response::json(500, ['error' => $error]);
         }
 
         //everything was successful
-        Response::response(204);
+        return Response::statusCode(204);
     }
 
 
     /**
      * If patients encounter issues during the completion of the survey they can contact the support
      */
-    public function contactSupport()
+    public function contactSupport(Request $request)
     {
         $errors = [];
-        $data = Request::getBody();
+        $data = $request->getBody();
 
         extract($data);
         $email_from = $email ?? '-'; // renames the variable for clearer use
@@ -122,7 +122,7 @@ class MailController extends Controller
         if (!isset($issue) || !$issue) $errors['no-issue'] = "Nessun problema specificato";
 
         if (!empty($errors)) {
-            Response::response(400, $errors);
+            return Response::json(400, $errors);
         }
 
         // only if all checks are passed log the issue to the database (it could be a bot completing the form we don't want to log junks)
@@ -144,6 +144,6 @@ class MailController extends Controller
         $this->mail->load($data);
         $this->mail->send();
 
-        Response::response(204);
+        return Response::statusCode(204);
     }
 }

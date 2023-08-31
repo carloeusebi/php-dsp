@@ -23,85 +23,85 @@ abstract class AdminController extends Controller
     abstract protected function getModel(): DbModel;
 
 
-    public function index(): void
+    public function index()
     {
         $resources = $this->model->get();
         $labels = $this->model->labels();
 
         if (empty($labels)) {
-            $response = $resources;
+            $json = $resources;
         } else {
-            $response = ['labels' => $labels, 'list' => $resources];
+            $json = ['labels' => $labels, 'list' => $resources];
         }
-        Response::response(200, $response);
+        return Response::json(200, $json);
     }
 
 
-    public function show(int $id): void
+    public function show(int $id)
     {
         $resource = $this->model->getById($id);
         if (!$resource) {
-            Response::response(404, ['error' => "No resource found with id $id"]);
+            return Response::json(404, ['error' => "No resource found with id $id"]);
         }
-        Response::response(200, $resource);
+        return Response::json(200, $resource);
     }
 
 
-    public function store(): void
+    public function store(Request $request)
     {
         $errors = [];
-        $data = Request::getBody();
+        $data = $request->getBody();
         if (!$data) {
-            Response::response(400, ['error' => 'No Body']);
+            return Response::json(400, ['error' => 'No Body']);
         }
 
         $this->model->load($data);
         $errors = $this->model->save();
         if ($errors) {
-            Response::response(422, ['errors' => $errors]);
+            return Response::json(422, ['errors' => $errors]);
         }
 
         $inserted_id = Database::getLastInsertId();
         $just_inserted_item = $this->model->getById($inserted_id);
 
-        Response::response(201, $just_inserted_item);
+        return Response::json(201, $just_inserted_item);
     }
 
 
-    public function update(int $id): void
+    public function update(int $id, Request $request)
     {
         $errors = [];
-        $data = Request::getBody();
+        $data = $request->getBody();
         if (!$data) {
-            Response::response(400, ['errors' => 'No Body']);
+            return Response::json(400, ['errors' => 'No Body']);
         }
 
         $this->model->load($data);
         $errors = $this->model->save();
         if ($errors) {
-            Response::response(422, ['errors' => $errors]);
+            return Response::json(422, ['errors' => $errors]);
         }
 
         $updated_item = $this->model->getById($id);
 
-        Response::response(201, $updated_item);
+        return Response::json(201, $updated_item);
     }
 
 
-    public function destroy(int $id): void
+    public function destroy(int $id)
     {
         if (!$id) {
-            Response::response(400, ['Error' => 'No ID provided']);
+            return Response::json(400, ['Error' => 'No ID provided']);
         }
 
         $itemToDelete = $this->model->getById($id);
 
         if (!$itemToDelete) {
-            Response::response(400, ["Error" => "Invalid ID"]);
+            return Response::json(400, ["Error" => "Invalid ID"]);
             exit();
         }
 
         $this->model->delete($id);
-        Response::statusCode(204);
+        return Response::statusCode(204);
     }
 }

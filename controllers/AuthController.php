@@ -17,37 +17,38 @@ class AuthController extends Controller
     }
 
 
-    public function login(): void
+    public function login(Request $request)
     {
-        $data = Request::getBody();
+        $data = $request->getBody();
 
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
         if (!isset($email) || !isset($password)) {
-            Response::response(400, ['Error' => 'Missing email or password']);
+            return Response::json(400, ['Error' => 'Missing email or password']);
         }
         $admin = Auth::attemptLogin($email, $password);
         if (!$admin) {
-            Response::response(401, ['message' => 'invalid-credentials']);
+            return Response::json(401, ['message' => 'invalid-credentials']);
         }
-        $token = Auth::generateToken($admin);
 
-        Response::response(200, ['user' => $admin]);
+        Auth::generateToken($admin);
+        unset($admin['password']);
+        return Response::json(200, ['user' => $admin]);
     }
 
 
-    public function logout(): void
+    public function logout()
     {
         Auth::logout();
-        Response::statusCode(204);
+        return Response::statusCode(204);
     }
 
 
     /**
      * Mocks Laravel Sanctum, to allow the frontend Vue app to work with both this vanilla PHP app and Laravel.
      */
-    public function mockSanctum(): void
+    public function mockSanctum()
     {
-        Response::statusCode(200);
+        return Response::statusCode(200);
     }
 }

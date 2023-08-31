@@ -2,6 +2,8 @@
 
 namespace app\core\utils;
 
+use app\app\App;
+
 class Response
 {
     static function statusCode(int $http_code): void
@@ -14,15 +16,13 @@ class Response
         header("Location: $url");
     }
 
-    static function response(int $http_code, array|string $messages = []): void
+    static function json(int $http_code, array|string $messages)
     {
-        if (Request::isApi()) {
-            header('Content-Type: application/json');
-        }
+        header('Content-Type: application/json');
+
         self::statusCode($http_code);
         $json =  json_encode($messages, JSON_INVALID_UTF8_IGNORE);
         if ($json) echo $json;
         else self::statusCode(500);
-        exit;
     }
 }

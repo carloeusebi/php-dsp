@@ -20,29 +20,28 @@ class TestsController extends Controller
   }
 
 
-  public function show(string $token)
+  public function show(Request $request, string $token)
   {
     $survey = App::$app->survey->getByToken($token);
     if (!$survey) {
-      Response::response(404, ['error' => 'No Test found']);
+      return Response::json(404, ['error' => 'No Test found']);
     }
 
     if (isset($survey['completed']) && $survey['completed']) {
-      Response::response(423, ['error' => 'Test is completed']);
+      return Response::json(423, ['error' => 'Test is completed']);
     }
 
-    Response::response(200, $survey);
+    return Response::json(200, $survey);
   }
 
 
-  public function update(): void
+  public function update(Request $request)
   {
     $errors = [];
-    $data = Request::getBody();
+    $data = $request->getBody();
 
     if (!$data) {
-      Response::statusCode(400);
-      exit();
+      return Response::statusCode(404);
     }
 
     App::$app->survey->load($data);
@@ -53,20 +52,20 @@ class TestsController extends Controller
     }
 
     if (empty($errors)) {
-      Response::response(204);
+      return Response::statusCode(204);
     } else {
-      Response::response(422, $errors); // HTTP 422 - Unprocessable Entity
+      return Response::json(422, $errors); // HTTP 422 - Unprocessable Entity
     }
   }
 
 
-  public function updatePatientInfo(int $id): void
+  public function updatePatientInfo(Request $request, int $id)
   {
     $model = App::$app->patient;
-    $updated_patient_info = Request::getBody();
+    $updated_patient_info = $request->getBody();
 
     if (!$updated_patient_info) {
-      Response::response(400);
+      return Response::statusCode(400);
     }
 
     $patient_to_update = $model->getById($id);
@@ -80,11 +79,11 @@ class TestsController extends Controller
     $model->load($patient_to_update);
     $errors = $model->save();
 
-    $errors ? Response::response(422, ['errors' => $errors]) : Response::response(204);
+    return $errors ? Response::json(422, ['errors' => $errors]) : Response::statusCode(204);
   }
 
 
-  private function sendCompletionEmail(array $survey)
+  private function sendCompletionEmail(array $survey): void
   {
     $mail = new Mail();
     $patient = $survey['patient'];

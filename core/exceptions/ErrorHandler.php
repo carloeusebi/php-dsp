@@ -3,8 +3,8 @@
 namespace app\core\exceptions;
 
 use app\app\App;
-use Throwable;
 use app\core\utils\Response;
+use Throwable;
 
 class ErrorHandler
 {
@@ -14,7 +14,7 @@ class ErrorHandler
         // logs every exception for debugging purposes
         self::log($exception);
 
-        Response::response(500, [
+        Response::json(500, [
             "code" => $exception->getCode(),
             "message" => $exception->getMessage(),
             "file" => $exception->getFile(),

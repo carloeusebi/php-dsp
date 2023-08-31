@@ -34,6 +34,8 @@ class App
     public File $file;
     public Tag $tag;
 
+    public Request $request;
+
 
     public function __construct()
     {
@@ -54,6 +56,8 @@ class App
         $this->db = new Database();
         $this->router = new Router();
         $this->session = new Session();
+
+        $this->request = new Request();
 
         // models
         $this->user = new User();
@@ -76,7 +80,7 @@ class App
         } catch (RouteNotFoundException | ForbiddenException $e) {
             $code = intval($e->getCode());
             Response::statusCode($code);
-            if ($e instanceof RouteNotFoundException && !Request::isApi())
+            if ($e instanceof RouteNotFoundException && !$this->request->isApi())
                 $this->router->renderView('404');
         }
     }
