@@ -66,12 +66,14 @@ class Router
 
     public function resolve()
     {
-        $path = Request::getPath();
-        $method = Request::getMethod();
+        $request = App::$app->request;
+
+        $path = $request->getPath();
+        $method = $request->getMethod();
 
         // todo remove for production; to allow cors to pass through during testing
-        if (Request::isOption()) {
-            Response::response(200);
+        if ($request->isOption()) {
+            return Response::statusCode(200);
         }
 
         [$callback, $params] = $this->findMatchingRoute($method, $path);
@@ -84,17 +86,18 @@ class Router
          * @var Controller
          */
         $controller = new $callback[0]();
-        $controller->action = $callback[1];
+        $controller->action = $action = $callback[1];
         App::$app->controller = $controller;
 
         // execute controller's middlewares
         $middlewares = $controller->getMiddlewares();
         foreach ($middlewares as $middleware) {
-            $middleware->execute();
+            $middleware->execute($request);
         }
 
-        // call the controller function
-        return $controller->{$controller->action}(...$params);
+        $params = [...$params, $request];
+
+        return call_user_func_array([$controller, $action], $params);
     }
 
     /**

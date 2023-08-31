@@ -18,26 +18,26 @@ class SurveysController extends AdminController
   }
 
 
-  public function getScores(int $id): void
+  public function getScores(int $id)
   {
     if (!$id) {
-      Response::response(400, ['Error' => 'No ID']);
+      return Response::json(400, ['Error' => 'No ID']);
     }
 
     $survey = App::$app->survey->getById($id);
     if (!$survey) {
-      Response::response(404, ['Error' => "No Test found with id $id"]);
+      return Response::json(404, ['Error' => "No Test found with id $id"]);
     }
     if (!$survey['completed']) {
-      Response::response(422, ['Error' => 'Test not completed yet']);
+      return Response::json(422, ['Error' => 'Test not completed yet']);
     }
 
     try {
       $scores = Scores::calculateScores($survey);
     } catch (\Exception $e) {
-      Response::response(422, ['message' => $e->getMessage()]);
+      return Response::json(422, ['message' => $e->getMessage()]);
     }
 
-    Response::response(200, ['survey' => $survey, 'scores' => $scores]);
+    return Response::json(200, ['survey' => $survey, 'scores' => $scores]);
   }
 }

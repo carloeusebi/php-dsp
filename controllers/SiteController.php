@@ -9,9 +9,9 @@ use app\core\utils\Request;
 
 class SiteController extends Controller
 {
-    public function index(): void
+    public function index(Request $request)
     {
-        $view = Request::getPath();
+        $view = $request->getPath();
         $view = $view === '/' ? '/home' : $view;
 
         $pageTitle = Site::getPageTitle($view);
@@ -25,6 +25,6 @@ class SiteController extends Controller
             ->addToParams('errors', $errors)
             ->addToParams('form', $form);
 
-        $this->render($view, $this->params);
+        return $this->render($view, $this->params);
     }
 }

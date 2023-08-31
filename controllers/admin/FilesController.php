@@ -16,16 +16,16 @@ class FilesController extends AdminController
         return App::$app->file;
     }
 
-    public function upload(): void
+    public function upload(Request $request)
     {
         $file_to_upload = $_FILES['file'];
         if (!$file_to_upload) {
-            Response::response(400, ['Error' => 'Missing file to upload']);
+            return Response::json(400, ['Error' => 'Missing file to upload']);
         }
 
-        $data = Request::getBody();
+        $data = $request->getBody();
         if (!$data['patient_id']) {
-            Response::response(400, ['Error' => 'Missing patient ID']);
+            return Response::json(400, ['Error' => 'Missing patient ID']);
         }
 
         $data['name'] = $file_to_upload['name'];
@@ -36,23 +36,23 @@ class FilesController extends AdminController
         $errors = $this->model->save();
 
         if ($errors) {
-            Response::response(422, $errors);
+            return Response::json(422, $errors);
         }
 
         $last_insert_id = intval(App::$app->db->getLastInsertId());
         $last_insert_item = $this->model->getById($last_insert_id);
 
-        Response::response(201, $last_insert_item);
+        return Response::json(201, $last_insert_item);
     }
 
-    public function download(int $id): void
+    public function download(int $id)
     {
         if (!$id) {
-            Response::response(404);
+            return Response::statusCode(404);
         }
         $file = App::$app->file->getById($id);
         if (!$file) {
-            Response::response(404, ['error' => "No file found with id $id"]);
+            return Response::json(404, ['error' => "No file found with id $id"]);
         }
 
         $file_path = $file['path'];
@@ -63,18 +63,18 @@ class FilesController extends AdminController
 
             readfile($file_path);
         } else {
-            Response::response(404, ['Error' => 'File not found']);
+            return Response::json(404, ['Error' => 'File not found']);
         }
     }
 
 
 
 
-    public function delete(int $id): void
+    public function delete(int $id)
     {
         $file = App::$app->file->getById($id);
         if (!$file) {
-            Response::response(404, ['error' => "No file found with id $id"]);
+            return Response::json(404, ['error' => "No file found with id $id"]);
         }
         $file_path = $file['path'];
 

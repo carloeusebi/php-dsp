@@ -17,21 +17,21 @@ class PatientMiddleware extends BaseMiddleware
   }
 
 
-  public function execute(): void
+  public function execute(Request $request): void
   {
     // if the controller's method is inside the actions array it executes the validation. An empty actions array means that all controller's methods are protected by the middleware
     if (empty($this->actions) || in_array(App::$app->controller->action, $this->actions)) {
 
-      if (!self::validateToken()) {
+      if (!self::validateToken($request)) {
         throw new ForbiddenException();
       }
     }
   }
 
 
-  protected static function validateToken(): bool
+  protected static function validateToken(Request $request): bool
   {
-    $token = Request::getBody()['token'] ?? '';
+    $token = $request->getBody()['token'] ?? '';
 
     if (!$token) return false;
 
