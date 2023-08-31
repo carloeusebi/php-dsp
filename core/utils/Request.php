@@ -48,6 +48,12 @@ class Request
     }
 
 
+    static function get(string $key): string
+    {
+        return self::getBody()[$key] ?? '';
+    }
+
+
     static function getBody(): ?array
     {
         $data = [];

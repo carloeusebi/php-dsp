@@ -31,7 +31,7 @@ class PatientMiddleware extends BaseMiddleware
 
   protected static function validateToken(Request $request): bool
   {
-    $token = $request->getBody()['token'] ?? '';
+    $token = $request->get('token');
 
     if (!$token) return false;
 
