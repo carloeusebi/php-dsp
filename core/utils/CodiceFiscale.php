@@ -87,6 +87,6 @@ class CodiceFiscale
         if (strlen($cf) == 16)
             return self::validate_regular($cf);
         else
-            return "Codice Fiscale - la lunghezza del non è valida.";
+            return "Codice Fiscale - la lunghezza del Codice Fiscale non è valida.";
     }
 }
