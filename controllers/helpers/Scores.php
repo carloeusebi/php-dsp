@@ -7,6 +7,7 @@ use Exception;
 
 class Scores
 {
+    private static array $patient;
 
     /**
      * Calculate scores for the given survey questions.
@@ -16,6 +17,8 @@ class Scores
      */
     public static function calculateScores(array $survey): array
     {
+        self::$patient = $survey['patient'];
+
         $scores = [];
 
         foreach ($survey['questions'] as $question) {
@@ -41,7 +44,14 @@ class Scores
         if (empty($variables)) return [];
 
         foreach ($variables as $variable) {
-            $scores[$variable['name']] = self::calculateVariableScore($question, $variable);
+            $score = self::calculateVariableScore($question, $variable);
+            $scores[$variable['name']]['score'] = $score;
+            foreach ($variable['cutoffs'] as $cutoff) {
+                $scores[$variable['name']]['cutoffs'][] = [
+                    'cutoff' => $cutoff['name'],
+                    'scored' => self::checkIfScored($score, $variable, $cutoff)
+                ];
+            }
         }
 
         return $scores;
@@ -132,5 +142,34 @@ class Scores
     private static function getQuestionVariables(int $id): array
     {
         return App::$app->question->getById($id)['variables'] ?? [];
+    }
+
+
+    private static function checkIfScored(int $score, array $variable, array $cutoff): bool
+    {
+        $patient = self::$patient ?? [];
+
+        $from = $cutoff['from'];
+        $to = $cutoff['to'];
+
+        if (isset($variable['genderBased']) && $variable['genderBased'] && !isset($patient['sex'])) {
+            if (!isset($patient['sex'])) {
+                throw new Exception("Uno dei questionari ha cutoffs basati sul sesso ma {$patient['fname']} {$patient['lname']} non ha nessun sesso assegnato.");
+            }
+
+            if ($patient['sex'] === 'F') {
+                $from ?? $cutoff['femFrom'];
+                $to ?? $cutoff['femTo'];
+            }
+        }
+
+        $type = $cutoff['type'];
+
+        if ($type === 'greater-than')
+            return $score > $from;
+        if ($type === 'lesser-than')
+            return $score < $from;
+        else
+            return $score >= $from && $score <= $to;
     }
 }
