@@ -107,7 +107,8 @@ class SurveysFactory extends BaseFactory
 
         $number_of_patients = count($patients);
 
-        $avg_surveys_per_patient = (float) readline("Average surveys per patients (float): ");
+        // $avg_surveys_per_patient = (float) readline("Average surveys per patients (float): ");
+        $avg_surveys_per_patient = 2;
 
         $total_num_of_surveys =  $number_of_patients * $avg_surveys_per_patient;
 

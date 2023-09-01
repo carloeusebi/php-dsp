@@ -20,7 +20,8 @@ class PatientsFactory extends BaseFactory
 
     public function generateAndInsert(): void
     {
-        $number_of_patients = (int) readline("How many patients do you want to generate? ");
+        // $number_of_patients = (int) readline("How many patients do you want to generate? ");
+        $number_of_patients = 80;
 
         for ($i = 1; $i <= $number_of_patients; $i++) {
 
