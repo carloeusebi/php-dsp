@@ -19,13 +19,10 @@ class Scores
     {
         self::$patient = $survey['patient'];
 
-        $scores = [];
-
-        foreach ($survey['questions'] as $question) {
-            $scores[$question['question']] = self::calculateQuestionScore($question);
+        foreach ($survey['questions'] as &$question) {
+            $question['variables'] = self::calculateQuestionScore($question);
         }
-
-        return $scores;
+        return $survey;
     }
 
 
@@ -37,24 +34,18 @@ class Scores
      */
     private static function calculateQuestionScore(array $question): array
     {
-        $scores = [];
-
         $variables = $question['variables'] ? $question['variables'] : self::getQuestionVariables($question['id']);
 
         if (empty($variables)) return [];
 
-        foreach ($variables as $variable) {
+        foreach ($variables as &$variable) {
             $score = self::calculateVariableScore($question, $variable);
-            $scores[$variable['name']]['score'] = $score;
-            foreach ($variable['cutoffs'] as $cutoff) {
-                $scores[$variable['name']]['cutoffs'][] = [
-                    'cutoff' => $cutoff['name'],
-                    'scored' => self::checkIfScored($score, $variable, $cutoff)
-                ];
+            $variable['score'] = $score;
+            foreach ($variable['cutoffs'] as &$cutoff) {
+                $cutoff['scored'] = self::checkIfScored($score, $variable, $cutoff);
             }
         }
-
-        return $scores;
+        return $variables;
     }
 
 
